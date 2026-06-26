@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD Work Records"
+  short_description: "Internal application-development workflow skill for sdd-work-records."
+  default_prompt: "Use $sdd-work-records only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

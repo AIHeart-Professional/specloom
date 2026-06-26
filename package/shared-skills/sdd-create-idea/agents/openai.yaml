@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD Create Idea"
+  short_description: "Internal application-development workflow skill for sdd-create-idea."
+  default_prompt: "Use $sdd-create-idea only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

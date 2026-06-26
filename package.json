@@ -1,0 +1,32 @@
+{
+  "name": "specloom",
+  "version": "1.0.0",
+  "description": "SpecLoom — weave spec-driven development into shipped code. Agents, skills, and repo automation for Cursor and Codex.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "specloom-install": "scripts/install.mjs"
+  },
+  "scripts": {
+    "install:specloom": "node scripts/install.mjs --all",
+    "install:cursor": "node scripts/install.mjs --cursor",
+    "install:codex": "node scripts/install.mjs --codex",
+    "bootstrap": "node scripts/install.mjs --bootstrap"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/specloom.git"
+  },
+  "keywords": [
+    "specloom",
+    "spec-driven-development",
+    "sdd",
+    "cursor",
+    "codex",
+    "ai-agents",
+    "automation"
+  ]
+}

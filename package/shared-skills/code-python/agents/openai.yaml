@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code Python"
+  short_description: "Internal application-development workflow skill for code-python."
+  default_prompt: "Use $code-python only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,12 @@
+{
+  "spec_id": "042",
+  "spec_path": "docs/specs/MMDDYY_short-description.md",
+  "parent_feature": "github:owner/repo#NN",
+  "status": "in_progress",
+  "updated_at": "YYYY-MM-DDTHH:mm:ssZ",
+  "git_spec_branch": null,
+  "layers": [],
+  "tasks": [],
+  "files_index": [],
+  "acceptance_criteria": []
+}

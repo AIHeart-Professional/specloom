@@ -1,0 +1,6 @@
+interface:
+  display_name: "Test React"
+  short_description: "Internal application-development workflow skill for test-react."
+  default_prompt: "Use $test-react only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

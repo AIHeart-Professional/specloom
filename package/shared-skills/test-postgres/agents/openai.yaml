@@ -1,0 +1,6 @@
+interface:
+  display_name: "Test Postgres"
+  short_description: "Internal application-development workflow skill for test-postgres."
+  default_prompt: "Use $test-postgres only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

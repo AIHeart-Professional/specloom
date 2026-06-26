@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD Create Feature"
+  short_description: "Internal application-development workflow skill for sdd-create-feature."
+  default_prompt: "Use $sdd-create-feature only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

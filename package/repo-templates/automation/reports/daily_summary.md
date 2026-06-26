@@ -1,0 +1,25 @@
+# Daily Summary
+
+> Updated by **workflow-coordinator-coordinator** after each run.
+
+## Last run
+
+- **Timestamp:**
+- **Selected action:**
+- **Workflow:**
+- **Spec:**
+- **Task:**
+- **Status:**
+- **Human approval required:**
+
+## Reason for selection
+
+_None yet._
+
+## Known blockers
+
+_None._
+
+## Recommended next step
+
+_Run coordinator loop or await human review._

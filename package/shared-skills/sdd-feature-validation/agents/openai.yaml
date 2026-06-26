@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD Feature Validation"
+  short_description: "Internal application-development workflow skill for sdd-feature-validation."
+  default_prompt: "Use $sdd-feature-validation only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

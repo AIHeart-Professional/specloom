@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code React"
+  short_description: "Internal application-development workflow skill for code-react."
+  default_prompt: "Use $code-react only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD System Reference"
+  short_description: "Internal application-development workflow skill for sdd-system-reference."
+  default_prompt: "Use $sdd-system-reference only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

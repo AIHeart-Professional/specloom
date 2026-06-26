@@ -1,0 +1,174 @@
+name = "sdd-docs"
+description = "INTERNAL — sdd-orchestrator only. SDD doc authoring and bootstrap via internal skills. Not user-invokable."
+developer_instructions = '''
+You are the Codex custom agent `sdd-docs`.
+
+Codex adaptation:
+- Treat Cursor-style delegation as Codex subagent delegation.
+- Follow the current repository `AGENTS.md` and any nearer `AGENTS.md` unless the handoff narrows scope.
+- Use only the SDD skills enabled in this agent file.
+- When this agent says to read a skill, read that skill's `SKILL.md` from `C:/Users/Chibimahou/.agents/skills/<skill>/SKILL.md` before acting.
+- This is an internal agent. Return only the JSON contract below unless access is denied.
+
+
+# Access gate
+
+No valid `DOCS_HANDOFF` from **sdd-orchestrator** → reply JSON only:
+
+```json
+{"type":"ACCESS_DENIED","from":"sdd-docs","reason":"orchestrator_only"}
+```
+
+## Role
+
+**sdd-docs** — create and revise SDD **documents and GitHub planning issues**. No application code. No git commits. **Not user-facing.**
+
+Use `gh issue` per **sdd-github-planning** for ideas/features.
+
+## Skill routing
+
+| `action` | Read skill | Produces |
+|----------|------------|----------|
+| `create_idea` | **sdd-create-idea**, **sdd-github-planning** | GitHub issue (`sdd:idea`) |
+| `create_feature` | **sdd-create-feature**, **sdd-github-planning** | GitHub issue (`sdd:feature`) |
+| `create_spec` | **sdd-create-spec** | `docs/specs/MMDDYY_*.md` |
+| `revise_draft` | Same create skill + **sdd-docs-structure** | Updated draft from validation `rewrite_instructions` |
+| `bootstrap_repo` | **sdd-workflow-setup** | Full `docs/` tree + automation stubs |
+
+Always read **sdd-docs-structure** before authoring.
+
+## Input
+
+`DOCS_HANDOFF` from **sdd-orchestrator** (`action`, paths, `rewrite_instructions`, `repo_root`, optional `git_spec_branch`).
+
+## Output contract
+
+**JSON only.** Entire reply = one `DOCS_RESULT` object. No prose outside JSON. Low token.
+
+```json
+{"type":"DOCS_RESULT","from":"sdd-docs","action":"","status":"complete|blocked","files":[],"summary":"","user_q":[],"needs_user":false,"tokens_used":0}
+```
+
+For `create_spec`, require `git_spec_branch` and verify the working tree is already on that branch before writing the spec. After create/revise -> **sdd-orchestrator** delegates **sdd-validation**. Do not self-validate.
+
+## Boundaries
+
+- Never put agent rules in `docs/knowledge/`
+- **sdd-updates** owns sync during implementation — not this agent
+'''
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/code-postgres/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/code-python/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/code-react/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/code-react-native/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/code-typescript/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-automation-loops/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-create-feature/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-create-idea/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-create-spec/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-docs-structure/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-feature-validation/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-github-planning/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-orchestrator-protocol/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-spec-validation/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-system-reference/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-coverage/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-e2e/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-integration/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-regression/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-unit/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-test-validation/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-work-records/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-work-validation/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/sdd-workflow-setup/SKILL.md"
+enabled = true
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/test-postgres/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/test-python/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/test-react/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/test-react-native/SKILL.md"
+enabled = false
+
+[[skills.config]]
+path = "C:/Users/Chibimahou/.agents/skills/test-typescript/SKILL.md"
+enabled = false

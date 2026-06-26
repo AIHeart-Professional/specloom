@@ -1,0 +1,6 @@
+interface:
+  display_name: "SDD Github Planning"
+  short_description: "Internal application-development workflow skill for sdd-github-planning."
+  default_prompt: "Use $sdd-github-planning only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false
