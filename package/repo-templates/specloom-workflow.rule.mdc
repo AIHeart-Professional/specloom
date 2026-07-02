@@ -1,0 +1,45 @@
+# SpecLoom Implementation Workflow
+
+## User entry
+
+- **specloom-work-creator** — planning
+- **specloom-implement** — implementation
+
+Never `@` internal agents directly.
+
+## Session contract (all 4 orchestrators)
+
+Load **specloom-orchestrator-session**:
+
+1. Work discovery → `no_work` → reply immediately, **no git**
+2. **specloom-git** `task_start` (new branch off `ai-workflow`)
+3. Work on branch
+4. **specloom-git** `task_push` + `merge_to_ai_workflow` before user reply
+
+**Priority:** specs before features. Blocked → no work.
+
+## Pipeline
+
+```
+specloom-implement
+  → specloom-worker (×10) → dev agents + specloom-worker-validation
+  → specloom-validator → specloom-standardized-loop (×3) → domain validators
+  → specloom-tester → specloom-test-loop (×5) → test-standards agents
+  → specloom-update-knowledgebase
+```
+
+## Confidence thresholds
+
+| Gate | Pass |
+|------|------|
+| Worker validation | ≥99 + app_runs |
+| Validator | ≥99 |
+| Tester | 100% coverage |
+
+## Git
+
+**specloom-git** at start + end of every orchestrator session. Base branch **`ai-workflow`**. Delegated sub-agents share parent branch.
+
+## Legacy agents (until full migration)
+
+Help routing still uses `sdd-system-advisor` until `specloom-advisor` lands.

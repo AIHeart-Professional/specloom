@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PACKAGE_ROOT = path.join(REPO_ROOT, "package");
 
-const MANAGED_SKILL_PREFIXES = ["sdd-", "code-", "test-"];
+const MANAGED_SKILL_PREFIXES = ["sdd-", "specloom-", "code-", "test-"];
 const MANAGED_CURSOR_SKILL_PREFIXES = [
   "workflow-coordinator",
   "project-lead",
@@ -23,6 +23,7 @@ const MANAGED_CURSOR_SKILL_PREFIXES = [
   "frontend-developer",
   "backend-developer",
   "database-developer",
+  "specloom-",
 ];
 
 function usage() {
@@ -424,8 +425,8 @@ function main() {
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
-  if (opts.cursor) console.log("Cursor entry agent: sdd-project-lead");
-  if (opts.codex) console.log("Codex entry agent:  sdd-orchestrator");
+  if (opts.cursor) console.log("Cursor entry agents: sdd-project-lead, specloom-implement, specloom-work-creator");
+  if (opts.codex) console.log("Codex entry agents:  sdd-orchestrator, specloom-implement, specloom-work-creator");
 }
 
 try {
