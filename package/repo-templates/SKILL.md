@@ -1,5 +1,5 @@
 ---
-name: technical-writer-workflow-setup
+name: specloom-work-creator-workflow-setup
 description: >-
   INTERNAL — specloom-work-creator agent only. Bootstrap repo docs/ tree and automation stubs.
   Not user-invokable.
@@ -86,7 +86,7 @@ Copy entire [automation/](automation/) folder to `docs/automation/`:
 | `automation/state/blocked_work.json` | `docs/automation/state/blocked_work.json` |
 | `automation/reports/*.md` | `docs/automation/reports/` |
 
-Workflow procedures: global **workflow-coordinator-*** skills (not repo markdown).
+Workflow procedures: global **specloom-*** skills (not repo markdown).
 
 ### Step 5: Ideas + features stubs
 
@@ -96,7 +96,7 @@ Workflow procedures: global **workflow-coordinator-*** skills (not repo markdown
 | `ideas/idea-template.md` | `docs/ideas/idea-template.md` |
 | `features/README.md` | `docs/features/README.md` |
 
-Feature body template: **technical-writer-create-feature** ? `feature-template.md`.
+Feature body template: **specloom-work-creator-create-feature** ? `feature-template.md`.
 
 ### Step 6: Work-records templates
 
@@ -131,9 +131,9 @@ tasks ? manifest ? qa-tester(work)×3 ? qa-tester(test)×3 ? finalize ? auto_close
 
 | Layer | Location | Skill |
 |-------|----------|-------|
-| Ideas | `docs/ideas/` | technical-writer-create-idea + technical-writer-docs-planning |
-| Features | `docs/features/` | technical-writer-create-feature + technical-writer-docs-planning |
-| Specs | `docs/specs/` | technical-writer-create-spec |
+| Ideas | `docs/ideas/` | specloom-work-creator-create-idea + specloom-work-creator-docs-planning |
+| Features | `docs/features/` | specloom-work-creator-create-feature + specloom-work-creator-docs-planning |
+| Specs | `docs/specs/` | specloom-work-creator-create-spec |
 | Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | specloom-knowledgebase-work-records |
-| Workflows | Global **workflow-coordinator-*** skills | specloom-worker-loops |
+| Workflows | Global **specloom-*** skills | specloom-worker-loops |
 | Execute | — | **specloom-implement** ? sub-agents |

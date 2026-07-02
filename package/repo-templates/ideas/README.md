@@ -14,9 +14,9 @@ See [idea-template.md](idea-template.md).
 
 When ready, ask **specloom-implement**: *"Promote idea 001 to a feature"*.
 
-That runs **technical-writer-create-feature**, validates, archives the idea as `promoted`, and creates `docs/features/NNN_*.md`.
+That runs **specloom-work-creator-create-feature**, validates, archives the idea as `promoted`, and creates `docs/features/NNN_*.md`.
 
 ## Skills
 
-- Add idea: **technical-writer-create-idea** (optional)
+- Add idea: **specloom-work-creator-create-idea** (optional)
 - Promote: user → **specloom-implement** only

@@ -1,6 +1,6 @@
 # Daily Summary
 
-> Updated by **workflow-coordinator-coordinator** after each run.
+> Updated by **specloom-orchestrator-session** after each run.
 
 ## Last run
 

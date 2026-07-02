@@ -19,12 +19,12 @@ docs/automation/
 
 | id | Skill |
 |----|-------|
-| `coordinator` | workflow-coordinator-coordinator |
-| `task_execution` | workflow-coordinator-task-execution |
-| `spec_creation` | workflow-coordinator-spec-creation |
-| `feature_definition` | workflow-coordinator-feature-definition (manual only) |
-| `validation` | workflow-coordinator-validation |
-| `auto_closeout` | workflow-coordinator-auto-closeout |
+| `coordinator` | specloom-orchestrator-session |
+| `task_execution` | specloom-worker-task-execution |
+| `spec_creation` | specloom-work-creator-create-spec |
+| `feature_definition` | specloom-work-creator-create-feature (manual only) |
+| `validation` | specloom-validator-orchestration |
+| `auto_closeout` | specloom-update-knowledgebase |
 
 Index: **specloom-worker-loops** skill.
 

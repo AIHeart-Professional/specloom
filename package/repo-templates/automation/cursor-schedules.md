@@ -4,7 +4,7 @@
 
 **Agent (required):** Select **`specloom-implement`** in each automation's agent settings — not `specloom-worker` or any other sub-agent.
 
-Workflow procedures live in **global skills** (`workflow-coordinator-*`), not repo markdown.  
+Workflow procedures live in **global skills** (`specloom-*`), not repo markdown.  
 **specloom-implement** Task-delegates **specloom-worker** and other sub-agents. Sub-agents reply in JSON **to the project lead only**. The **final automation message to you must be natural language** — never raw JSON.
 
 ---
@@ -24,7 +24,7 @@ Task-delegate specloom-worker with action run_until_complete (max_loop_iteration
 
 Sub-agents return JSON to you only — never paste LOOP_RESULT, VALIDATION_RESULT, or other JSON in your final reply. Summarize outcomes in natural language for the user.
 
-Workflow procedures are skills (workflow-coordinator-*), not repo files. Coordinator reads active_work.json workflow id and loads matching skill.
+Workflow procedures are skills (specloom-*), not repo files. Coordinator reads active_work.json workflow id and loads matching skill.
 
 Run continuously until stopReason: idle, blocked, needs_user, awaiting_sign_off, or iteration_cap.
 

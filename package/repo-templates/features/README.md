@@ -6,7 +6,7 @@
 
 Each file: `NNN_short-description.md` (e.g. `014_auth-system.md`)
 
-See **technical-writer-create-feature** → [feature-template.md](../../technical-writer-create-feature/feature-template.md).
+See **specloom-work-creator-create-feature** → [feature-template.md](../../specloom-work-creator-create-feature/feature-template.md).
 
 ## Queue
 
@@ -18,5 +18,5 @@ On Complete → `docs/features/archived/NNN_short-description.md`
 
 ## Skills
 
-- Create/promote: **technical-writer-create-feature**
-- Spawn spec: **technical-writer-create-spec**
+- Create/promote: **specloom-work-creator-create-feature**
+- Spawn spec: **specloom-work-creator-create-spec**

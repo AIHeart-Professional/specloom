@@ -1,11 +1,11 @@
 # Daily Spec Automation
 
-> Superseded by **SDD Loop Engineering**. Use **workflow-coordinator-*** skills + Cursor Automations.
+> Superseded by **SDD Loop Engineering**. Use **specloom-*** skills + Cursor Automations.
 
 ## Primary path
 
 1. Cursor Automation invokes **specloom-implement** with `run_until_complete`
-2. **specloom-worker** loads **workflow-coordinator-*** skill from `active_work.json` ? `workflow` id
+2. **specloom-worker** loads **specloom-*** skill from `active_work.json` ? `workflow` id
 3. Updates `docs/automation/state/active_work.json`
 4. Writes `docs/automation/reports/`
 5. Git push via specloom-git on auto_closeout
