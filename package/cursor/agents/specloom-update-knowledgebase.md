@@ -1,12 +1,12 @@
 ---
 name: specloom-update-knowledgebase
 model: inherit
-description: INTERNAL — specloom-implement only. Updates docs/, work-records, and knowledge files after implementation and testing complete.
+description: INTERNAL — specloom-implement (task_sync) and specloom-tester (finalize_work_records) only. Updates docs/, work-records, and knowledge files.
 ---
 
 # Access gate
 
-No valid `KNOWLEDGEBASE_HANDOFF` from **specloom-implement** → reply JSON only:
+No valid `KNOWLEDGEBASE_HANDOFF` from **specloom-implement** or **specloom-tester** → reply JSON only:
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-update-knowledgebase","reason":"implement_only"}

@@ -6,7 +6,7 @@ description: INTERNAL — specloom-validator only. Code quality loop — max 3 i
 
 # Access gate
 
-No valid `STANDARDIZED_LOOP_HANDOFF` from **specloom-implement** (for **specloom-validator**) → reply JSON only:
+No valid `STANDARDIZED_LOOP_HANDOFF` from **specloom-validator** → reply JSON only:
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-standardized-loop","reason":"validator_only"}
@@ -24,7 +24,7 @@ No valid `STANDARDIZED_LOOP_HANDOFF` from **specloom-implement** (for **specloom
 | **specloom-backend-validator** | backend |
 | **specloom-database-validator** | database |
 
-Invoke only layers in handoff `layers[]`. **Parallel** when multiple layers and `parallel: yes`.
+Parallel when `parallel: yes` and multiple layers.
 
 ## Skills
 
@@ -33,32 +33,16 @@ Invoke only layers in handoff `layers[]`. **Parallel** when multiple layers and 
 
 ## Loop rules
 
-- **Max 3 iterations** per validator session
-- Each iteration: run all active layer validators → aggregate scores
+- **Max 3 iterations**
 - Pass when every active layer `>= 99`
-- On fail: return remediation for implement → worker retry
+- On fail: remediation for **specloom-validator** → user re-runs `@specloom-implement`
 
 ## Output
 
-**JSON only** — `STANDARDIZED_LOOP_RESULT`.
-
-```json
-{
-  "type": "STANDARDIZED_LOOP_RESULT",
-  "from": "specloom-standardized-loop",
-  "status": "pass|fail|in_progress",
-  "attempt": 1,
-  "loopIterations": 1,
-  "layer_results": [],
-  "delegations": [],
-  "aggregated_confidence": 0,
-  "findings": [],
-  "remediation": [],
-  "tokens_used": 0
-}
-```
+**JSON only** — `STANDARDIZED_LOOP_RESULT` to **specloom-validator**.
 
 ## Boundaries
 
-- Return delegations to **specloom-implement** — do not Task directly
+- Return delegations to **specloom-validator** — validator executes Task calls
 - **Do not** edit code
+- **Do not** delegate peer orchestrators

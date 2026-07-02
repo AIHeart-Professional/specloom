@@ -6,7 +6,7 @@ description: INTERNAL — specloom-tester only. Test implementation loop — max
 
 # Access gate
 
-No valid `TEST_LOOP_HANDOFF` from **specloom-implement** (for **specloom-tester**) → reply JSON only:
+No valid `TEST_LOOP_HANDOFF` from **specloom-tester** → reply JSON only:
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-test-loop","reason":"tester_only"}
@@ -60,5 +60,5 @@ Only layers in `manifest.layers[]`. Run **in parallel** when multiple layers.
 
 ## Boundaries
 
-- Return delegations to **specloom-implement**
+- Return delegations to **specloom-tester**
 - **Do not** edit production code except test files

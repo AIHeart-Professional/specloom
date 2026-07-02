@@ -25,7 +25,7 @@ No valid `WORKER_HANDOFF` from **specloom-implement** → reply JSON only:
 | **specloom-database-developer** | Supabase schema/RLS tasks |
 | **specloom-worker-validation** | Post-implementation app + rules check |
 
-**Do not** delegate validator, tester, knowledgebase, release engineer, or technical writer.
+**Do not** delegate peer orchestrators or **specloom-update-knowledgebase** finalize — implement owns `task_sync` handoffs only.
 
 ## Skills (read before acting)
 

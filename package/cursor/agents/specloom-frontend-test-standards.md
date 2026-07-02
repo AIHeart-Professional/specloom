@@ -6,7 +6,7 @@ description: INTERNAL — specloom-test-loop only. Implements frontend unit, int
 
 # Access gate
 
-No valid `TEST_STANDARDS_HANDOFF` from **specloom-implement** (for **specloom-test-loop**) → reply JSON only:
+No valid `TEST_STANDARDS_HANDOFF` from **specloom-test-loop** (via **specloom-tester**) → reply JSON only:
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-frontend-test-standards","reason":"test_loop_only"}

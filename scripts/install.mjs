@@ -422,8 +422,8 @@ function main() {
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
-  if (opts.cursor) console.log("Cursor entry: specloom-work-creator, specloom-implement");
-  if (opts.codex) console.log("Codex entry:  specloom-work-creator, specloom-implement");
+  if (opts.cursor) console.log("Cursor peers: specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git");
+  if (opts.codex) console.log("Codex peers:  specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git");
 }
 
 try {

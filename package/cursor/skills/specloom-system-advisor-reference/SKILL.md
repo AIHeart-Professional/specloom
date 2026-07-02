@@ -10,36 +10,33 @@ disable-model-invocation: true
 
 Global install: `~/.cursor/agents/`, `~/.cursor/skills/`. Repo: `{repo}/docs/`.
 
-## User entry (speak natural language)
+## User entry — five independent peers
 
-| Agent | Role |
-|-------|------|
-| **specloom-work-creator** | Planning — ideas, features, specs |
-| **specloom-implement** | Implementation — code, validation, tests |
+| Agent | Invoke | Role | Loop cap |
+|-------|--------|------|----------|
+| **specloom-work-creator** | `@specloom-work-creator` | Planning | — |
+| **specloom-implement** | `@specloom-implement` | Implementation | worker **10** |
+| **specloom-validator** | `@specloom-validator` | Quality | standardized **3** |
+| **specloom-tester** | `@specloom-tester` | Tests | test **5** |
+| **specloom-git** | `@specloom-git` | Git-only | — |
 
-## Orchestrators (internal unless invoked directly)
+**Peers never Task-delegate each other.** User chains manually.
 
-| Agent | Role |
-|-------|------|
-| **specloom-worker** | Implementation loop (≤10) |
-| **specloom-validator** | Draft + code quality |
-| **specloom-tester** | Test suite (100% coverage) |
-| **specloom-git** | Branches, push, merge (`ai-workflow`) |
+## Sub-agents (internal)
 
-## Domain agents
-
-| Agent | Layer |
-|-------|-------|
-| **specloom-frontend-developer** | UI |
-| **specloom-backend-developer** | API |
-| **specloom-database-developer** | Supabase/Postgres |
-| **specloom-*-validator** | Per-layer quality |
-| **specloom-*-test-standards** | Per-layer tests |
-| **specloom-update-knowledgebase** | Docs sync |
+| Agent | Parent | Role |
+|-------|--------|------|
+| **specloom-worker** | implement | Implementation loop (≤10) |
+| **specloom-standardized-loop** | validator | Quality loop (≤3) |
+| **specloom-test-loop** | tester | Test loop (≤5) |
+| **specloom-*-developer** | worker | Per-layer code |
+| **specloom-*-validator** | standardized-loop | Per-layer quality |
+| **specloom-*-test-standards** | test-loop | Per-layer tests |
+| **specloom-update-knowledgebase** | implement / tester | Docs sync |
 
 ## Session contract
 
-All orchestrators: work discovery → `no_work` or git `task_start` → work → git merge → reply.
+All peers: work discovery → `no_work` or git `task_start` → scope → git merge → reply.
 
 **Priority:** specs before features.
 
@@ -47,13 +44,13 @@ All orchestrators: work discovery → `no_work` or git `task_start` → work →
 
 | Skill | Purpose |
 |-------|---------|
-| **specloom-orchestrator-session** | Work queue + git bookends |
+| **specloom-orchestrator-session** | Independence + work queue + git bookends |
 | **specloom-implement-protocol** | Handoff JSON schemas |
 | **specloom-work-creator-*** | Planning docs |
 | **code-*** / **test-*** | Universal coding/testing standards |
 
 ## Output contract
 
-User-facing agents → natural language. All other `specloom-*` → JSON only.
+Five peer orchestrators → natural language. All other `specloom-*` → JSON only.
 
 See **WORKFLOW.md** in the specloom repo for full lifecycle.

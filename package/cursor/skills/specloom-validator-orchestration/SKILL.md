@@ -13,11 +13,11 @@ Runs after **specloom-worker-validation** passes.
 ## Procedure
 
 1. Build `STANDARDIZED_LOOP_HANDOFF` with `max_loop_iterations: 3`
-2. Delegate **specloom-standardized-loop** via **specloom-implement**
+2. Delegate **specloom-standardized-loop** (Task) — validator executes, not implement
 3. On each `STANDARDIZED_LOOP_RESULT`:
-   - If `status: pass` → return `VALIDATION_RESULT` with `confidence_score >= 99`
-   - If `status: fail` and attempts < 3 → return remediation to implement → worker
-   - If attempts = 3 → build `spec_validation_section`, return fail
+   - If `status: pass` → reply user pass
+   - If `status: fail` and attempts < 3 → retry loop
+   - If attempts = 3 → build `spec_validation_section`, append to spec, tell user `@specloom-implement`
 
 ## Aggregation
 
@@ -31,7 +31,7 @@ confidence_score = min(layer_scores.values())
 
 Generate markdown per **specloom-implement-protocol** → `## Validation Results` block.
 
-Implement appends to spec file before stopping session.
+**Validator** appends to spec file before stopping session.
 
 ## Findings merge
 

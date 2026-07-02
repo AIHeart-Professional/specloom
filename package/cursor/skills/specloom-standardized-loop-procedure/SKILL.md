@@ -14,7 +14,7 @@ disable-model-invocation: true
 
 1. For each layer in `layers[]`:
    - Build `DOMAIN_VALIDATION_HANDOFF`
-   - Return delegation to **specloom-implement**
+   - Return delegation to **specloom-validator** — validator executes Task calls
 2. When `parallel: true` and multiple layers → single iteration with parallel delegations
 3. Aggregate `DOMAIN_VALIDATION_RESULT` scores:
    - `aggregated_confidence = min(layer confidence_scores)` (weakest link)

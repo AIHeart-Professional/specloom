@@ -4,7 +4,11 @@
 
 SpecLoom is an installable spec-driven workflow for [Cursor](https://cursor.com) and [OpenAI Codex](https://openai.com/codex). It turns a codebase into a **spec loom**: ideas become features, features become dated specs, specs become validated implementation, and completed work merges back to a stable integration branch — with human sign-off at the draft stage and automation everywhere else.
 
-You talk to **specloom-work-creator** (planning) or **specloom-implement** (implementation). It delegates a full engineering crew behind the scenes.
+You invoke **five peer orchestrators** independently — they **never** call each other:
+
+`@specloom-work-creator` · `@specloom-implement` · `@specloom-validator` · `@specloom-tester` · `@specloom-git`
+
+Chain them manually in that order for a full pipeline.
 
 ---
 
@@ -110,42 +114,41 @@ The workflow coordinator always prefers **finishing in-flight work** over starti
 4. Idle                             → stop
 ```
 
-### Gate sequence (implementation)
+### Gate sequence (user pipeline)
 
 ```
-All Ready tasks implemented
-  → QA work validation (×3 max)
-  → QA test validation (×3 max)
-  → Records keeper finalizes work-records
-  → Release engineer: push → PR → merge to ai-workflow → delete branch → archive spec
+@specloom-work-creator   → planning + sign-off
+@specloom-implement      → worker loop (≤10) + worker-validation
+@specloom-validator      → standardized loop (≤3)
+@specloom-tester         → test loop (≤5)
 ```
 
-Draft specs and features **pause for your sign-off** after QA validation passes (≥99%). You get a review card with summary, estimated tokens, and open questions — reply **approved** / **sign off** in chat to continue. Implementation work/test gates still auto-advance.
+Each step is a **separate chat invocation**. No orchestrator auto-chains the next.
+
+Git bookends run inside each orchestrator session (or invoke `@specloom-git` standalone).
 
 ### Architecture
 
 ```mermaid
-flowchart TB
-  USER[You] --> PL[specloom-implement / specloom-implement]
-  AUTO[Scheduled automation] --> PL
+flowchart LR
+  USER[You]
 
-  PL --> WC[specloom-worker]
-  PL --> TW[specloom-work-creator]
-  PL --> QA[specloom-validator]
-  PL --> FE[specloom-frontend-developer]
-  PL --> BE[specloom-backend-developer]
-  PL --> DB[specloom-database-developer]
-  PL --> RK[specloom-update-knowledgebase]
-  PL --> RE[specloom-git]
-  PL --> SA[specloom-system-advisor]
+  USER --> WC[specloom-work-creator]
+  USER --> IMP[specloom-implement]
+  USER --> VAL[specloom-validator]
+  USER --> TST[specloom-tester]
+  USER --> GIT[specloom-git]
 
-  WC --> STATE[docs/automation/state/]
-  TW --> SPECS[docs/specs/]
-  QA --> WR[docs/specs/work-records/]
-  RE --> GIT[ai-workflow branch]
+  IMP --> WRK[specloom-worker]
+  VAL --> STD[specloom-standardized-loop]
+  TST --> TLP[specloom-test-loop]
+
+  WRK --> DEV[specloom-*-developer]
+  STD --> VLD[specloom-*-validator]
+  TLP --> TSTSTD[specloom-*-test-standards]
 ```
 
-**Critical rule:** Only the specloom-implement speaks to you in natural language. Every other agent returns JSON internally; the lead summarizes outcomes.
+**Critical rule:** Five peer orchestrators speak to you in natural language. Sub-agents return JSON only. **Peers never Task-delegate each other.**
 
 ---
 
@@ -428,16 +431,17 @@ See `docs/automation/git-workflow.md` in bootstrapped repos for full detail.
 
 | Agent | Role |
 |-------|------|
-| **specloom-implement** | user entry for implementation; delegates everyone |
-| **specloom-worker** | Loop routing, handoffs, gate sequences |
-| **specloom-work-creator** | Ideas, features, specs, repo bootstrap |
-| **specloom-validator** | All validation gates (work, test, feature, spec) |
-| **specloom-frontend-developer** | UI implementation |
-| **specloom-backend-developer** | API implementation |
-| **specloom-database-developer** | Supabase / Postgres |
-| **specloom-update-knowledgebase** | Work-records, manifest, archive |
-| **specloom-git** | Git, PRs, merges |
-| **specloom-system-advisor** | SDD system help |
+| **specloom-work-creator** | Planning — ideas, features, specs |
+| **specloom-implement** | Implementation — **specloom-worker** only (≤10) |
+| **specloom-validator** | Quality — **standardized-loop** only (≤3) |
+| **specloom-tester** | Tests — **test-loop** only (≤5) |
+| **specloom-git** | Git-only sessions |
+| **specloom-worker** | Implementation sub-loop |
+| **specloom-standardized-loop** | Validation sub-loop |
+| **specloom-test-loop** | Test sub-loop |
+| **specloom-*-developer** | Per-layer code |
+| **specloom-update-knowledgebase** | Work-records sync |
+| **specloom-system-advisor** | SpecLoom system help |
 
 ### Codex (`~/.codex/agents/`)
 

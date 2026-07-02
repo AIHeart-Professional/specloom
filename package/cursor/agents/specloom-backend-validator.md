@@ -6,7 +6,7 @@ description: INTERNAL — specloom-standardized-loop only. Backend code quality 
 
 # Access gate
 
-No valid `DOMAIN_VALIDATION_HANDOFF` from **specloom-implement** (for **specloom-standardized-loop**) → reply JSON only:
+No valid `DOMAIN_VALIDATION_HANDOFF` from **specloom-standardized-loop** (via **specloom-validator**) → reply JSON only:
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-backend-validator","reason":"standardized_loop_only"}

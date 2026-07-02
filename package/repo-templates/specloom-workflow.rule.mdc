@@ -1,45 +1,38 @@
-# SpecLoom Implementation Workflow
+---
+description: SpecLoom peer orchestrator rules
+alwaysApply: true
+---
+
+# SpecLoom Workflow
+
+## Five independent peer orchestrators
+
+`specloom-work-creator` · `specloom-implement` · `specloom-validator` · `specloom-tester` · `specloom-git`
+
+**Never delegate peer → peer.** User invokes each separately.
 
 ## User entry
 
-- **specloom-work-creator** — planning
-- **specloom-implement** — implementation
+| Agent | Role |
+|-------|------|
+| **specloom-work-creator** | Planning |
+| **specloom-implement** | Implementation (**specloom-worker** only, ≤10) |
+| **specloom-validator** | Quality (**standardized-loop** only, ≤3) |
+| **specloom-tester** | Tests (**test-loop** only, ≤5) |
+| **specloom-git** | Git-only sessions |
 
-Never `@` internal agents directly.
+## Session contract
 
-## Session contract (all 4 orchestrators)
+Load **specloom-orchestrator-session**: work discovery → git start → scope → git merge → reply.
 
-Load **specloom-orchestrator-session**:
+Each orchestrator runs git via **specloom-git-workflow** (shell), not by calling `@specloom-git`.
 
-1. Work discovery → `no_work` → reply immediately, **no git**
-2. **specloom-git** `task_start` (new branch off `ai-workflow`)
-3. Work on branch
-4. **specloom-git** `task_push` + `merge_to_ai_workflow` before user reply
-
-**Priority:** specs before features. Blocked → no work.
-
-## Pipeline
+## Pipeline order (user manual)
 
 ```
-specloom-implement
-  → specloom-worker (×10) → dev agents + specloom-worker-validation
-  → specloom-validator → specloom-standardized-loop (×3) → domain validators
-  → specloom-tester → specloom-test-loop (×5) → test-standards agents
-  → specloom-update-knowledgebase
+work-creator → implement → validator → tester
 ```
-
-## Confidence thresholds
-
-| Gate | Pass |
-|------|------|
-| Worker validation | ≥99 + app_runs |
-| Validator | ≥99 |
-| Tester | 100% coverage |
 
 ## Git
 
-**specloom-git** at start + end of every orchestrator session. Base branch **`ai-workflow`**. Delegated sub-agents share parent branch.
-
-## Legacy
-
-All `sdd-*` agents removed. See **MIGRATION.md** for rename map.
+Base branch **`ai-workflow`**.

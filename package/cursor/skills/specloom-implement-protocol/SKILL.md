@@ -16,23 +16,41 @@ Load **specloom-orchestrator-session** for work discovery, no_work, git bookends
 
 | Agent | User-facing |
 |-------|-------------|
-| **specloom-implement** | Yes — sole human voice |
+| **specloom-work-creator** | Yes |
+| **specloom-implement** | Yes |
+| **specloom-validator** | Yes |
+| **specloom-tester** | Yes |
+| **specloom-git** | Yes |
 | **All other specloom-* agents** | **No** — JSON only |
 
-Sub-agent rules:
-1. Entire reply = one JSON object
-2. Low token — short keys, omit null/empty
-3. Access denied → `{"type":"ACCESS_DENIED","from":"<agent>","reason":"..."}`
+## Independence
 
-## Gate order (implementation)
+Peer orchestrators **never** delegate each other. User runs each step manually.
+
+## User pipeline order (recommended)
 
 ```
-Ready tasks
-  → specloom-worker (≤10)
-  → specloom-worker-validation (confidence ≥99, app_runs)
-  → specloom-validator → specloom-standardized-loop (≤3, confidence ≥99)
-  → specloom-tester → specloom-test-loop (≤5, coverage 100%)
-  → specloom-update-knowledgebase
+specloom-work-creator → specloom-implement → specloom-validator → specloom-tester
+```
+
+Git bookends: each orchestrator runs **specloom-git-workflow** via shell, or user invokes `@specloom-git`.
+
+## specloom-implement scope only
+
+```
+Ready tasks → specloom-worker (≤10) → worker-validation
+```
+
+## specloom-validator scope only
+
+```
+specloom-standardized-loop (≤3) OR draft-validation skill
+```
+
+## specloom-tester scope only
+
+```
+specloom-test-loop (≤5)
 ```
 
 ## WORKER_HANDOFF → specloom-worker
@@ -83,11 +101,11 @@ WORKER_VALIDATION_HANDOFF:
 
 ## VALIDATOR_HANDOFF → specloom-validator
 
-Called by **specloom-work-creator** (draft) or **specloom-implement** (implementation).
+Called by **specloom-validator** only — never from **specloom-implement** or other peers.
 
 ```yaml
 VALIDATOR_HANDOFF:
-  from: specloom-work-creator | specloom-implement
+  from: specloom-validator
   validation_mode: draft | implementation
   session_owner: true | false
   git_task_branch: ""   # required when session_owner: false
@@ -103,13 +121,15 @@ VALIDATOR_HANDOFF:
   attempt: 1
 ```
 
-## GIT_HANDOFF → specloom-git
+## GIT workflow (peer orchestrators)
 
-Called by all four orchestrators. **Session owner** calls start + merge; delegates pass `git_task_branch` only.
+Peers run **specloom-git-workflow** via shell — **not** `GIT_HANDOFF` to `@specloom-git` agent.
+
+`@specloom-git` is a standalone peer for git-only sessions.
 
 ```yaml
-GIT_HANDOFF:
-  from: specloom-work-creator | specloom-implement | specloom-validator | specloom-tester
+GIT_SESSION:
+  from: specloom-work-creator | specloom-implement | specloom-validator | specloom-tester | specloom-git
   action: task_start | task_push | merge_to_ai_workflow | open_pr
   session_owner: true | false
   git_base_branch: ai-workflow
@@ -139,7 +159,7 @@ Never user-reply between work and merge.
 
 ```yaml
 STANDARDIZED_LOOP_HANDOFF:
-  from: specloom-implement
+  from: specloom-validator
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
   layers: [frontend, backend]
@@ -152,7 +172,7 @@ STANDARDIZED_LOOP_HANDOFF:
 
 ```yaml
 DOMAIN_VALIDATION_HANDOFF:
-  from: specloom-implement
+  from: specloom-standardized-loop
   layer: frontend | backend | database
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
@@ -165,7 +185,7 @@ DOMAIN_VALIDATION_HANDOFF:
 
 ```yaml
 TESTER_HANDOFF:
-  from: specloom-implement | user
+  from: specloom-tester
   session_owner: true | false
   git_task_branch: ""
   spec: docs/specs/MMDDYY_name.md
@@ -179,7 +199,7 @@ TESTER_HANDOFF:
 
 ```yaml
 TEST_LOOP_HANDOFF:
-  from: specloom-implement
+  from: specloom-tester
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
   layers: [frontend, backend]
@@ -192,7 +212,7 @@ TEST_LOOP_HANDOFF:
 
 ```yaml
 TEST_STANDARDS_HANDOFF:
-  from: specloom-implement
+  from: specloom-test-loop
   layer: frontend | backend | database
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
@@ -205,7 +225,7 @@ TEST_STANDARDS_HANDOFF:
 
 ```yaml
 KNOWLEDGEBASE_HANDOFF:
-  from: specloom-implement
+  from: specloom-implement | specloom-tester
   action: task_sync | finalize_work_records | archive_spec | sync_knowledge
   spec_id: "014"
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json

@@ -1,12 +1,14 @@
 ---
 name: specloom-system-advisor
 model: inherit
-description: INTERNAL — specloom-work-creator and specloom-implement only. SpecLoom system help via specloom-specloom-system-advisor-reference skill.
+description: INTERNAL — peer orchestrators only. SpecLoom system help via specloom-specloom-system-advisor-reference skill.
 ---
 
 # Access gate
 
-No valid `HELP_HANDOFF` from **specloom-work-creator** or **specloom-implement** → JSON only:
+No valid `HELP_HANDOFF` from any peer orchestrator → JSON only:
+
+`specloom-work-creator` · `specloom-implement` · `specloom-validator` · `specloom-tester` · `specloom-git`
 
 ```json
 {"type":"ACCESS_DENIED","from":"specloom-system-advisor","reason":"orchestrator_only"}
