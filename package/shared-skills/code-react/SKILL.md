@@ -1,7 +1,7 @@
 ---
 name: code-react
 description: >-
-  INTERNAL � sdd-frontend agents only. Universal react coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer agents only. Universal react coding standards. Not user-invokable.
 ---
 
 # React Core Standards
@@ -131,4 +131,4 @@ Components and Hooks must be:
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

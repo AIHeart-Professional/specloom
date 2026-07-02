@@ -1,6 +1,6 @@
 # SDD Loop Automation
 
-Workflow procedures live in **global skills** (`workflow-coordinator-*`), not repo markdown.
+Workflow procedures live in **global skills** (`specloom-worker-*`), not repo markdown.
 
 **specloom-work-creator** is user entry. Ideas/features live in `docs/ideas/` and `docs/features/`.
 
@@ -26,6 +26,6 @@ docs/automation/
 | `validation` | workflow-coordinator-validation |
 | `auto_closeout` | workflow-coordinator-auto-closeout |
 
-Index: **workflow-coordinator-loops** skill.
+Index: **specloom-worker-loops** skill.
 
 Git base: **`ai-workflow`**.

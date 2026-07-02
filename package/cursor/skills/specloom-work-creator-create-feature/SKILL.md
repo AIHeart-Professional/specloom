@@ -82,7 +82,7 @@ When spawning a spec from Spec Queue row:
 1. All Acceptance Criteria checked
 2. All spawned specs archived
 3. Token Budget synced
-4. **sdd-records-keeper** moves file to `docs/features/archived/`, `status: Complete`
+4. **specloom-update-knowledgebase** moves file to `docs/features/archived/`, `status: Complete`
 
 ## Related
 

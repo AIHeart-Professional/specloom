@@ -1,6 +1,0 @@
-interface:
-  display_name: "SDD Work Validation"
-  short_description: "Internal application-development workflow skill for sdd-work-validation."
-  default_prompt: "Use $sdd-work-validation only from its assigned SDD custom agent."
-policy:
-  allow_implicit_invocation: false

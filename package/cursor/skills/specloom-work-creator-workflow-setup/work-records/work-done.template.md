@@ -22,4 +22,4 @@ started: YYYY-MM-DD
 
 ---
 
-<!-- sdd-records-keeper appends a new ### block after each task completes -->
+<!-- specloom-update-knowledgebase appends a new ### block after each task completes -->

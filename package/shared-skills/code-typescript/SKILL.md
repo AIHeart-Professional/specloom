@@ -1,7 +1,7 @@
 ---
 name: code-typescript
 description: >-
-  INTERNAL � sdd-frontend, sdd-backend agents only. Universal typescript coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer, specloom-backend-developer agents only. Universal typescript coding standards. Not user-invokable.
 ---
 
 # TypeScript Core Standards
@@ -108,4 +108,4 @@ Universal TypeScript standards for all projects. Apply to every `.ts` / `.tsx` f
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

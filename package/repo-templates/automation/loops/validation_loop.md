@@ -80,11 +80,11 @@ On failure:
 
 ## Final spec validation (all tasks complete)
 
-When all spec tasks complete, **sdd-orchestrator** must:
+When all spec tasks complete, **specloom-implement** must:
 
-1. Delegate **sdd-validation** (`validation_type: work`) — max 3 (`workValidationAttempts`)
-2. On pass → **sdd-validation** (`validation_type: test`) — max 3 (`testingAttempts`); pass bar ≥ 99% confidence on coverage + test quality
-3. On pass → **sdd-updates** finalize work-records
+1. Delegate **specloom-validator** (`validation_type: work`) — max 3 (`workValidationAttempts`)
+2. On pass → **specloom-validator** (`validation_type: test`) — max 3 (`testingAttempts`); pass bar ≥ 99% confidence on coverage + test quality
+3. On pass → **specloom-update-knowledgebase** finalize work-records
 5. Route to `review_loop.md`
 6. **No git** until review approved
 

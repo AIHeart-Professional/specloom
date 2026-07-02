@@ -1,7 +1,7 @@
 ---
 name: test-typescript
 description: >-
-  INTERNAL — sdd-validation, sdd-frontend, sdd-backend agents. Universal TypeScript/JavaScript
+  INTERNAL — specloom-validator, specloom-frontend-developer, specloom-backend-developer agents. Universal TypeScript/JavaScript
   testing standards. Pair with code-typescript. Not user-invokable.
 ---
 
@@ -30,7 +30,7 @@ Read `AGENTS.md` for project choice.
 
 ## Coverage
 
-- 100% lines + branches on spec-touched files (see **sdd-test-coverage**).
+- 100% lines + branches on spec-touched files (see **specloom-frontend-test-standards-rules**).
 - Cover error paths, empty input, and boundary values.
 - Every exported function/hook needs at least one test.
 
@@ -52,4 +52,4 @@ Read `AGENTS.md` for project choice.
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

@@ -1,8 +1,8 @@
 ---
 name: specloom-work-creator-docs-planning
 description: >-
-  INTERNAL — sdd-workflow-coordinator, specloom-work-creator, specloom-validator,
-  sdd-records-keeper. Query and allocate docs/ideas and docs/features. Not user-invokable.
+  INTERNAL — specloom-worker, specloom-work-creator, specloom-validator,
+  specloom-update-knowledgebase. Query and allocate docs/ideas and docs/features. Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -69,7 +69,7 @@ Features are worked **only when no spec planning or implementation queue items e
 1. All Acceptance Criteria checked
 2. All spawned specs in `docs/specs/archived/`
 3. Token Budget actuals filled
-4. **sdd-records-keeper** sets `status: Complete`, moves file to `docs/features/archived/`
+4. **specloom-update-knowledgebase** sets `status: Complete`, moves file to `docs/features/archived/`
 
 ## active_work.json fields
 

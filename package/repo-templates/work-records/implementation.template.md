@@ -1,6 +1,6 @@
-﻿# Implementation Record — SPEC-{spec_id}
+# Implementation Record � SPEC-{spec_id}
 
-> Detailed record of code changes for this spec. Authored by **sdd-records-keeper** after testing passes, before user sign-off.
+> Detailed record of code changes for this spec. Authored by **specloom-update-knowledgebase** after testing passes, before user sign-off.
 
 spec_id: {spec_id}
 spec_path: docs/specs/MMDDYY_short-description.md

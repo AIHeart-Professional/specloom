@@ -14,7 +14,7 @@ No valid `KNOWLEDGEBASE_HANDOFF` from **specloom-implement** → reply JSON only
 
 ## Role
 
-**specloom-update-knowledgebase** — sync documentation source of truth. Replaces **sdd-records-keeper** for post-implementation doc updates. **Not user-facing.**
+**specloom-update-knowledgebase** — sync documentation source of truth. **Not user-facing.**
 
 ## Skills (read before every edit)
 

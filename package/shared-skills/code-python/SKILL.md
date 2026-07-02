@@ -1,7 +1,7 @@
 ---
 name: code-python
 description: >-
-  INTERNAL � sdd-backend agents only. Universal python coding standards. Not user-invokable.
+  INTERNAL � specloom-backend-developer agents only. Universal python coding standards. Not user-invokable.
 ---
 
 # Python Core Standards
@@ -130,4 +130,4 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

@@ -11,20 +11,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PACKAGE_ROOT = path.join(REPO_ROOT, "package");
 
-const MANAGED_SKILL_PREFIXES = ["sdd-", "specloom-", "code-", "test-"];
-const MANAGED_CURSOR_SKILL_PREFIXES = [
-  "workflow-coordinator",
-  "project-lead",
-  "system-advisor",
-  "technical-writer",
-  "qa-tester",
-  "records-keeper",
-  "release-engineer",
-  "frontend-developer",
-  "backend-developer",
-  "database-developer",
-  "specloom-",
-];
+const MANAGED_SKILL_PREFIXES = ["specloom-", "code-", "test-"];
+const MANAGED_CURSOR_SKILL_PREFIXES = ["specloom-"];
 
 function usage() {
   console.log(`SpecLoom installer
@@ -181,7 +169,7 @@ function installCursor({ force, dryRun }) {
   const agents = copyTree({
     source: cursorAgentsSrc,
     target: cursorAgentsDest,
-    filter: (base) => base.endsWith(".md") || fs.existsSync(path.join(cursorAgentsSrc, base)),
+    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
     force,
     dryRun,
     label: "cursor/agents",
@@ -218,14 +206,14 @@ function installCodex({ force, dryRun }) {
   const agents = copyTree({
     source: codexAgentsSrc,
     target: codexAgentsDest,
-    filter: () => true,
+    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
     transform: rewriteCodexAgent,
     force,
     dryRun,
     label: "codex/agents",
   });
 
-  const skills = copyTree({
+  const shared = copyTree({
     source: sharedSkillsSrc,
     target: sharedSkillsDest,
     filter: (base) => isManagedSkillName(base),
@@ -234,7 +222,16 @@ function installCodex({ force, dryRun }) {
     label: "shared-skills",
   });
 
-  return { agents, skills };
+  const specloomSkills = copyTree({
+    source: path.join(PACKAGE_ROOT, "cursor", "skills"),
+    target: sharedSkillsDest,
+    filter: (base) => base.startsWith("specloom-"),
+    force,
+    dryRun,
+    label: "specloom-skills→codex",
+  });
+
+  return { agents, skills: shared, specloomSkills };
 }
 
 function readTemplate(name) {
@@ -347,7 +344,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
 
   writeIfMissing(
     path.join(repoRoot, "docs", "workflows", "agent-orchestration.md"),
-    `# Agent Orchestration\n\nUser entry: **sdd-project-lead** (Cursor) or **sdd-orchestrator** (Codex).\n\nInstall SpecLoom globally, then talk to the project lead in chat or via scheduled automations.\n`,
+    `# Agent Orchestration\n\nUser entry: **specloom-work-creator** (planning) and **specloom-implement** (implementation).\n\nSee WORKFLOW.md in the specloom package and \`docs/workflows/\`.\n`,
     { force, dryRun },
   );
 
@@ -398,7 +395,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
     const existing = fs.readFileSync(gitignorePath, "utf8");
     if (!existing.includes("automation_inputs/")) {
       fs.appendFileSync(gitignorePath, gitignoreBlock, "utf8");
-      console.log(`[ok] bootstrap: appended SDD entries to .gitignore`);
+      console.log(`[ok] bootstrap: appended SpecLoom entries to .gitignore`);
     }
   }
 
@@ -425,8 +422,8 @@ function main() {
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
-  if (opts.cursor) console.log("Cursor entry agents: sdd-project-lead, specloom-implement, specloom-work-creator");
-  if (opts.codex) console.log("Codex entry agents:  sdd-orchestrator, specloom-implement, specloom-work-creator");
+  if (opts.cursor) console.log("Cursor entry: specloom-work-creator, specloom-implement");
+  if (opts.codex) console.log("Codex entry:  specloom-work-creator, specloom-implement");
 }
 
 try {

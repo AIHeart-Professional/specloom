@@ -1,7 +1,7 @@
 ---
 name: code-postgres
 description: >-
-  INTERNAL � sdd-database agents only. Universal postgres coding standards. Not user-invokable.
+  INTERNAL � specloom-database-developer agents only. Universal postgres coding standards. Not user-invokable.
 ---
 
 # PostgreSQL / Supabase Core Standards
@@ -148,4 +148,4 @@ UPDATE requires a matching **SELECT policy** — without it, updates silently af
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

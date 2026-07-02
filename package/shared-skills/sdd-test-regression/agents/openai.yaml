@@ -1,6 +1,0 @@
-interface:
-  display_name: "SDD Test Regression"
-  short_description: "Internal application-development workflow skill for sdd-test-regression."
-  default_prompt: "Use $sdd-test-regression only from its assigned SDD custom agent."
-policy:
-  allow_implicit_invocation: false

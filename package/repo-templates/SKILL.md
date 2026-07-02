@@ -1,7 +1,7 @@
-﻿---
+---
 name: technical-writer-workflow-setup
 description: >-
-  INTERNAL — sdd-technical-writer agent only. Bootstrap repo docs/ tree and automation stubs.
+  INTERNAL � specloom-work-creator agent only. Bootstrap repo docs/ tree and automation stubs.
   Not user-invokable.
 disable-model-invocation: true
 ---
@@ -96,7 +96,7 @@ Workflow procedures: global **workflow-coordinator-*** skills (not repo markdown
 | `ideas/idea-template.md` | `docs/ideas/idea-template.md` |
 | `features/README.md` | `docs/features/README.md` |
 
-Feature body template: **technical-writer-create-feature** → `feature-template.md`.
+Feature body template: **technical-writer-create-feature** ? `feature-template.md`.
 
 ### Step 6: Work-records templates
 
@@ -113,7 +113,7 @@ docs/images/private/
 
 `docs/automation/state/` is **committed**.
 
-### Step 8–9: Verify
+### Step 8�9: Verify
 
 - `active_work.json` uses `workflow` id (e.g. `coordinator`)
 - Idea/feature folders exist
@@ -124,7 +124,7 @@ docs/images/private/
 ## Gate order
 
 ```
-tasks → manifest → qa-tester(work)×3 → qa-tester(test)×3 → finalize → auto_closeout → git
+tasks ? manifest ? qa-tester(work)�3 ? qa-tester(test)�3 ? finalize ? auto_closeout ? git
 ```
 
 ## Models
@@ -134,6 +134,6 @@ tasks → manifest → qa-tester(work)×3 → qa-tester(test)×3 → finalize �
 | Ideas | `docs/ideas/` | technical-writer-create-idea + technical-writer-docs-planning |
 | Features | `docs/features/` | technical-writer-create-feature + technical-writer-docs-planning |
 | Specs | `docs/specs/` | technical-writer-create-spec |
-| Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | records-keeper-work-records |
-| Workflows | Global **workflow-coordinator-*** skills | workflow-coordinator-loops |
-| Execute | — | **sdd-project-lead** → sub-agents |
+| Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | specloom-knowledgebase-work-records |
+| Workflows | Global **workflow-coordinator-*** skills | specloom-worker-loops |
+| Execute | � | **specloom-implement** ? sub-agents |

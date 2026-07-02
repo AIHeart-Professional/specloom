@@ -54,6 +54,7 @@ Pass `git_task_branch` to every handoff.
 | **specloom-tester** | After validator pass |
 | **specloom-update-knowledgebase** | After tester pass |
 | **specloom-work-creator** | User asks planning only |
+| **specloom-system-advisor** | SpecLoom system help |
 
 ## No work includes
 

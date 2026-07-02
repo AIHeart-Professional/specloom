@@ -33,7 +33,7 @@ Git base branch: **`ai-workflow`**. See `docs/automation/git-workflow.md`.
 | Spec created | Fill **Token Budget** + frontmatter `estimated_tokens`; estimate each task row |
 | Task completes | Set task **Used**; add task `tokens_used` from agent Result |
 | Spec sign-off | Sum task Used ? spec **Tokens used**; compute **Variance**; sync frontmatter |
-| Spec archived | **sdd-records-keeper** rolls spec totals into parent feature **Per-spec rollup** |
+| Spec archived | **specloom-update-knowledgebase** rolls spec totals into parent feature **Per-spec rollup** |
 
 Variance formula: **`token_variance = tokens_used - estimated_tokens`**.
 
@@ -105,14 +105,14 @@ Validate before `Pending`:
 - Append **Changes** row per file touched: Date, Task ID, File, What changed
 - Update task checkboxes
 - Do not add Required Context paths mid-flight without user approval + spec update
-- Subagents return `changes` in Result ? sdd-records-keeper merges into spec **Changes**
+- Subagents return `changes` in Result ? specloom-update-knowledgebase merges into spec **Changes**
 
 ## On Complete
 
 1. Sign-off checkboxes + Reviewed by + date
 2. Token Budget finalized (`tokens_used`, `token_variance`, per-task Used)
 3. Status ? Complete
-4. sdd-records-keeper archives ? `docs/specs/archived/` + parent feature rollup
+4. specloom-update-knowledgebase archives ? `docs/specs/archived/` + parent feature rollup
 5. Update `docs/knowledge/changelog.md`
 
 ## Related

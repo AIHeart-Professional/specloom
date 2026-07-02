@@ -1,6 +1,6 @@
-ï»¿# Work Done â€” SPEC-{spec_id}
+# Work Done — SPEC-{spec_id}
 
-> Human-readable implementation log. **Agents do not read this file** â€” use `manifest.json` only.
+> Human-readable implementation log. **Agents do not read this file** — use `manifest.json` only.
 
 spec_path: docs/specs/MMDDYY_short-description.md
 started: YYYY-MM-DD
@@ -9,12 +9,12 @@ started: YYYY-MM-DD
 
 ## Chronological log
 
-### YYYY-MM-DD â€” Task T1 ({layer})
+### YYYY-MM-DD — Task T1 ({layer})
 
 **Summary:** What was accomplished in plain language.
 
 **Files:**
-- `path/to/file.tsx` â€” what changed and why
+- `path/to/file.tsx` — what changed and why
 
 **Validation run:** typecheck passed | lint passed
 
@@ -22,4 +22,4 @@ started: YYYY-MM-DD
 
 ---
 
-<!-- sdd-records-keeper appends a new ### block after each task completes -->
+<!-- specloom-update-knowledgebase appends a new ### block after each task completes -->

@@ -1,6 +1,6 @@
-ï»¿# Testing Record â€” SPEC-{spec_id}
+# Testing Record — SPEC-{spec_id}
 
-> Full test run by **sdd-qa-tester** after all tasks complete. Before git commit and user sign-off.
+> Full test run by **specloom-validator** after all tasks complete. Before git commit and user sign-off.
 
 spec_id: {spec_id}
 spec_path: docs/specs/MMDDYY_short-description.md
@@ -28,7 +28,7 @@ Brief narrative: what was tested, outcome, coverage.
 
 | File | Lines missed | Notes |
 |------|--------------|-------|
-| _None_ | â€” | |
+| _None_ | — | |
 
 ### Failures
 
@@ -66,11 +66,11 @@ _None_
 
 ## Remediation history
 
-> If sdd-project-lead retried after failures, log each attempt.
+> If specloom-implement retried after failures, log each attempt.
 
 | Attempt | Status | Layer fixed | Notes |
 |---------|--------|-------------|-------|
-| 1 | passed | â€” | Initial run |
+| 1 | passed | — | Initial run |
 
 ## Sign-off gate
 

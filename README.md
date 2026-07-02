@@ -4,7 +4,7 @@
 
 SpecLoom is an installable spec-driven workflow for [Cursor](https://cursor.com) and [OpenAI Codex](https://openai.com/codex). It turns a codebase into a **spec loom**: ideas become features, features become dated specs, specs become validated implementation, and completed work merges back to a stable integration branch — with human sign-off at the draft stage and automation everywhere else.
 
-You talk to **one agent** (the project lead). It delegates a full engineering crew behind the scenes.
+You talk to **specloom-work-creator** (planning) or **specloom-implement** (implementation). It delegates a full engineering crew behind the scenes.
 
 ---
 
@@ -45,7 +45,7 @@ SpecLoom is opinionated on purpose. The opinions are what make long-running AI e
 
 ### What you get
 
-- **10 specialized agents** (project lead, coordinator, technical writer, QA, frontend/backend/database devs, records keeper, release engineer, system advisor)
+- **20+ specialized specloom agents** (specloom-implement, coordinator, technical writer, QA, frontend/backend/database devs, records keeper, release engineer, system advisor)
 - **35+ skills** encoding loop procedures, validation rubrics, and coding standards
 - **Repo scaffolding** — `docs/` tree, automation state, work-record templates, GitHub planning config
 - **Loop engineering** — coordinator, spec creation, task execution, validation, review loops
@@ -126,18 +126,18 @@ Draft specs and features **pause for your sign-off** after QA validation passes 
 
 ```mermaid
 flowchart TB
-  USER[You] --> PL[sdd-project-lead / sdd-orchestrator]
+  USER[You] --> PL[specloom-implement / specloom-implement]
   AUTO[Scheduled automation] --> PL
 
-  PL --> WC[sdd-workflow-coordinator / sdd-loop]
-  PL --> TW[sdd-technical-writer / sdd-docs]
-  PL --> QA[sdd-qa-tester / sdd-validation]
-  PL --> FE[sdd-frontend-developer]
-  PL --> BE[sdd-backend-developer]
-  PL --> DB[sdd-database-developer]
-  PL --> RK[sdd-records-keeper / sdd-updates]
-  PL --> RE[sdd-release-engineer / sdd-github]
-  PL --> SA[sdd-system-advisor / sdd-help]
+  PL --> WC[specloom-worker]
+  PL --> TW[specloom-work-creator]
+  PL --> QA[specloom-validator]
+  PL --> FE[specloom-frontend-developer]
+  PL --> BE[specloom-backend-developer]
+  PL --> DB[specloom-database-developer]
+  PL --> RK[specloom-update-knowledgebase]
+  PL --> RE[specloom-git]
+  PL --> SA[specloom-system-advisor]
 
   WC --> STATE[docs/automation/state/]
   TW --> SPECS[docs/specs/]
@@ -145,7 +145,7 @@ flowchart TB
   RE --> GIT[ai-workflow branch]
 ```
 
-**Critical rule:** Only the project lead speaks to you in natural language. Every other agent returns JSON internally; the lead summarizes outcomes.
+**Critical rule:** Only the specloom-implement speaks to you in natural language. Every other agent returns JSON internally; the lead summarizes outcomes.
 
 ---
 
@@ -222,11 +222,11 @@ node scripts/install.mjs --all --bootstrap ~/Projects/my-app
 
 ### 3. Verify installation
 
-**Cursor:** Open Agent panel → you should see `sdd-project-lead` as a subagent.
+**Cursor:** Open Agent panel → you should see `specloom-implement` as a subagent.
 
-**Codex:** Custom agents list should include `sdd-orchestrator`.
+**Codex:** Custom agents list should include `specloom-implement`.
 
-**Skills:** Check `~/.cursor/skills/workflow-coordinator-loops/` (Cursor) or `~/.agents/skills/sdd-automation-loops/` (Codex).
+**Skills:** Check `~/.cursor/skills/specloom-worker-loops/` (Cursor) or `~/.agents/skills/specloom-orchestrator-session/` (Codex).
 
 ### 4. Update later
 
@@ -296,8 +296,8 @@ your-repo/
 
 | Platform | Talk to | Example prompt |
 |----------|---------|----------------|
-| **Cursor** | `@sdd-project-lead` | "Run the coordinator until idle." |
-| **Codex** | `sdd-orchestrator` | "What's the next SDD task on this repo?" |
+| **Cursor** | `@specloom-implement` | "Run the coordinator until idle." |
+| **Codex** | `specloom-implement` | "What's the next SDD task on this repo?" |
 
 ### Common workflows
 
@@ -328,15 +328,15 @@ Reply **approved** to promote and start implementation.
 #### Run until idle (automation-style)
 
 ```
-@sdd-project-lead Run the coordinator with run_until_complete. Finish all Ready tasks, then stop.
+@specloom-implement Run the coordinator with run_until_complete. Finish all Ready tasks, then stop.
 ```
 
-The project lead delegates the workflow coordinator, which loops until `idle`, `blocked`, `needs_user`, or iteration cap.
+The specloom-implement delegates the workflow coordinator, which loops until `idle`, `blocked`, `needs_user`, or iteration cap.
 
 #### Create an idea
 
 ```
-@sdd-project-lead Create an idea for [problem]. Add it to the GitHub backlog.
+@specloom-implement Create an idea for [problem]. Add it to the GitHub backlog.
 ```
 
 Ideas stay in backlog until **you** manually promote them to features.
@@ -344,7 +344,7 @@ Ideas stay in backlog until **you** manually promote them to features.
 #### Promote idea → feature (manual)
 
 ```
-@sdd-project-lead Promote idea IDEA-003 to a feature.
+@specloom-implement Promote idea IDEA-003 to a feature.
 ```
 
 Automations never auto-promote ideas — only you trigger `feature_definition`.
@@ -352,7 +352,7 @@ Automations never auto-promote ideas — only you trigger `feature_definition`.
 #### Bootstrap help
 
 ```
-@sdd-project-lead How does the spec creation loop work?
+@specloom-implement How does the spec creation loop work?
 ```
 
 Routes to the system advisor; you get a plain-language answer.
@@ -362,7 +362,7 @@ Routes to the system advisor; you get a plain-language answer.
 Check `docs/automation/state/blocked_work.json`, fix the root cause, then:
 
 ```
-@sdd-project-lead Clear the block on spec 060626_auth-filter and resume.
+@specloom-implement Clear the block on spec 060626_auth-filter and resume.
 ```
 
 ### What you do vs what automation does
@@ -382,7 +382,7 @@ Check `docs/automation/state/blocked_work.json`, fix the root cause, then:
 ### Cursor Automations
 
 1. Commit `docs/automation/` to your repo
-2. Create automations that invoke **`sdd-project-lead`** (not sub-agents directly)
+2. Create automations that invoke **`specloom-implement`** (not sub-agents directly)
 3. Set repository branch to **`ai-workflow`**
 4. Use prompts from `docs/automation/cursor-schedules.md`
 
@@ -392,11 +392,11 @@ Check `docs/automation/state/blocked_work.json`, fix the root cause, then:
 | Task Execution | Weekdays every 2h | `task_execution_loop.md` |
 | Nightly Validation | Daily 11 PM | `validation_loop.md` |
 
-**Important:** Automations must use `sdd-project-lead` so you never see raw JSON results.
+**Important:** Automations must use `specloom-implement` so you never see raw JSON results.
 
 ### Codex automations
 
-Same loop files and schedules. Entry agent is **`sdd-orchestrator`**. Set git base branch to **`ai-workflow`**.
+Same loop files and schedules. Entry agent is **`specloom-implement`**. Set git base branch to **`ai-workflow`**.
 
 ---
 
@@ -428,29 +428,29 @@ See `docs/automation/git-workflow.md` in bootstrapped repos for full detail.
 
 | Agent | Role |
 |-------|------|
-| **sdd-project-lead** | Sole user entry; delegates everyone |
-| **sdd-workflow-coordinator** | Loop routing, handoffs, gate sequences |
-| **sdd-technical-writer** | Ideas, features, specs, repo bootstrap |
-| **sdd-qa-tester** | All validation gates (work, test, feature, spec) |
-| **sdd-frontend-developer** | UI implementation |
-| **sdd-backend-developer** | API implementation |
-| **sdd-database-developer** | Supabase / Postgres |
-| **sdd-records-keeper** | Work-records, manifest, archive |
-| **sdd-release-engineer** | Git, PRs, merges |
-| **sdd-system-advisor** | SDD system help |
+| **specloom-implement** | user entry for implementation; delegates everyone |
+| **specloom-worker** | Loop routing, handoffs, gate sequences |
+| **specloom-work-creator** | Ideas, features, specs, repo bootstrap |
+| **specloom-validator** | All validation gates (work, test, feature, spec) |
+| **specloom-frontend-developer** | UI implementation |
+| **specloom-backend-developer** | API implementation |
+| **specloom-database-developer** | Supabase / Postgres |
+| **specloom-update-knowledgebase** | Work-records, manifest, archive |
+| **specloom-git** | Git, PRs, merges |
+| **specloom-system-advisor** | SDD system help |
 
 ### Codex (`~/.codex/agents/`)
 
 | Agent | Cursor equivalent |
 |-------|-------------------|
-| **sdd-orchestrator** | sdd-project-lead |
-| **sdd-loop** | sdd-workflow-coordinator |
-| **sdd-docs** | sdd-technical-writer |
-| **sdd-validation** | sdd-qa-tester |
-| **sdd-frontend / backend / database** | domain developers |
-| **sdd-updates** | sdd-records-keeper |
-| **sdd-github** | sdd-release-engineer |
-| **sdd-help** | sdd-system-advisor |
+| **specloom-implement** | specloom-implement |
+| **specloom-worker** | specloom-worker |
+| **specloom-work-creator** | specloom-work-creator |
+| **specloom-validator** | specloom-validator |
+| **specloom-frontend / backend / database** | domain developers |
+| **specloom-update-knowledgebase** | specloom-update-knowledgebase |
+| **specloom-git** | specloom-git |
+| **specloom-system-advisor** | specloom-system-advisor |
 
 ---
 
@@ -476,7 +476,7 @@ On 3 failures → `docs/automation/state/blocked_work.json` + session stops.
 
 ### "I see raw JSON in the chat"
 
-Wrong entry agent. Use **`sdd-project-lead`** (Cursor) or **`sdd-orchestrator`** (Codex) — not sub-agents directly.
+Wrong entry agent. Use **`specloom-implement`** (Cursor) or **`specloom-implement`** (Codex) — not sub-agents directly.
 
 ### Test gate keeps failing
 
@@ -506,7 +506,7 @@ Set automation repository branch to **`ai-workflow`**, not `main`.
 
 ### Blocked work
 
-Read `docs/automation/state/blocked_work.json` for `stopReason` and attempt counts. Fix underlying issue, then ask project lead to resume.
+Read `docs/automation/state/blocked_work.json` for `stopReason` and attempt counts. Fix underlying issue, then ask specloom-implement to resume.
 
 ---
 
@@ -540,7 +540,7 @@ your-app/                          ← your project (bootstrapped)
 3. Test: `node scripts/install.mjs --dry-run --all`
 4. Open a PR
 
-When updating agents, keep the **project lead / orchestrator** as the only user-facing agent.
+When updating agents, keep the **specloom-implement / orchestrator** as the only user-facing agent.
 
 ---
 

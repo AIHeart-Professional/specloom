@@ -1,7 +1,7 @@
 ---
 name: test-react-native
 description: >-
-  INTERNAL — sdd-validation, sdd-frontend agents. Universal React Native testing standards.
+  INTERNAL — specloom-validator, specloom-frontend-developer agents. Universal React Native testing standards.
   Pair with code-react-native. Not user-invokable.
 ---
 
@@ -43,4 +43,4 @@ Pair with **code-react-native**, **test-react**, **test-typescript**.
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

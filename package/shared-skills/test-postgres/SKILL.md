@@ -1,7 +1,7 @@
 ---
 name: test-postgres
 description: >-
-  INTERNAL — sdd-validation, sdd-database agents. PostgreSQL/Supabase testing standards.
+  INTERNAL — specloom-validator, specloom-database-developer agents. PostgreSQL/Supabase testing standards.
   Pair with code-postgres. Not user-invokable.
 ---
 
@@ -52,4 +52,4 @@ Use `(SELECT auth.uid())` pattern in policies under test.
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

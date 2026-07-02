@@ -1,7 +1,7 @@
 ---
 name: code-react-native
 description: >-
-  INTERNAL � sdd-frontend agents only. Universal react-native coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer agents only. Universal react-native coding standards. Not user-invokable.
 ---
 
 # React Native Core Standards
@@ -125,4 +125,4 @@ Universal React Native standards for mobile apps. Requires **React CORE** and **
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

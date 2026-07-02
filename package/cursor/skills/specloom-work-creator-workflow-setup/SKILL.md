@@ -86,7 +86,7 @@ Copy entire [automation/](automation/) folder to `docs/automation/`:
 | `automation/state/blocked_work.json` | `docs/automation/state/blocked_work.json` |
 | `automation/reports/*.md` | `docs/automation/reports/` |
 
-Workflow procedures: global **workflow-coordinator-*** skills (not repo markdown).
+Workflow procedures: global **specloom-worker-*** skills (not repo markdown).
 
 ### Step 5: Ideas + features stubs
 
@@ -134,6 +134,6 @@ tasks ? manifest ? qa-tester(work)×3 ? qa-tester(test)×3 ? finalize ? auto_close
 | Ideas | `docs/ideas/` | specloom-work-creator-create-idea + specloom-work-creator-docs-planning |
 | Features | `docs/features/` | specloom-work-creator-create-feature + specloom-work-creator-docs-planning |
 | Specs | `docs/specs/` | specloom-work-creator-create-spec |
-| Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | records-keeper-work-records |
-| Workflows | Global **workflow-coordinator-*** skills | workflow-coordinator-loops |
+| Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | specloom-knowledgebase-work-records |
+| Workflows | Global **specloom-worker-*** skills | specloom-worker-loops |
 | Execute | — | **specloom-work-creator** ? sub-agents |

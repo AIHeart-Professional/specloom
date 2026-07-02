@@ -1,4 +1,4 @@
-﻿# SDD Command Center
+# SDD Command Center
 
 Root `docs/` is the project source of truth for specs, queues, architecture, decisions, code standards, and workflow status. Read this file before any work.
 
@@ -10,7 +10,7 @@ Root `docs/` is the project source of truth for specs, queues, architecture, dec
 4. If no task is ready, spawn a spec from the lowest Ready feature Spec Queue row.
 5. Read `docs/automation/state/active_work.json` when automation state exists.
 
-**Ideas** (`docs/ideas/`) are optional. Automations never promote them — you promote manually via **sdd-project-lead**.
+**Ideas** (`docs/ideas/`) are optional. Automations never promote them � you promote manually via **specloom-implement**.
 
 ## Three Layers
 
@@ -20,7 +20,7 @@ Root `docs/` is the project source of truth for specs, queues, architecture, dec
 | **Feature** | `docs/features/` | WHAT to build |
 | **Spec** | `docs/specs/` | HOW to build one unit |
 
-Prefer finishing approved specs/tasks first. Coordinator automation: **tasks → ready features → specs → idle**.
+Prefer finishing approved specs/tasks first. Coordinator automation: **tasks ? ready features ? specs ? idle**.
 
 ## Loop Engineering
 
@@ -37,7 +37,7 @@ Cursor Automations: `docs/automation/cursor-schedules.md`.
 |--------|---------|
 | `docs/ideas/` | Backlog ideas |
 | `docs/ideas/archived/` | Promoted ideas |
-| `docs/features/` | Active WHAT — scope, deps, Spec Queue |
+| `docs/features/` | Active WHAT � scope, deps, Spec Queue |
 | `docs/features/archived/` | Complete features |
 | `docs/specs/` | Low-level HOW |
 | `docs/specs/archived/` | Completed specs |

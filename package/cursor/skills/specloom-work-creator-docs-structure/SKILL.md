@@ -1,11 +1,11 @@
 ---
 name: specloom-work-creator-docs-structure
 description: >-
-  INTERNAL ? specloom-work-creator and sdd-records-keeper agents only. Doc tree reference. Not user-invokable.
+  INTERNAL — specloom-work-creator and specloom-update-knowledgebase only. Doc tree reference. Not user-invokable.
 disable-model-invocation: true
 ---
 
-# SDD Docs Structure
+# SpecLoom Docs Structure
 
 Repo root `docs/`. One tree per repo.
 
@@ -52,7 +52,7 @@ Path: `docs/specs/work-records/SPEC-{spec_id}/`
 | testing.md | After tests pass | No |
 | completion.json | After tests pass | No |
 
-Schema: **records-keeper-work-records** skill. **sdd-records-keeper** writes manifest + work-done per task.
+Schema: **specloom-knowledgebase-work-records**. **specloom-update-knowledgebase** writes manifest + work-done per task.
 
 Created incrementally on first task. Finalized after **specloom-validator** passes.
 
@@ -64,10 +64,10 @@ Repo `docs/code/` holds **project extensions only** (e.g. `react-native-ui.md`, 
 
 | Skill | Agent |
 |-------|-------|
-| frontend-developer-typescript | sdd-frontend-developer, sdd-backend-developer |
-| frontend-developer-react, frontend-developer-react-native | sdd-frontend-developer |
-| backend-developer-python | sdd-backend-developer |
-| database-developer-postgres | sdd-database-developer |
+| specloom-frontend-developer-typescript | specloom-frontend-developer, specloom-backend-developer |
+| specloom-frontend-developer-react, specloom-frontend-developer-react-native | specloom-frontend-developer |
+| specloom-backend-developer-python | specloom-backend-developer |
+| specloom-database-developer-postgres | specloom-database-developer |
 
 Spec **Required Context** lists repo extension paths. Skills load automatically per layer.
 
@@ -118,29 +118,24 @@ Explicit path table. **Only** listed paths may be read. Sources:
 | `docs/automation/` | Loops, state, reports |
 | `docs/knowledge/` | App memory |
 
-## Skills (internal ? agent-loaded)
+## Skills (internal)
 
 | Skill | Loaded by |
 |-------|-----------|
-| **specloom-work-creator-docs-planning** | **sdd-workflow-coordinator**, **specloom-work-creator**, **specloom-validator**, **sdd-records-keeper** |
-| **specloom-work-creator-create-idea/feature/spec** | **specloom-work-creator** |
-| **specloom-work-creator-workflow-setup** | **specloom-work-creator** (bootstrap) |
-| **specloom-work-creator-docs-structure** | **specloom-work-creator**, **sdd-records-keeper** |
-| **records-keeper-work-records** | **sdd-records-keeper**, **specloom-validator**, **specloom-validator** |
-| **sdd-work/feature/spec-validation** | **specloom-validator** |
-| **project-lead-protocol** | **sdd-workflow-coordinator** |
-| **workflow-coordinator-loops** | **sdd-workflow-coordinator** |
-| **system-advisor-reference** | **sdd-system-advisor** |
-| **system-advisor-reference** | **sdd-system-advisor** (user asks **specloom-work-creator**) |
-
-## Task status
-
-Each task: `Status: Ready | Blocked | Complete`. Coordinator runs **Ready** only.
+| **specloom-work-creator-docs-planning** | work-creator, validator, update-knowledgebase |
+| **specloom-work-creator-create-idea/feature/spec** | specloom-work-creator |
+| **specloom-work-creator-workflow-setup** | specloom-work-creator (bootstrap) |
+| **specloom-work-creator-docs-structure** | work-creator, update-knowledgebase |
+| **specloom-knowledgebase-work-records** | update-knowledgebase, validator, tester |
+| **specloom-work-creator-draft-validation** | specloom-validator (draft) |
+| **specloom-implement-protocol** | worker, validator, tester, git |
+| **specloom-orchestrator-session** | all orchestrators |
+| **specloom-specloom-system-advisor-reference** | specloom-system-advisor |
 
 ## Validation pipeline
 
 ```
-tasks Complete ? specloom-validator(work) ?3 ? specloom-validator(test) ?3 ? finalize work-records ? sign-off ? git
+tasks Complete → worker-validation → validator (impl) → tester → update-knowledgebase → git merge
 ```
 
-Draft: **specloom-work-creator** ? **specloom-validator**(feature|spec) ?3.
+Draft: **specloom-work-creator** → **specloom-validator** (draft).

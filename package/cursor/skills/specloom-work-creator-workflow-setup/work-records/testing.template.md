@@ -1,6 +1,6 @@
 # Testing Record — SPEC-{spec_id}
 
-> Full test run by **sdd-qa-tester** after all tasks complete. Before git commit and user sign-off.
+> Full test run by **specloom-validator** after all tasks complete. Before git commit and user sign-off.
 
 spec_id: {spec_id}
 spec_path: docs/specs/MMDDYY_short-description.md

@@ -2,10 +2,10 @@
 
 **Git base branch:** `ai-workflow` for all automations.
 
-**Agent (required):** Select **`specloom-work-creator`** in each automation's agent settings — not `sdd-workflow-coordinator` or any other sub-agent.
+**Agent (required):** Select **`specloom-work-creator`** in each automation's agent settings — not `specloom-implement` or any other sub-agent.
 
-Workflow procedures live in **global skills** (`workflow-coordinator-*`), not repo markdown.  
-**specloom-work-creator** Task-delegates **sdd-workflow-coordinator** and other sub-agents. Sub-agents reply in JSON **to the project lead only**. The **final automation message to you must be natural language** — never raw JSON.
+Workflow procedures live in **global skills** (`specloom-worker-*`), not repo markdown.  
+**specloom-work-creator** Task-delegates **specloom-implement** and other sub-agents. Sub-agents reply in JSON **to the project lead only**. The **final automation message to you must be natural language** — never raw JSON.
 
 ---
 
@@ -20,11 +20,11 @@ Workflow procedures live in **global skills** (`workflow-coordinator-*`), not re
 ```
 You ARE specloom-work-creator (sole user-facing entry). Follow ~/.cursor/agents/specloom-work-creator.md.
 
-Task-delegate sdd-workflow-coordinator with action run_until_complete (max_loop_iterations: 25).
+Task-delegate specloom-implement with action run_until_complete (max_loop_iterations: 25).
 
 Sub-agents return JSON to you only — never paste LOOP_RESULT, VALIDATION_RESULT, or other JSON in your final reply. Summarize outcomes in natural language for the user.
 
-Workflow procedures are skills (workflow-coordinator-*), not repo files. Coordinator reads active_work.json workflow id and loads matching skill.
+Workflow procedures are skills (specloom-worker-*), not repo files. Coordinator reads active_work.json workflow id and loads matching skill.
 
 Run continuously until stopReason: idle, blocked, needs_user, awaiting_sign_off, or iteration_cap.
 
@@ -94,7 +94,7 @@ Your final message to the user must be natural language (what you wrote to lates
 
 If an automation replied with raw JSON, one of these happened:
 
-- Agent was **sdd-workflow-coordinator** (or default) instead of **specloom-work-creator**
+- Agent was **specloom-implement** (or default) instead of **specloom-work-creator**
 - Prompt said "delegate coordinator" and the run **echoed the coordinator's JSON** instead of synthesizing
 - Sub-agent was invoked **without** project lead as the parent
 

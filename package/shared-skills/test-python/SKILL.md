@@ -1,7 +1,7 @@
 ---
 name: test-python
 description: >-
-  INTERNAL — sdd-validation, sdd-backend agents. Universal Python testing standards.
+  INTERNAL — specloom-validator, specloom-backend-developer agents. Universal Python testing standards.
   Pair with code-python. Not user-invokable.
 ---
 
@@ -49,7 +49,7 @@ Mirror package structure under `tests/`.
 
 ## Coverage
 
-- 100% on spec-touched modules (see **sdd-test-coverage**).
+- 100% on spec-touched modules (see **specloom-frontend-test-standards-rules**).
 - Cover exception handlers and validation errors.
 
 ## Anti-patterns
@@ -60,4 +60,4 @@ Mirror package structure under `tests/`.
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `sdd-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

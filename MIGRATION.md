@@ -23,7 +23,7 @@
 | `sdd-records-keeper` | `specloom-update-knowledgebase` | Docs sync with per-repo skills |
 | `sdd-technical-writer` | **`specloom-work-creator`** | Planning — ideas, features, specs; user-facing |
 | `sdd-release-engineer` | **`specloom-git`** | Git sub-agent — branches, push, merge, PR |
-| `sdd-system-advisor` | *(unchanged in this package)* | Help routing |
+| `sdd-system-advisor` | **`specloom-system-advisor`** | Help routing |
 
 ## Skill rename map
 
@@ -121,10 +121,6 @@ specloom-implement
 - **Confidence bar:** 99 = success for validation gates
 - **Test coverage:** 100% on spec work or fail after 5 loops
 
-## Not migrated in this package
+## Status
 
-These remain in the parent `specloom` / `sdd-loop` repo until a follow-up:
-
-- Coordinator priority for backlog ideas (manual promote via work-creator)
-- Full Codex shared-skills rename (TOML stubs included)
-- `sdd-system-advisor` → future `specloom-advisor`
+Migration complete on branch `task/specloom-agent-migration`. All runtime agents use `specloom-*` prefix. This file is the historical rename reference only.

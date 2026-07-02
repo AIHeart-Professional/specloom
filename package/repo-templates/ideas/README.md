@@ -12,11 +12,11 @@ See [idea-template.md](idea-template.md).
 
 ## Manual promotion
 
-When ready, ask **sdd-project-lead**: *"Promote idea 001 to a feature"*.
+When ready, ask **specloom-implement**: *"Promote idea 001 to a feature"*.
 
 That runs **technical-writer-create-feature**, validates, archives the idea as `promoted`, and creates `docs/features/NNN_*.md`.
 
 ## Skills
 
 - Add idea: **technical-writer-create-idea** (optional)
-- Promote: user → **sdd-project-lead** only
+- Promote: user → **specloom-implement** only

@@ -40,6 +40,6 @@ specloom-implement
 
 **specloom-git** at start + end of every orchestrator session. Base branch **`ai-workflow`**. Delegated sub-agents share parent branch.
 
-## Legacy agents (until full migration)
+## Legacy
 
-Help routing still uses `sdd-system-advisor` until `specloom-advisor` lands.
+All `sdd-*` agents removed. See **MIGRATION.md** for rename map.
