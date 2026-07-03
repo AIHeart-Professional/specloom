@@ -2,13 +2,13 @@
 
 Five **peer** orchestrators. **None call each other.** User chains manually.
 
-| Agent | Invoke | Scope | Loop cap |
-|-------|--------|-------|----------|
-| **specloom-work-creator** | `@specloom-work-creator` | Planning docs | — |
-| **specloom-implement** | `@specloom-implement` | **specloom-worker** only | **10** |
-| **specloom-validator** | `@specloom-validator` | **specloom-standardized-loop** only | **3** |
-| **specloom-tester** | `@specloom-tester` | **specloom-test-loop** only | **5** |
-| **specloom-git** | `@specloom-git` | Git only | — |
+## User entry — five independent peers
+
+| Runtime | Invoke |
+|---------|--------|
+| **Cursor** | `@specloom-work-creator` · `@specloom-implement` · `@specloom-validator` · `@specloom-tester` · `@specloom-git` |
+| **Antigravity** | `/specloom-work-creator` · `/specloom-implement` · `/specloom-validator` · `/specloom-tester` · `/specloom-git` |
+| **Codex** | `specloom-work-creator` · `specloom-implement` · etc. (custom agents) |
 
 ---
 

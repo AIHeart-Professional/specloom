@@ -2,7 +2,7 @@
 
 **Weave ideas into shipped code.**
 
-SpecLoom is an installable spec-driven workflow for [Cursor](https://cursor.com) and [OpenAI Codex](https://openai.com/codex). It turns a codebase into a **spec loom**: ideas become features, features become dated specs, specs become validated implementation, and completed work merges back to a stable integration branch — with human sign-off at the draft stage and automation everywhere else.
+SpecLoom is an installable spec-driven workflow for [Cursor](https://cursor.com), [OpenAI Codex](https://openai.com/codex), and [Google Antigravity](https://antigravity.google/). It turns a codebase into a **spec loom**: ideas become features, features become dated specs, specs become validated implementation, and completed work merges back to a stable integration branch — with human sign-off at the draft stage and automation everywhere else.
 
 You invoke **five peer orchestrators** independently — they **never** call each other:
 
@@ -53,7 +53,7 @@ SpecLoom is opinionated on purpose. The opinions are what make long-running AI e
 - **35+ skills** encoding loop procedures, validation rubrics, and coding standards
 - **Repo scaffolding** — `docs/` tree, automation state, work-record templates, GitHub planning config
 - **Loop engineering** — coordinator, spec creation, task execution, validation, review loops
-- **Dual runtime** — Cursor (`.cursor/`) and Codex (`.codex/` + `.agents/skills/`)
+- **Triple runtime** — Cursor (`.cursor/`), Codex (`.codex/` + `.agents/skills/`), Antigravity (`~/.gemini/config/skills/` + global workflows)
 
 ---
 
@@ -157,7 +157,7 @@ flowchart LR
 | Requirement | Why |
 |-------------|-----|
 | **Node.js 18+** | Runs the installer (`install.mjs`) |
-| **Cursor** and/or **Codex** | Host environment for custom agents |
+| **Cursor** and/or **Codex** and/or **Antigravity** | Host environment for agents/skills/workflows |
 | **Git** | Branch workflow, PRs |
 | **[GitHub CLI](https://cli.github.com/)** (`gh`) | Idea/feature issues, planning queries |
 | **A GitHub repo** | Planning issues + `ai-workflow` branch |
@@ -205,7 +205,8 @@ chmod +x install.sh
 |------|--------|
 | `--cursor` | Install Cursor agents → `~/.cursor/agents/`, skills → `~/.cursor/skills/` |
 | `--codex` | Install Codex agents → `~/.codex/agents/`, skills → `~/.agents/skills/` |
-| `--all` | Both (default) |
+| `--antigravity` | Install Antigravity skills → `~/.gemini/config/skills/`, workflows → `~/.gemini/antigravity/global_workflows/` |
+| `--all` | Cursor + Codex + Antigravity (default) |
 | `--force` | Overwrite existing files (creates timestamped `.specloom-backup-*` first) |
 | `--dry-run` | Print actions without writing |
 | `--bootstrap <path>` | Scaffold `docs/` in target repo (see below) |
@@ -219,6 +220,9 @@ node scripts/install.mjs --cursor
 # Codex only, preview changes
 node scripts/install.mjs --codex --dry-run
 
+# Antigravity only
+node scripts/install.mjs --antigravity
+
 # Install + bootstrap new app in one step
 node scripts/install.mjs --all --bootstrap ~/Projects/my-app
 ```
@@ -228,6 +232,8 @@ node scripts/install.mjs --all --bootstrap ~/Projects/my-app
 **Cursor:** Open Agent panel → you should see `specloom-implement` as a subagent.
 
 **Codex:** Custom agents list should include `specloom-implement`.
+
+**Antigravity:** Type `/specloom` in agent chat — you should see `/specloom-implement`, `/specloom-validator`, etc. Skills live in `~/.gemini/config/skills/specloom-orchestrator-session/`.
 
 **Skills:** Check `~/.cursor/skills/specloom-worker-loops/` (Cursor) or `~/.agents/skills/specloom-orchestrator-session/` (Codex).
 
@@ -301,6 +307,7 @@ your-repo/
 |----------|---------|----------------|
 | **Cursor** | `@specloom-implement` | "Run the coordinator until idle." |
 | **Codex** | `specloom-implement` | "What's the next SDD task on this repo?" |
+| **Antigravity** | `/specloom-implement` | "Run implementation on the active spec." |
 
 ### Common workflows
 
@@ -527,7 +534,10 @@ specloom/                          ← this repo (installer)
     ├── cursor/agents/             # Cursor custom agents
     ├── cursor/skills/             # Cursor skills
     ├── codex/agents/              # Codex agent definitions
-    ├── shared-skills/             # Codex skills (~/.agents/skills)
+    ├── shared-skills/             # Codex + Antigravity code/test skills
+    ├── antigravity/
+    │   ├── workflows/             # Global slash commands (peer orchestrators)
+    │   └── rules/                 # Workspace rule template for bootstrap
     └── repo-templates/            # Bootstrap templates for docs/
 
 your-app/                          ← your project (bootstrapped)

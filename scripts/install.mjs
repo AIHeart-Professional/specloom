@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SpecLoom installer — copies agents + skills to user-level Cursor/Codex dirs.
+ * SpecLoom installer — copies agents + skills to Cursor, Codex, and Google Antigravity dirs.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -23,7 +23,8 @@ Usage:
 Options:
   --cursor          Install Cursor agents + skills (~/.cursor/)
   --codex           Install Codex agents + shared skills (~/.codex/, ~/.agents/)
-  --all             Install both Cursor and Codex (default)
+  --antigravity     Install Antigravity skills + global workflows (~/.gemini/)
+  --all             Install Cursor, Codex, and Antigravity (default)
   --bootstrap <dir> Scaffold docs/ tree in target repo after install
   --force           Overwrite existing files (backs up first)
   --dry-run         Print actions without writing
@@ -31,6 +32,7 @@ Options:
 
 Examples:
   node scripts/install.mjs --all
+  node scripts/install.mjs --antigravity --force
   node scripts/install.mjs --cursor --bootstrap ./my-app
   ./install.sh --codex
 `);
@@ -40,6 +42,7 @@ function parseArgs(argv) {
   const opts = {
     cursor: false,
     codex: false,
+    antigravity: false,
     all: false,
     bootstrap: null,
     force: false,
@@ -52,6 +55,7 @@ function parseArgs(argv) {
     if (arg === "-h" || arg === "--help") opts.help = true;
     else if (arg === "--cursor") opts.cursor = true;
     else if (arg === "--codex") opts.codex = true;
+    else if (arg === "--antigravity") opts.antigravity = true;
     else if (arg === "--all") opts.all = true;
     else if (arg === "--force") opts.force = true;
     else if (arg === "--dry-run") opts.dryRun = true;
@@ -62,10 +66,11 @@ function parseArgs(argv) {
     } else throw new Error(`Unknown argument: ${arg}`);
   }
 
-  if (!opts.cursor && !opts.codex && !opts.all) opts.all = true;
+  if (!opts.cursor && !opts.codex && !opts.antigravity && !opts.all) opts.all = true;
   if (opts.all) {
     opts.cursor = true;
     opts.codex = true;
+    opts.antigravity = true;
   }
 
   return opts;
@@ -77,6 +82,14 @@ function homeDir() {
 
 function codexSkillsPath() {
   return path.join(homeDir(), ".agents", "skills").replace(/\\/g, "/");
+}
+
+function antigravityGlobalSkillsDir() {
+  return path.join(homeDir(), ".gemini", "config", "skills");
+}
+
+function antigravityGlobalWorkflowsDir() {
+  return path.join(homeDir(), ".gemini", "antigravity", "global_workflows");
 }
 
 function walkFiles(dir) {
@@ -234,6 +247,45 @@ function installCodex({ force, dryRun }) {
   return { agents, skills: shared, specloomSkills };
 }
 
+function installAntigravity({ force, dryRun }) {
+  const cursorSkillsSrc = path.join(PACKAGE_ROOT, "cursor", "skills");
+  const sharedSkillsSrc = path.join(PACKAGE_ROOT, "shared-skills");
+  const workflowsSrc = path.join(PACKAGE_ROOT, "antigravity", "workflows");
+  const skillsDest = antigravityGlobalSkillsDir();
+  const workflowsDest = antigravityGlobalWorkflowsDir();
+
+  console.log("\n== Google Antigravity ==");
+
+  const specloomSkills = copyTree({
+    source: cursorSkillsSrc,
+    target: skillsDest,
+    filter: (base) => isManagedCursorSkillName(base),
+    force,
+    dryRun,
+    label: "antigravity/skills (specloom)",
+  });
+
+  const sharedSkills = copyTree({
+    source: sharedSkillsSrc,
+    target: skillsDest,
+    filter: (base) => isManagedSkillName(base),
+    force,
+    dryRun,
+    label: "antigravity/skills (code/test)",
+  });
+
+  const workflows = copyTree({
+    source: workflowsSrc,
+    target: workflowsDest,
+    filter: () => true,
+    force,
+    dryRun,
+    label: "antigravity/global_workflows",
+  });
+
+  return { specloomSkills, sharedSkills, workflows };
+}
+
 function readTemplate(name) {
   return fs.readFileSync(path.join(PACKAGE_ROOT, "repo-templates", name), "utf8");
 }
@@ -344,9 +396,34 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
 
   writeIfMissing(
     path.join(repoRoot, "docs", "workflows", "agent-orchestration.md"),
-    `# Agent Orchestration\n\nUser entry: **specloom-work-creator** (planning) and **specloom-implement** (implementation).\n\nSee WORKFLOW.md in the specloom package and \`docs/workflows/\`.\n`,
+    `# Agent Orchestration\n\n**Cursor:** \`@specloom-work-creator\`, \`@specloom-implement\`, \`@specloom-validator\`, \`@specloom-tester\`, \`@specloom-git\`\n\n**Antigravity:** \`/specloom-work-creator\`, \`/specloom-implement\`, \`/specloom-validator\`, \`/specloom-tester\`, \`/specloom-git\`\n\nSee WORKFLOW.md in the specloom package.\n`,
     { force, dryRun },
   );
+
+  // Antigravity workspace workflows + rules
+  const agyWorkflowsSrc = path.join(PACKAGE_ROOT, "antigravity", "workflows");
+  if (fs.existsSync(agyWorkflowsSrc)) {
+    copyTree({
+      source: agyWorkflowsSrc,
+      target: path.join(repoRoot, ".agents", "workflows"),
+      filter: () => true,
+      force,
+      dryRun,
+      label: "bootstrap/.agents/workflows",
+    });
+  }
+
+  const agyRulesSrc = path.join(PACKAGE_ROOT, "antigravity", "rules");
+  if (fs.existsSync(agyRulesSrc)) {
+    copyTree({
+      source: agyRulesSrc,
+      target: path.join(repoRoot, ".agents", "rules"),
+      filter: () => true,
+      force,
+      dryRun,
+      label: "bootstrap/.agents/rules",
+    });
+  }
 
   // Architecture stubs
   const archStubs = {
@@ -419,11 +496,19 @@ function main() {
 
   if (opts.cursor) installCursor(opts);
   if (opts.codex) installCodex(opts);
+  if (opts.antigravity) installAntigravity(opts);
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
-  if (opts.cursor) console.log("Cursor peers: specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git");
-  if (opts.codex) console.log("Codex peers:  specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git");
+  const peers =
+    "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
+  if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
+  if (opts.codex) console.log(`Codex peers:  ${peers}`);
+  if (opts.antigravity) {
+    console.log(`Antigravity:  /${peers.replace(/, /g, ", /")}`);
+    console.log(`  skills:    ${antigravityGlobalSkillsDir()}`);
+    console.log(`  workflows: ${antigravityGlobalWorkflowsDir()}`);
+  }
 }
 
 try {
