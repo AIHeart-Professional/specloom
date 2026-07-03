@@ -1,7 +1,7 @@
 ---
 name: code-typescript
 description: >-
-  INTERNAL � specloom-frontend-developer, specloom-backend-developer agents only. Universal typescript coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer, specloom-backend-developer agents only. Universal TypeScript coding standards. No testing — use test-typescript in specloom-tester. Not user-invokable.
 ---
 
 # TypeScript Core Standards

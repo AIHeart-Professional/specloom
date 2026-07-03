@@ -1,9 +1,9 @@
 ---
 name: specloom-backend-developer-python
 description: >-
-  INTERNAL ? specloom-backend-developer agents only. Universal python coding standards. Not user-invokable.
-disable-model-invocation: true
+  INTERNAL ù specloom-backend-developer agents only. Universal Python coding standards. No testing ó use test-python in specloom-tester. Not user-invokable.
 ---
+
 # Python Core Standards
 
 Universal Python standards for backend services, scripts, and tooling. Based on PEP 8 and professional production practice.
@@ -52,7 +52,7 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 ## Functions and Classes
 
 - **Single responsibility** ó functions do one thing; split when name needs "and".
-- Keep functions **= 20ñ30 lines** when practical; extract helpers.
+- Keep functions **? 20ñ30 lines** when practical; extract helpers.
 - Prefer **composition** over deep inheritance.
 - Use **`@staticmethod` / `@classmethod`** only when semantically correct.
 - Default arguments must be **immutable** ó never `def f(x=[])`; use `None` and assign inside.
@@ -79,15 +79,6 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - Use **`asyncio.TaskGroup`** (3.11+) or structured concurrency patterns for fan-out.
 - Always **await** coroutines; use timeout wrappers on external calls.
 
-## Testing
-
-- **pytest** as the default test runner.
-- **ArrangeñActñAssert** structure; one logical assertion focus per test.
-- Use **fixtures** for setup; avoid shared mutable global test state.
-- **Mock at boundaries** (HTTP, DB, clock) ó not internal implementation details.
-- Target **high coverage** on business logic and auth/permission paths.
-- Property-based tests (Hypothesis) for parsers and validators when valuable.
-
 ## Security
 
 - Parameterized queries / ORM only ó **never** string-concatenate SQL.
@@ -100,7 +91,7 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - **`pyproject.toml`** as single source for deps, tools, and metadata.
 - Pin dependencies in lock file or constraints for reproducible builds.
 - Use **`uv` / `poetry` / `pip-tools`** consistently within a project.
-- Pre-commit hooks: format, lint, typecheck, tests on changed files.
+- Pre-commit hooks: format, lint, typecheck on changed files.
 
 ## Anti-Patterns
 
@@ -116,7 +107,6 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - [ ] Black/Ruff format and lint clean
 - [ ] Docstrings on public modules/functions
 - [ ] No secrets in code or logs
-- [ ] Tests for new behavior and edge cases
 - [ ] Errors logged with context; specific exception types
 - [ ] SQL parameterized; input validated at boundary
 
@@ -127,3 +117,7 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - [PEP 484 ó Type Hints](https://peps.python.org/pep-0484/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 - [The Hitchhiker's Guide to Python ó Structuring Projects](https://docs.python-guide.org/writing/structure/)
+
+## Codex Port
+
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

@@ -1,14 +1,14 @@
 ---
 name: test-python
 description: >-
-  INTERNAL — specloom-validator, specloom-backend-developer agents. Universal Python testing standards.
-  Pair with code-python. Not user-invokable.
+  INTERNAL — specloom-backend-test-standards only. Python testing standards.
+  Do not load code-python. Not user-invokable.
 ---
 
 
 # Python Testing Standards
 
-Pair with **code-python**.
+Professional Python test standards. **Testing only** — no production coding rules.
 
 ## Stack
 
@@ -45,11 +45,12 @@ Mirror package structure under `tests/`.
 ## API tests
 
 - Test status codes, response schema, and auth rejection paths.
+- Assert behavior matches **spec Requirements** and **feature** acceptance criteria.
 - Never hit production DB or external APIs in CI.
 
 ## Coverage
 
-- 100% on spec-touched modules (see **specloom-frontend-test-standards-rules**).
+- 100% on spec-touched production modules (see **specloom-backend-test-standards-rules**).
 - Cover exception handlers and validation errors.
 
 ## Anti-patterns

@@ -44,13 +44,14 @@ All peers: work discovery → `no_work` or git `task_start` → scope → git me
 
 | Skill | Purpose |
 |-------|---------|
-| **specloom-orchestrator-session** | Independence + work queue + git bookends |
+| **specloom-orchestrator-session** | Independence + work queue + git bookends + approval mode |
+| **specloom-approval-mode** | `/manual` `/auto` `/approve` for implement/validator/tester |
 | **specloom-implement-protocol** | Handoff JSON schemas |
 | **specloom-work-creator-*** | Planning docs |
-| **code-*** / **test-*** | Universal coding/testing standards |
+| **code-*** / **test-*** | Universal coding vs testing standards (separate flows) |
 
 ## Output contract
 
 Five peer orchestrators → natural language. All other `specloom-*` → JSON only.
 
-See **WORKFLOW.md** in the specloom repo for full lifecycle.
+**code-*** → specloom-implement domain developers only. **test-*** → specloom-tester only. Never cross-load.

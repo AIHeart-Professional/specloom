@@ -6,39 +6,30 @@ disable-model-invocation: true
 
 # Test Loop Procedure
 
-**Max 5 iterations**. Target **100% coverage** on `manifest.files_index`.
+**Max 5 iterations** per test session.
 
-## Preconditions
+## Skill boundary
 
-All spec tasks `Complete`. Validator passed. Else return `no_work`.
+Delegate **specloom-*-test-standards** only. They load **test-*** skills — never **code-***.
 
 ## Per iteration
 
-1. Run coverage report per layer (`AGENTS.md` commands)
-2. Build `uncovered_files[]` from manifest paths
-3. For each active layer with gaps:
-   - Delegate **specloom-*-test-standards** via implement
-   - **Parallel** when multiple layers
+1. Read uncovered files + spec acceptance gaps from prior result
+2. For each layer in `layers[]`:
+   - Build `TEST_STANDARDS_HANDOFF` with spec + feature paths
+   - Return delegation to **specloom-tester** — tester executes Task calls
+3. When `parallel: true` → multiple layers same iteration
 4. Re-run coverage + full test suite
-5. **Pass:** `coverage_percent == 100` AND all tests green
-6. **Fail:** increment iteration; pass `uncovered_files` to next handoff
+5. **Pass:** `coverage_percent == 100` AND all tests green AND spec criteria mapped
 
-## Iteration 5 fail
+## Fail
 
-Return `status: fail` with coverage gap report. **specloom-tester** surfaces failure to implement.
+Return `status: fail` with coverage gap + unmapped spec criteria. **specloom-tester** surfaces to user.
 
-## Layer → agent
+## Layer → agent map
 
 | layer | agent |
 |-------|-------|
 | frontend | specloom-frontend-test-standards |
 | backend | specloom-backend-test-standards |
 | database | specloom-database-test-standards |
-
-## Coverage calculation
-
-```
-coverage_percent = round(100 * covered_lines / total_lines)
-```
-
-Across **all** manifest files (all layers combined). 100% required.

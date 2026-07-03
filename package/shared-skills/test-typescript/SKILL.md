@@ -1,14 +1,14 @@
 ---
 name: test-typescript
 description: >-
-  INTERNAL — specloom-validator, specloom-frontend-developer, specloom-backend-developer agents. Universal TypeScript/JavaScript
-  testing standards. Pair with code-typescript. Not user-invokable.
+  INTERNAL — specloom-*-test-standards agents only. TypeScript/JavaScript testing standards.
+  Do not load code-typescript. Not user-invokable.
 ---
 
 
 # TypeScript Testing Standards
 
-Pair with **code-typescript**. Load when writing or validating TS/JS tests.
+Professional TypeScript/JavaScript test standards. **Testing only** — no production coding rules.
 
 ## Stack defaults
 
@@ -30,7 +30,7 @@ Read `AGENTS.md` for project choice.
 
 ## Coverage
 
-- 100% lines + branches on spec-touched files (see **specloom-frontend-test-standards-rules**).
+- 100% lines + branches on spec-touched production files (see **specloom-*-test-standards-rules**).
 - Cover error paths, empty input, and boundary values.
 - Every exported function/hook needs at least one test.
 

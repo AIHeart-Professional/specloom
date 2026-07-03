@@ -1,20 +1,20 @@
 ---
 name: test-postgres
 description: >-
-  INTERNAL — specloom-validator, specloom-database-developer agents. PostgreSQL/Supabase testing standards.
-  Pair with code-postgres. Not user-invokable.
+  INTERNAL — specloom-database-test-standards only. PostgreSQL/Supabase testing standards.
+  Do not load code-postgres. Not user-invokable.
 ---
 
 
 # PostgreSQL / Supabase Testing Standards
 
-Pair with **code-postgres**.
+Professional database test standards. **Testing only** — no schema authoring rules.
 
 ## Scope
 
 - Schema migrations apply cleanly on empty and existing DBs.
-- RLS policies enforce tenant/user isolation.
-- Constraints, triggers, and functions behave as specified.
+- RLS policies enforce tenant/user isolation per **spec** security requirements.
+- Constraints, triggers, and functions behave as specified in spec/feature.
 
 ## Environment
 
@@ -24,7 +24,7 @@ Pair with **code-postgres**.
 
 ## RLS tests
 
-For each policy set:
+For each policy set in spec:
 
 | Operation | Assert |
 |-----------|--------|

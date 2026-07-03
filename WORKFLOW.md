@@ -29,6 +29,24 @@ Each orchestrator:
 
 ---
 
+## Approval mode (implement · validator · tester)
+
+| Command | Default | Effect |
+|---------|---------|--------|
+| `/manual` | **yes** | Review card after pass; **no archive** until `/approve` |
+| `/auto` | | Auto-approve; **specloom-tester** archives spec on pass |
+| `/approve` | | Confirm pending sign-off (manual follow-up) |
+
+Persist `approvalMode` in `docs/automation/state/active_work.json`. See **specloom-approval-mode**.
+
+```
+@specloom-implement /auto
+@specloom-validator /manual
+@specloom-tester /approve
+```
+
+---
+
 ## Recommended user pipeline
 
 ```mermaid
@@ -60,10 +78,14 @@ Each box = **separate chat invocation**. No auto-chain.
 **Only sub-agent:** `specloom-worker` (≤10)
 
 ```
-worker → domain developers → worker-validation → task_sync
+worker → domain developers (production code ONLY)
+     → worker-validation (app runs + doc/spec standards)
+     → task_sync
 ```
 
-**Does not** list validator/tester caps. **Does not** call validator, tester, work-creator, or git agent.
+Domain developers load **code-*** skills only. **Never** write tests or load **test-*** skills.
+
+**Does not** call validator, tester, or other peers.
 
 When tasks complete → tell user `@specloom-validator`.
 
@@ -82,6 +104,8 @@ Pass → tell user `@specloom-tester`.
 ## 4. specloom-tester
 
 **Only sub-loop:** `specloom-test-loop` (≤5)
+
+Loads **test-*** skills only — **no code-***. All tests written here. Tests assert spec + feature acceptance criteria.
 
 Precondition: validator passed. Pass → done.
 

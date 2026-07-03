@@ -1,14 +1,14 @@
 ---
 name: test-react-native
 description: >-
-  INTERNAL — specloom-validator, specloom-frontend-developer agents. Universal React Native testing standards.
-  Pair with code-react-native. Not user-invokable.
+  INTERNAL — specloom-frontend-test-standards only. React Native testing standards.
+  Do not load code-react-native. Not user-invokable.
 ---
 
 
 # React Native Testing Standards
 
-Pair with **code-react-native**, **test-react**, **test-typescript**.
+Professional React Native test standards. **Testing only**.
 
 ## Stack
 
@@ -23,6 +23,7 @@ Pair with **code-react-native**, **test-react**, **test-typescript**.
 - Mock `react-native` native modules only when needed — prefer integration-style tests.
 - Test navigation with mocked navigators or test harness screens.
 - Verify accessibility: `accessibilityLabel`, `accessibilityRole`.
+- Assert flows match **spec** acceptance criteria.
 
 ## Platform
 

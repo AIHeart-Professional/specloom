@@ -10,7 +10,17 @@ disable-model-invocation: true
 
 **specloom-implement** never reads this skill directly. Loop agents read it.
 
-Load **specloom-orchestrator-session** for work discovery, no_work, git bookends, spec-over-feature priority.
+Load **specloom-orchestrator-session** for work discovery, no_work, git bookends, spec-over-feature priority, approval mode.
+
+## Approval commands (implement · validator · tester)
+
+| Command | Default | Effect |
+|---------|---------|--------|
+| `/manual` | **yes** | Review card; archive only after `/approve` |
+| `/auto` | | Auto-approve; tester archives on pass |
+| `/approve` | | Confirm pending sign-off |
+
+See **specloom-approval-mode**. Persist `approvalMode` in `active_work.json`.
 
 ## Output contract
 
@@ -66,6 +76,7 @@ WORKER_HANDOFF:
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
   max_loop_iterations: 10
   active_work_path: docs/automation/state/active_work.json
+  approval_mode: manual | auto
 ```
 
 ## IMPLEMENTATION_HANDOFF → domain developers
@@ -268,10 +279,22 @@ Append to spec under `## Validation Results`:
 1. [{layer}] {file} — {issue} → {remediation}
 ```
 
-## Default skill_standards per layer
+## Default implementation skills per layer (specloom-implement only)
 
-| Layer | Skills |
-|-------|--------|
-| frontend | specloom-frontend-developer-typescript, specloom-frontend-developer-react, specloom-frontend-developer-react-native |
-| backend | specloom-backend-developer-python |
-| database | specloom-database-developer-postgres |
+| Layer | Skills (`code-*` / `specloom-*-developer-*`) |
+|-------|------------------------------------------------|
+| frontend | code-typescript, code-react, code-react-native |
+| backend | code-python |
+| database | code-postgres |
+
+**No test-* skills.** Domain developers never write test files.
+
+## Default test skills per layer (specloom-tester only)
+
+| Layer | Skills (`test-*` only) |
+|-------|------------------------|
+| frontend | test-typescript, test-react, test-react-native |
+| backend | test-python, test-typescript (when Node tests) |
+| database | test-postgres |
+
+**No code-* skills.** Test agents validate against spec + parent feature.

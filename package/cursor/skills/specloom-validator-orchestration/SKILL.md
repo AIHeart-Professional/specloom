@@ -15,7 +15,7 @@ Runs after **specloom-worker-validation** passes.
 1. Build `STANDARDIZED_LOOP_HANDOFF` with `max_loop_iterations: 3`
 2. Delegate **specloom-standardized-loop** (Task) — validator executes, not implement
 3. On each `STANDARDIZED_LOOP_RESULT`:
-   - If `status: pass` → reply user pass
+   - If `status: pass` → apply **specloom-approval-mode** post-pass (manual review card or auto `awaiting_tests`)
    - If `status: fail` and attempts < 3 → retry loop
    - If attempts = 3 → build `spec_validation_section`, append to spec, tell user `@specloom-implement`
 

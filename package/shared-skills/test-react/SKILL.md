@@ -1,14 +1,14 @@
 ---
 name: test-react
 description: >-
-  INTERNAL — specloom-validator, specloom-frontend-developer agents. Universal React testing standards.
-  Pair with code-react and test-typescript. Not user-invokable.
+  INTERNAL — specloom-frontend-test-standards only. React testing standards.
+  Do not load code-react. Not user-invokable.
 ---
 
 
 # React Testing Standards
 
-Pair with **code-react** + **test-typescript**.
+Professional React test standards. **Testing only** — load **test-typescript** for TS test patterns.
 
 ## Library
 
@@ -28,6 +28,7 @@ Pair with **code-react** + **test-typescript**.
 - Fire events with `@testing-library/user-event` — not raw `fireEvent` unless necessary.
 - Assert **visible outcomes** — not internal state or prop drilling.
 - Test loading, empty, and error states for every async component.
+- Map assertions to **spec** requirements and **feature** acceptance criteria.
 
 ## Hooks
 

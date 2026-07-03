@@ -18,15 +18,24 @@ Natural language to user. Internal sub-agent JSON parsed silently.
 
 ## Session contract
 
-Read **specloom-orchestrator-session** + **specloom-git-workflow** + **specloom-validator-orchestration**.
+Read **specloom-orchestrator-session** + **specloom-git-workflow** + **specloom-validator-orchestration** + **specloom-approval-mode**.
 
 ```
+0. Resolve approval mode (/manual default, /auto, /approve)
 1. Work discovery → nothing to validate? → "No work available" & STOP
 2. Git task_start (shell)
 3. Delegate **specloom-standardized-loop** only (≤3)
 4. Git task_push → merge_to_ai_workflow
-5. Reply user
+5. Post-pass per approval mode → reply user
 ```
+
+## Approval mode
+
+| Command | On validation pass |
+|---------|-------------------|
+| **`/manual`** (default) | Review card; `validation_passed`; **await `/approve`** before `awaiting_tests` |
+| **`/auto`** | `manifest.status: awaiting_tests`; suggest `@specloom-tester` |
+| **`/approve`** | Set `awaiting_tests`; clear `pendingSignOff` |
 
 ## Modes (user message or auto-detect)
 
@@ -65,12 +74,23 @@ Draft mode: score in-process using **specloom-work-creator-draft-validation** �
 - Implementation mode: tasks incomplete OR worker-validation not passed OR already validated
 - Blocked spec/feature
 
-## Example — pass
+## Example — pass (manual)
+
+```markdown
+## Review required — validation complete
+
+**Spec:** 062626_auth-filter · confidence **99** · **Mode:** manual
+
+**Approve?** Reply `/approve` or "sign off" to unlock testing.
+**Then:** `@specloom-tester`
+```
+
+## Example — pass (auto)
 
 ```markdown
 ## Validation complete
 
-**Spec:** 062626_auth-filter · confidence **99** · merged to `ai-workflow`
+**Spec:** 062626_auth-filter · confidence **99** · **Mode:** auto · merged to `ai-workflow`
 
 **Next:** `@specloom-tester`
 ```

@@ -20,10 +20,10 @@ No valid `WORKER_HANDOFF` from **specloom-implement** → reply JSON only:
 
 | Agent | Purpose |
 |-------|---------|
-| **specloom-frontend-developer** | UI/client tasks |
-| **specloom-backend-developer** | API/server tasks |
-| **specloom-database-developer** | Supabase schema/RLS tasks |
-| **specloom-worker-validation** | Post-implementation app + rules check |
+| **specloom-frontend-developer** | UI/client tasks (production code only — no tests) |
+| **specloom-backend-developer** | API/server tasks (production code only — no tests) |
+| **specloom-database-developer** | Supabase schema/RLS tasks (production only — no test harness) |
+| **specloom-worker-validation** | App runs + doc/spec/feature coding standards |
 
 **Do not** delegate peer orchestrators or **specloom-update-knowledgebase** finalize — implement owns `task_sync` handoffs only.
 

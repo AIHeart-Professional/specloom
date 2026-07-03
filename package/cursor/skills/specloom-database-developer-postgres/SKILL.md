@@ -1,9 +1,9 @@
 ---
 name: specloom-database-developer-postgres
 description: >-
-  INTERNAL ? specloom-database-developer agents only. Universal postgres coding standards. Not user-invokable.
-disable-model-invocation: true
+  INTERNAL ù specloom-database-developer agents only. Universal Postgres coding standards. No testing ó use test-postgres in specloom-tester. Not user-invokable.
 ---
+
 # PostgreSQL / Supabase Core Standards
 
 Universal database standards for PostgreSQL and Supabase-backed applications. Apply to schema design, migrations, RLS policies, and SQL accessed via Supabase MCP or migration tools.
@@ -114,13 +114,6 @@ UPDATE requires a matching **SELECT policy** ó without it, updates silently affe
 - [ ] FK columns indexed
 - [ ] Views use `security_invoker = true` (PG 15+)
 
-## Testing
-
-- Test RLS with **`authenticated`** and **`anon`** roles ó not superuser.
-- Verify cross-tenant isolation: user A cannot read/write user B rows.
-- Test UPDATE and DELETE return expected row counts.
-- Include policy regression tests in CI when the project supports pgTAP or integration tests.
-
 ## Anti-Patterns
 
 - Tables in `public` without RLS on a Supabase project with Data API enabled.
@@ -145,3 +138,7 @@ UPDATE requires a matching **SELECT policy** ó without it, updates silently affe
 - [Supabase ó Postgres Indexes](https://supabase.com/docs/guides/database/postgres/indexes)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/current/)
 - [Supabase RLS Policy Examples (GitHub)](https://github.com/supabase/supabase/blob/master/examples/prompts/database-rls-policies.md)
+
+## Codex Port
+
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

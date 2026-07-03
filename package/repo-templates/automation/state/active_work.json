@@ -22,6 +22,7 @@
   "workRecordPath": null,
   "reason": "Initial state — run_until_complete from coordinator workflow",
   "humanApprovalRequired": false,
+  "approvalMode": "manual",
   "pendingSignOff": null,
   "needsUserReason": null,
   "lastValidation": null,

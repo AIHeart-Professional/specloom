@@ -1,7 +1,7 @@
 ---
 name: code-react-native
 description: >-
-  INTERNAL � specloom-frontend-developer agents only. Universal react-native coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer agents only. Universal React Native coding standards. No testing — use test-react-native in specloom-tester. Not user-invokable.
 ---
 
 # React Native Core Standards
@@ -87,12 +87,6 @@ Universal React Native standards for mobile apps. Requires **React CORE** and **
 - Centralize HTTP client configuration (base URL, auth headers, timeouts, retries).
 - Handle offline and slow network — show loading and retry affordances.
 - Never block the JS thread with synchronous heavy work — offload or chunk.
-
-## Testing
-
-- **Jest** for unit tests; **React Native Testing Library** for component tests.
-- Detox / Maestro / Appium for E2E when the project adopts them.
-- Test navigation flows and platform-specific permissions where applicable.
 
 ## Anti-Patterns
 

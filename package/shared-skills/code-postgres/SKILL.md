@@ -1,7 +1,7 @@
 ---
 name: code-postgres
 description: >-
-  INTERNAL � specloom-database-developer agents only. Universal postgres coding standards. Not user-invokable.
+  INTERNAL � specloom-database-developer agents only. Universal Postgres coding standards. No testing — use test-postgres in specloom-tester. Not user-invokable.
 ---
 
 # PostgreSQL / Supabase Core Standards
@@ -113,13 +113,6 @@ UPDATE requires a matching **SELECT policy** — without it, updates silently af
 - [ ] Service role never in client env
 - [ ] FK columns indexed
 - [ ] Views use `security_invoker = true` (PG 15+)
-
-## Testing
-
-- Test RLS with **`authenticated`** and **`anon`** roles — not superuser.
-- Verify cross-tenant isolation: user A cannot read/write user B rows.
-- Test UPDATE and DELETE return expected row counts.
-- Include policy regression tests in CI when the project supports pgTAP or integration tests.
 
 ## Anti-Patterns
 

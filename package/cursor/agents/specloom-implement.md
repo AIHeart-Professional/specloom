@@ -20,24 +20,35 @@ Natural language only. Never paste sub-agent JSON.
 
 ## Session contract
 
-Read **specloom-orchestrator-session** + **specloom-git-workflow**.
+Read **specloom-orchestrator-session** + **specloom-git-workflow** + **specloom-approval-mode**.
 
 ```
+0. Resolve approval mode (/manual default, /auto, /approve)
 1. Work discovery → no Ready tasks? → "No work available" & STOP
 2. Git task_start (shell, ai-workflow)
 3. Delegate **specloom-worker** only (≤10 iterations)
 4. Git task_push → merge_to_ai_workflow
-5. Reply user
+5. Post-pass per approval mode → reply user
 ```
+
+## Approval mode
+
+| Command | Behavior on pass |
+|---------|------------------|
+| **`/manual`** (default) | Review card; `manifest.status: awaiting_validation`; **no archive** |
+| **`/auto`** | `manifest.status: awaiting_validation`; suggest `@specloom-validator` |
+| **`/approve`** | Process deferred sign-off if `pendingSignOff` set |
 
 ## Scope (this agent only)
 
 ```
 specloom-worker (≤10)
-  → domain developers per task
-  → specloom-worker-validation when all tasks Complete
+  → domain developers per task (production code ONLY — no tests)
+  → specloom-worker-validation when all tasks Complete (app runs + doc/spec standards)
   → specloom-update-knowledgebase task_sync (per task, via worker delegations)
 ```
+
+**Production code only.** Domain developers **never** create test files. **specloom-tester** owns all tests after validator passes.
 
 **Not in scope:** validator, tester, planning, git agent delegation.
 
@@ -61,18 +72,29 @@ specloom-worker (≤10)
 - Spec/feature blocked
 - All tasks already `Complete` (user should run `@specloom-validator` next)
 
-## Example — success
+## Example — success (manual)
+
+```markdown
+## Review required — implementation complete
+
+**Spec:** 062626_auth-filter · **Mode:** manual · merged to `ai-workflow`
+
+**Done:** T1–T3 implemented; worker-validation 99.
+
+**Approve?** Reply `/approve` or "sign off" to mark ready for validation.
+**Then:** `@specloom-validator`
+```
+
+## Example — success (auto)
 
 ```markdown
 ## Implementation complete
 
-**Spec:** 062626_auth-filter · merged to `ai-workflow`
+**Spec:** 062626_auth-filter · **Mode:** auto · merged to `ai-workflow`
 
 **Done:** T1–T3 implemented; worker-validation 99.
 
-**Your next steps:**
-1. `@specloom-validator` — code quality gate
-2. `@specloom-tester` — after validator passes
+**Next:** `@specloom-validator`
 ```
 
 ## Example — no work

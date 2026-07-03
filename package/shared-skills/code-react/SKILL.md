@@ -1,7 +1,7 @@
 ---
 name: code-react
 description: >-
-  INTERNAL � specloom-frontend-developer agents only. Universal react coding standards. Not user-invokable.
+  INTERNAL � specloom-frontend-developer agents only. Universal React coding standards. No testing — use test-react in specloom-tester. Not user-invokable.
 ---
 
 # React Core Standards
@@ -55,7 +55,7 @@ Components and Hooks must be:
 - **Props down, events up** — no cross-sibling communication via mutable module variables.
 - Prefer **composition** over inheritance; use `children`, render props, or slots.
 - Keep **presentational** components free of data-fetching; container components own data loading.
-- Colocate styles, tests, and types with components when the project structure allows.
+- Colocate styles and types with components when the project structure allows.
 - Use **fragments** (`<>...</>`) to avoid unnecessary wrapper DOM nodes.
 
 ## State
@@ -95,12 +95,6 @@ Components and Hooks must be:
 - Use **Error Boundaries** for unexpected render errors in feature sections.
 - Handle async errors in event handlers and data layers — surface user-friendly messages.
 - Never expose raw stack traces to end users in production.
-
-## Testing
-
-- Test behavior users see — not implementation details.
-- Prefer **React Testing Library** queries by role/label/text.
-- Avoid testing internal state; interact via public UI.
 
 ## Anti-Patterns
 

@@ -33,7 +33,7 @@ Load **specloom-knowledgebase-*** skill matching handoff `target_repo` before ed
 |----------|------|
 | `task_sync` | After each task — manifest + spec Changes |
 | `finalize_work_records` | After tester passes — implementation.md, testing.md, completion.json |
-| `archive_spec` | Move spec to archived/, update feature status |
+| `archive_spec` | Move spec to archived/ — **manual** mode only after `/approve`; **auto** on tester pass |
 | `sync_knowledge` | Update docs/knowledge/ from implementation results |
 
 ## Per-repository skills

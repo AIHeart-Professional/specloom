@@ -1,9 +1,9 @@
 ---
 name: specloom-frontend-developer-react
 description: >-
-  INTERNAL ? specloom-frontend-developer agents only. Universal react coding standards. Not user-invokable.
-disable-model-invocation: true
+  INTERNAL ù specloom-frontend-developer agents only. Universal React coding standards. No testing ó use test-react in specloom-tester. Not user-invokable.
 ---
+
 # React Core Standards
 
 Universal React standards for all projects (web and shared component logic). Pair with **TypeScript CORE** for `.tsx` files.
@@ -55,7 +55,7 @@ Components and Hooks must be:
 - **Props down, events up** ó no cross-sibling communication via mutable module variables.
 - Prefer **composition** over inheritance; use `children`, render props, or slots.
 - Keep **presentational** components free of data-fetching; container components own data loading.
-- Colocate styles, tests, and types with components when the project structure allows.
+- Colocate styles and types with components when the project structure allows.
 - Use **fragments** (`<>...</>`) to avoid unnecessary wrapper DOM nodes.
 
 ## State
@@ -96,12 +96,6 @@ Components and Hooks must be:
 - Handle async errors in event handlers and data layers ó surface user-friendly messages.
 - Never expose raw stack traces to end users in production.
 
-## Testing
-
-- Test behavior users see ó not implementation details.
-- Prefer **React Testing Library** queries by role/label/text.
-- Avoid testing internal state; interact via public UI.
-
 ## Anti-Patterns
 
 - Calling component functions directly (`MyComponent()`) instead of `<MyComponent />`.
@@ -128,3 +122,7 @@ Components and Hooks must be:
 - [Keeping Components Pure](https://react.dev/learn/keeping-components-pure)
 - [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)
 - [Thinking in React](https://react.dev/learn/thinking-in-react)
+
+## Codex Port
+
+This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.

@@ -25,6 +25,8 @@ alwaysApply: true
 
 Load **specloom-orchestrator-session**: work discovery → git start → scope → git merge → reply.
 
+**Approval:** `/manual` (default), `/auto`, `/approve` — see **specloom-approval-mode** (implement, validator, tester only).
+
 Each orchestrator runs git via **specloom-git-workflow** (shell), not by calling `@specloom-git`.
 
 ## Pipeline order (user manual)

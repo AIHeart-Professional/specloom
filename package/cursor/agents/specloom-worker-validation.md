@@ -74,5 +74,6 @@ Where `app_score` = 100 if `app_runs`, else 0.
 ## Boundaries
 
 - **Do not** edit code — report only
-- **Do not** run full test suite (that's **specloom-tester**)
+- **Do not** run full test suite, pytest, `npm test`, or coverage — **specloom-tester** owns all tests
+- **Do not** edit test files
 - **Do not** Task other agents

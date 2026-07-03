@@ -1,7 +1,7 @@
 ---
 name: code-python
 description: >-
-  INTERNAL � specloom-backend-developer agents only. Universal python coding standards. Not user-invokable.
+  INTERNAL � specloom-backend-developer agents only. Universal Python coding standards. No testing — use test-python in specloom-tester. Not user-invokable.
 ---
 
 # Python Core Standards
@@ -79,15 +79,6 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - Use **`asyncio.TaskGroup`** (3.11+) or structured concurrency patterns for fan-out.
 - Always **await** coroutines; use timeout wrappers on external calls.
 
-## Testing
-
-- **pytest** as the default test runner.
-- **Arrange–Act–Assert** structure; one logical assertion focus per test.
-- Use **fixtures** for setup; avoid shared mutable global test state.
-- **Mock at boundaries** (HTTP, DB, clock) — not internal implementation details.
-- Target **high coverage** on business logic and auth/permission paths.
-- Property-based tests (Hypothesis) for parsers and validators when valuable.
-
 ## Security
 
 - Parameterized queries / ORM only — **never** string-concatenate SQL.
@@ -100,7 +91,7 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - **`pyproject.toml`** as single source for deps, tools, and metadata.
 - Pin dependencies in lock file or constraints for reproducible builds.
 - Use **`uv` / `poetry` / `pip-tools`** consistently within a project.
-- Pre-commit hooks: format, lint, typecheck, tests on changed files.
+- Pre-commit hooks: format, lint, typecheck on changed files.
 
 ## Anti-Patterns
 
@@ -116,7 +107,6 @@ Universal Python standards for backend services, scripts, and tooling. Based on 
 - [ ] Black/Ruff format and lint clean
 - [ ] Docstrings on public modules/functions
 - [ ] No secrets in code or logs
-- [ ] Tests for new behavior and edge cases
 - [ ] Errors logged with context; specific exception types
 - [ ] SQL parameterized; input validated at boundary
 

@@ -37,11 +37,11 @@ User runs each orchestrator **separately** in pipeline order.
 |--------|----------------|
 | **specloom-work-creator** | *(none — reads skills, edits docs directly)* |
 | **specloom-implement** | **specloom-worker**, **specloom-update-knowledgebase** (`task_sync` only) |
-| **specloom-worker** | domain developers, **specloom-worker-validation** |
+| **specloom-worker** | domain developers (production code + `code-*` only), **specloom-worker-validation** |
 | **specloom-validator** | **specloom-standardized-loop** |
 | **specloom-standardized-loop** | domain validators |
 | **specloom-tester** | **specloom-test-loop**, **specloom-update-knowledgebase** (`finalize_work_records` only) |
-| **specloom-test-loop** | test-standards agents |
+| **specloom-test-loop** | test-standards agents (`test-*` skills only — no `code-*`) |
 | **specloom-git** | *(none — runs git commands directly)* |
 
 **specloom-system-advisor** — any peer may delegate for help questions only.
@@ -79,6 +79,22 @@ Orchestrators run git **themselves** via skill + shell — they do **not** invok
 
 ---
 
+## Approval mode (implement · validator · tester)
+
+Load **specloom-approval-mode** at session start.
+
+| Command | Default | Effect |
+|---------|---------|--------|
+| **`/manual`** | **yes** | Review card; **no archive** until `/approve` |
+| **`/auto`** | | Auto-approve; tester runs `archive_spec` on pass |
+| **`/approve`** | | Confirm pending sign-off (manual follow-up) |
+
+Persist `approvalMode` in `docs/automation/state/active_work.json`.
+
+**specloom-work-creator** and **specloom-git** ignore approval mode.
+
+---
+
 ## Work discovery
 
 Load **specloom-work-creator-docs-planning** for queue paths.
@@ -87,7 +103,7 @@ Load **specloom-work-creator-docs-planning** for queue paths.
 
 - `blocked_work.json` hit
 - Spec/feature `Status: Blocked`
-- `pendingSignOff` unresolved
+- `pendingSignOff` unresolved **and** user did not send `/approve`
 - `stopReason: needs_user`
 
 ### Priority: specs before features

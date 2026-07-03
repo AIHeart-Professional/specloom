@@ -37,8 +37,17 @@ After each task:
 
 ## Archive spec
 
+Respect `active_work.json` **approvalMode** (see **specloom-approval-mode**):
+
+| Mode | When to archive |
+|------|-----------------|
+| **manual** | Only on **`/approve`** or explicit user sign-off after review card |
+| **auto** | Immediately when **specloom-tester** passes all tests |
+
+Steps when archive allowed:
+
 1. Set spec `Status: Complete`
-2. Move to `docs/specs/archived/` **only after user sign-off** (if policy requires)
+2. Move to `docs/specs/archived/`
 3. Update parent feature progress
 4. `manifest.status: archived`
 
