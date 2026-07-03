@@ -32,7 +32,7 @@ Read active **spec**, parent **feature**, and `manifest.files_index` (`layer: ba
 
 ## Work
 
-1. Unit + integration + regression tests per spec/feature
+1. **Unit**, **integration**, **system**, and **performance** tests per spec/feature
 2. **100% coverage** on manifest backend production paths
 3. Run `AGENTS.md` test commands with coverage
 4. Validate API behavior matches spec Requirements

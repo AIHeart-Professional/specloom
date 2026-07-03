@@ -2,54 +2,54 @@
 name: test-typescript
 description: >-
   INTERNAL — specloom-*-test-standards agents only. TypeScript/JavaScript testing standards.
-  Do not load code-typescript. Not user-invokable.
+  Unit, integration, system, performance. Do not load code-typescript. Not user-invokable.
 ---
-
 
 # TypeScript Testing Standards
 
-Professional TypeScript/JavaScript test standards. **Testing only** — no production coding rules.
+Professional TypeScript/JavaScript test standards. **Testing only** — pairs with **test-react** / **test-react-native** for UI layers.
 
-## Stack defaults
+## Required test styles (all four per spec work)
+
+| Style | Scope |
+|-------|--------|
+| **unit** | Pure functions, hooks, utilities — mocked boundaries |
+| **integration** | Multiple modules, API client + handlers, provider trees |
+| **system** | Full app path in test env (Playwright/Cypress/API E2E per `AGENTS.md`) |
+| **performance** | Render timing, debounce/throttle, list virtualization smoke |
+
+## Stack (read `AGENTS.md`)
 
 | Tool | Use |
 |------|-----|
-| Jest or Vitest | Unit + integration |
-| React Testing Library | Components (with test-react) |
-| @testing-library/jest-dom | DOM matchers |
-
-Read `AGENTS.md` for project choice.
+| **Jest** or **Vitest** | Unit + integration |
+| **React Testing Library** | Components (with test-react / test-react-native) |
+| **@testing-library/jest-dom** | DOM matchers |
+| **Playwright** / **Cypress** | System/E2E when adopted |
 
 ## Principles
 
-- Test **behavior**, not implementation (no testing private methods or internal state).
-- **Arrange–Act–Assert** structure; one logical assertion focus per test.
-- **AAA** naming: `should_<expected>_when_<condition>`.
-- Mock at **boundaries** (fetch, modules) — not every internal call.
-- Use **fake timers** for debounce/throttle; restore after each test.
-
-## Coverage
-
-- 100% lines + branches on spec-touched production files (see **specloom-*-test-standards-rules**).
-- Cover error paths, empty input, and boundary values.
-- Every exported function/hook needs at least one test.
-
-## Types in tests
-
-- Type test fixtures and mocks — no `any` in test files.
-- Use `satisfies` / typed mock factories for API responses.
+- Test **behavior**, not implementation
+- **AAA** — Arrange, Act, Assert; one focus per test
+- Mock at **boundaries** (fetch, native modules) — not every internal call
+- **Fake timers** for debounce/throttle; restore after each test
+- Type fixtures — no `any`; use `satisfies` / typed factories
+- Map assertions to **spec** / **feature** (`spec_ref`)
 
 ## Async
 
-- Always `await` assertions on async UI (`findBy*`, `waitFor`).
-- Reject floating promises in tests.
+- `await` assertions (`findBy*`, `waitFor`); no floating promises
+
+## Coverage
+
+- **100%** lines + branches on manifest production files
 
 ## Anti-patterns
 
-- Snapshot-only tests with no behavioral assertion.
-- Testing library implementation details (hook state directly).
-- Shared mutable state between tests.
+- Snapshot-only tests without behavioral assertion
+- Testing hook/state implementation details
+- Shared mutable state between tests
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+Internal — specloom-*-test-standards only.

@@ -1,55 +1,67 @@
 ---
 name: test-postgres
 description: >-
-  INTERNAL — specloom-database-test-standards only. PostgreSQL/Supabase testing standards.
-  Do not load code-postgres. Not user-invokable.
+  INTERNAL — specloom-database-test-standards only. Postgres/Supabase testing standards.
+  Unit, integration, system, performance. Do not load code-postgres. Not user-invokable.
 ---
-
 
 # PostgreSQL / Supabase Testing Standards
 
 Professional database test standards. **Testing only** — no schema authoring rules.
 
-## Scope
+## Required test styles (all four per spec work)
 
-- Schema migrations apply cleanly on empty and existing DBs.
-- RLS policies enforce tenant/user isolation per **spec** security requirements.
-- Constraints, triggers, and functions behave as specified in spec/feature.
+| Style | Scope |
+|-------|--------|
+| **unit** | SQL functions, constraints logic via isolated queries |
+| **integration** | Migrations, RLS, triggers with real test DB |
+| **system** | App + Supabase client full path per spec security model |
+| **performance** | `EXPLAIN (ANALYZE)` on hot queries; index usage |
 
 ## Environment
 
-- **Local Supabase** or isolated test project — never production.
-- Test as **`authenticated`** and **`anon`** roles — not superuser (RLS blind spot).
-- Use **service_role** only in explicit admin test fixtures — document why.
+- **Local Supabase** or isolated test project — never production
+- Roles: **`authenticated`**, **`anon`** — not superuser for RLS tests
+- **`service_role`** only in documented admin fixtures
 
-## RLS tests
+## RLS tests (integration/system)
 
-For each policy set in spec:
+Per spec policy matrix:
 
 | Operation | Assert |
 |-----------|--------|
-| SELECT | User A cannot read User B rows |
+| SELECT | Tenant A cannot read tenant B |
 | INSERT | `WITH CHECK` rejects invalid ownership |
-| UPDATE | Requires SELECT policy; returns expected row count |
-| DELETE | Unauthorized role affects 0 rows |
+| UPDATE | SELECT policy prerequisite; expected row count |
+| DELETE | Unauthorized → 0 rows |
 
-Use `(SELECT auth.uid())` pattern in policies under test.
+Use `(SELECT auth.uid())` in policies under test.
 
-## Integration
+## Migrations (integration)
 
-- pgTAP or application integration tests that exercise real queries through Supabase client.
-- Verify migration up/down or forward-only path per project policy.
+- Apply on empty and seeded DB
+- Forward-only or up/down per project policy
 
-## Performance smoke
+## Performance (performance)
 
-- `EXPLAIN` on hot queries touched by spec — no sequential scan on large tables without index.
+- No sequential scan on large tables without index on spec hot paths
+- Document baseline ms for critical queries when spec requires
+
+## Coverage
+
+- **100%** on database work items in manifest (policies, functions, migrations)
 
 ## Anti-patterns
 
-- Testing RLS only as superuser.
-- Skipping UPDATE policy SELECT prerequisite tests.
-- SQL string concatenation in test setup.
+- RLS tested only as superuser
+- Destructive tests against production
+- SQL string concatenation in fixtures
+
+## References
+
+- [Supabase Testing](https://supabase.com/docs/guides/database/overview)
+- [pgTAP](https://pgtap.org/) when project adopts it
 
 ## Codex Port
 
-This skill was ported from the Cursor SDD system. It is internal and should be used only by the assigned `specloom-*` Codex custom agent. Implicit invocation is disabled in `agents/openai.yaml`.
+Internal — **specloom-database-test-standards** only.

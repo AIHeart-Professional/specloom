@@ -1,6 +1,6 @@
 # Testing Record — SPEC-{spec_id}
 
-> Full test run by **specloom-validator** after all tasks complete. Before git commit and user sign-off.
+> Full test run by **specloom-tester** after work validation. Before user sign-off.
 
 spec_id: {spec_id}
 spec_path: docs/specs/MMDDYY_short-description.md
@@ -17,12 +17,12 @@ Brief narrative: what was tested, outcome, coverage.
 
 | Metric | Value |
 |--------|-------|
-| Command | `pytest tests/...` or `npm run test` |
+| Command | `pytest tests/unit` or `npm test` |
 | Passed | 0 |
 | Failed | 0 |
 | Skipped | 0 |
 | Coverage % | 0 |
-| Target | 100% on spec-touched files |
+| Target | 100% on spec-touched production files |
 
 ### Coverage gaps
 
@@ -41,20 +41,20 @@ _None_ or list test name, file, error.
 | Command | |
 | Passed | 0 |
 | Failed | 0 |
-| Summary | |
+| Summary | Multi-module / API + DB cooperation |
 
 ### Failures
 
 _None_
 
-## End-to-end (E2E) tests
+## System tests
 
 | Metric | Value |
 |--------|-------|
-| Command | `npm run test:e2e` or Playwright |
+| Command | E2E / full-stack per `AGENTS.md` |
 | Passed | 0 |
 | Failed | 0 |
-| Summary | User journeys exercised |
+| Summary | User journeys from spec/feature acceptance criteria |
 
 ### Scenarios covered
 
@@ -64,9 +64,22 @@ _None_
 
 _None_
 
+## Performance tests
+
+| Metric | Value |
+|--------|-------|
+| Command | benchmark / load smoke per `AGENTS.md` |
+| Passed | 0 |
+| Failed | 0 |
+| Summary | Hot paths, latency thresholds |
+
+### Failures
+
+_None_
+
 ## Remediation history
 
-> If specloom-work-creator retried after failures, log each attempt.
+> If specloom-implement retried after failures, log each attempt.
 
 | Attempt | Status | Layer fixed | Notes |
 |---------|--------|-------------|-------|
@@ -74,7 +87,7 @@ _None_
 
 ## Sign-off gate
 
-- [ ] All three layers executed (unit, integration, E2E)
-- [ ] 100% coverage on spec-touched files (or documented exception in Open Questions)
+- [ ] All four styles executed (unit, integration, system, performance) — or documented N/A per layer in Open Questions
+- [ ] 100% coverage on spec-touched production files (or documented exception)
 - [ ] No failing tests
 - [ ] Ready for user approval

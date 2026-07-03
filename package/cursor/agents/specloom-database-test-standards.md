@@ -31,7 +31,7 @@ Read active **spec**, parent **feature**, and manifest database work items. RLS/
 
 ## Work
 
-1. Integration tests for schema, RLS, migrations per spec/feature
+1. **Unit**, **integration**, **system**, and **performance** tests for schema, RLS, migrations per spec/feature
 2. **100% coverage** on database-related manifest items
 3. Use Supabase MCP or test DB per `AGENTS.md`
 4. Test as `authenticated` / `anon` — not superuser

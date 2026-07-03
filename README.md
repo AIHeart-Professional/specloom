@@ -26,6 +26,7 @@ Chain them manually in that order for a full pipeline.
 - [Git workflow](#git-workflow)
 - [Agent team](#agent-team)
 - [Validation gates](#validation-gates)
+- [Testing standards](#testing-standards)
 - [Troubleshooting](#troubleshooting)
 - [Project structure](#project-structure)
 - [Contributing](#contributing)
@@ -165,7 +166,7 @@ flowchart LR
 Optional but recommended:
 
 - Cursor **Automations** or Codex **scheduled automations** for hands-off runs
-- Existing test suite (unit + integration commands in `AGENTS.md`)
+- Existing test suite with **unit**, **integration**, **system**, and **performance** commands in `AGENTS.md`
 
 ---
 
@@ -480,6 +481,62 @@ On pass:
 - **work + test** — auto closeout (finalize, PR, merge, archive)
 
 On 3 failures → `docs/automation/state/blocked_work.json` + session stops.
+
+---
+
+## Testing standards
+
+SpecLoom splits **production code** from **tests**:
+
+| Layer | Who writes code | Who writes tests | Skills |
+|-------|-----------------|------------------|--------|
+| Frontend | `specloom-*-developer` | `specloom-frontend-test-standards` | `code-*` vs `test-*` |
+| Backend | `specloom-*-developer` | `specloom-backend-test-standards` | `code-*` vs `test-*` |
+| Database | `specloom-database-developer` | `specloom-database-test-standards` | `code-postgres` vs `test-postgres` |
+
+**Never** cross-load: implement agents use `code-*` only; tester agents use `test-*` only.
+
+### Four required test styles
+
+Every spec must have coverage across **all four** styles (or documented N/A in Open Questions):
+
+| Style | Purpose |
+|-------|---------|
+| **unit** | Smallest units — functions, hooks, SQL functions |
+| **integration** | Real modules combined — API + test DB, provider trees |
+| **system** | Full user/stack path — E2E, Detox/Maestro/Playwright, full HTTP worker |
+| **performance** | Smoke benchmarks — scroll, query `EXPLAIN`, latency thresholds |
+
+Regression for acceptance criteria is covered **inside** these four styles, not as a separate category.
+
+### Official references (core principles)
+
+| Stack | Primary docs |
+|-------|----------------|
+| **React Native** | [reactnative.dev — Testing Overview](https://reactnative.dev/docs/testing-overview) (static analysis, unit, integration, component, E2E, testable code) |
+| **React (web)** | [react.dev — Testing](https://react.dev/learn/testing) |
+| **Python** | [PEP 8](https://peps.python.org/pep-0008/) (test code style) + [pytest docs](https://docs.pytest.org/en/stable/) ([assertions](https://docs.pytest.org/en/stable/how-to/assert.html), fixtures, parametrize, markers) |
+| **TypeScript** | Jest/Vitest + Testing Library (see `test-typescript`) |
+| **Postgres / Supabase** | RLS matrix + migration verification (see `test-postgres`) |
+
+Skills live in `package/shared-skills/test-*/` and install to `~/.cursor/skills/`, `~/.agents/skills/`, and `~/.gemini/config/skills/`.
+
+### Coverage gate
+
+- **100% line coverage** on every production file in the active spec manifest
+- Every spec **Requirement** maps to at least one test (`spec_ref` in work-records)
+- Commands come from your project `AGENTS.md` — the tester runs your real suite
+
+### Layout (recommended)
+
+```
+tests/
+  unit/
+  integration/
+  system/
+  performance/
+  conftest.py          # Python; or jest/vitest config at root for JS
+```
 
 ---
 

@@ -8,15 +8,20 @@ disable-model-invocation: true
 
 ## Spec / feature mapping (mandatory)
 
-RLS and schema tests must trace to spec security requirements and parent feature acceptance criteria.
+RLS and schema tests must trace to spec security requirements and parent feature acceptance criteria. Record `spec_ref` on `tests_added[]`.
 
-## Test types
+## Test styles (all required per spec work)
 
-| Type | Scope |
-|------|-------|
-| **integration** | Schema migrations apply cleanly |
-| **RLS** | Policy allow/deny per role matrix in spec |
-| **regression** | Data integrity constraints from spec |
+| Style | Scope |
+|-------|--------|
+| **unit** | SQL functions, constraints in isolation |
+| **integration** | Migrations, RLS, triggers on test DB |
+| **system** | App + Supabase client full security path |
+| **performance** | `EXPLAIN (ANALYZE)` on spec hot queries |
+
+## Skills (test only)
+
+- **test-postgres** — never **code-postgres**
 
 ## Coverage target
 
@@ -26,10 +31,13 @@ RLS and schema tests must trace to spec security requirements and parent feature
 
 - Supabase local or test project per `AGENTS.md`
 - Never run destructive tests against production
-- Follow **test-postgres** — not **code-postgres**
 
-## RLS test pattern
+## RLS test pattern (integration/system)
 
 For each policy in spec:
 1. Authenticate as role A → expect allow/deny per spec
 2. Authenticate as role B → expect allow/deny per spec
+
+## Output
+
+`tests_added[]` with `spec_ref` and `style`; `uncovered_files[]`.

@@ -38,7 +38,7 @@ Every test must trace to a spec requirement or feature acceptance criterion.
 
 ## Work
 
-1. Implement unit + integration + regression tests per spec/feature criteria
+1. Implement **unit**, **integration**, **system**, and **performance** tests per spec/feature criteria
 2. Target **100% line coverage** on manifest frontend production files
 3. Run test commands from `AGENTS.md` + spec Validation section
 4. Assert expected behavior from spec — not implementation details
@@ -54,7 +54,7 @@ Every test must trace to a spec requirement or feature acceptance criterion.
   "layer": "frontend",
   "status": "complete|incomplete",
   "coverage_percent": 0,
-  "tests_added": [{"file": "", "type": "unit|integration|regression", "covers": [], "spec_ref": ""}],
+  "tests_added": [{"file": "", "style": "unit|integration|system|performance", "covers": [], "spec_ref": ""}],
   "uncovered_files": [],
   "test_run": {"cmd": "", "exit": 0, "passed": 0, "failed": 0},
   "tokens_used": 0
