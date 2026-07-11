@@ -34,7 +34,7 @@ Each orchestrator:
 | Command | Default | Effect |
 |---------|---------|--------|
 | `/manual` | **yes** | Review card after pass; **no archive** until `/approve` |
-| `/auto` | | Auto-approve; **specloom-tester** archives spec on pass |
+| `/auto` | | Validator archives on final pass |
 | `/approve` | | Confirm pending sign-off (manual follow-up) |
 
 Persist `approvalMode` in `docs/automation/state/active_work.json`. See **specloom-approval-mode**.
@@ -53,12 +53,12 @@ Persist `approvalMode` in `docs/automation/state/active_work.json`. See **speclo
 flowchart LR
   WC[specloom-work-creator]
   IMP[specloom-implement]
-  VAL[specloom-validator]
   TST[specloom-tester]
+  VAL[specloom-validator]
 
   WC -->|user runs| IMP
-  IMP -->|user runs| VAL
-  VAL -->|user runs| TST
+  IMP -->|user runs| TST
+  TST -->|user runs| VAL
 ```
 
 Each box = **separate chat invocation**. No auto-chain.
@@ -87,27 +87,37 @@ Domain developers load **code-*** skills only. **Never** write tests or load **t
 
 **Does not** call validator, tester, or other peers.
 
-When tasks complete → tell user `@specloom-validator`.
+When tasks complete → tell user `@specloom-tester`.
+
+On validator remediation → read `## Validation Results` (`owner:implement`) and fix.
 
 ---
 
-## 3. specloom-validator
-
-**Only sub-loop:** `specloom-standardized-loop` (≤3) for implementation mode
-
-Draft mode: **specloom-work-creator-draft-validation** skill in-process.
-
-Pass → tell user `@specloom-tester`.
-
----
-
-## 4. specloom-tester
+## 3. specloom-tester
 
 **Only sub-loop:** `specloom-test-loop` (≤5)
 
-Loads **test-*** skills only — **no code-***. All tests written here. Tests assert spec + feature acceptance criteria.
+Runs **after implement**, **before validator**. Preconditions: `awaiting_tests` (not validator pass).
 
-Precondition: validator passed. Pass → done.
+Pass → `tests_passed` → tell user `@specloom-validator`.
+
+On validator remediation → fix `owner:tester` issues.
+
+**Does not archive.**
+
+---
+
+## 4. specloom-validator
+
+**Final gate** after tests. Re-runs tests + **specloom-standardized-loop** (≤3).
+
+Precondition: `tests_passed`.
+
+Pass → **sign-off / archive** (`/auto` immediate, `/manual` on `/approve`).
+
+Fail → tag issues `owner:implement` / `owner:tester` → route back.
+
+Draft mode: **specloom-work-creator-draft-validation** (no test prerequisite).
 
 ---
 
@@ -126,13 +136,13 @@ specloom-implement
         ├── specloom-worker-validation
         └── (implement) specloom-update-knowledgebase task_sync
 
-specloom-validator
-  └── specloom-standardized-loop (≤3)
-        └── specloom-*-validator
-
 specloom-tester
   └── specloom-test-loop (≤5)
         └── specloom-*-test-standards
+
+specloom-validator
+  └── specloom-standardized-loop (≤3)
+        └── specloom-*-validator
 ```
 
 ---

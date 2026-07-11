@@ -11,7 +11,8 @@ disable-model-invocation: true
 1. `manifest.json` — `files_index` where `layer: frontend`
 2. Spec Goal, Requirements, task acceptance
 3. Parent feature doc
-4. `required_context[]` + `standards[]`
+4. Phase `PHASE.md` from Required Context
+5. `required_context[]` + `standards[]`
 5. `docs/architecture/` (UI/navigation sections)
 6. `docs/code/typescript/CORE.md`, `docs/code/react-native/CORE.md` when listed
 
@@ -22,6 +23,7 @@ disable-model-invocation: true
 - Every requirement has corresponding UI/behavior in changed files
 - Reference images match layout (when provided)
 - Task checklist items satisfied
+- Phase **In scope** / not **Out of scope** per `PHASE.md`
 
 ### architecture (30%)
 

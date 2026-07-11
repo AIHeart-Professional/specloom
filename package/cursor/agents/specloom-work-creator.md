@@ -48,8 +48,9 @@ Read **specloom-orchestrator-session** + **specloom-git-workflow**.
 | `revise_draft` | create skill + **specloom-work-creator-docs-structure** |
 | `promote_feature` / `promote_spec` | **only after user sign-off** |
 | `bootstrap_repo` | **specloom-work-creator-workflow-setup** |
+| `create_phase` | **specloom-work-creator-create-phase**, **specloom-phase-alignment** |
 
-Always read **specloom-work-creator-docs-structure** before authoring.
+Always read **specloom-work-creator-docs-structure** and **specloom-phase-alignment** before authoring.
 
 ## Sub-agents
 

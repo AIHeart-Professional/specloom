@@ -1,7 +1,7 @@
 ---
 name: specloom-work-creator-create-spec
 description: >-
-  INTERNAL — specloom-work-creator agent only. Author docs/specs/ with Required Context. Not user-invokable.
+  INTERNAL ï¿½ specloom-work-creator agent only. Author docs/specs/ with Required Context. Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -9,20 +9,23 @@ disable-model-invocation: true
 
 Creates **low-level HOW** specs from **high-level WHAT** features. **One spec = one Spec Queue row.**
 
+Load **specloom-phase-alignment** before authoring.
+
 ## Critical Rules
 
 1. **Parent required:** `parent_feature: docs/features/NNN_short-description.md`
-2. **Required Context:** explicit path table — **only** docs subagents may read
+2. **Phase required:** `parent_phase` + `PHASE.md` in Required Context (from feature `phase`)
+2. **Required Context:** explicit path table ï¿½ **only** docs subagents may read
 3. **No extra context:** if not in Required Context, subagents do not load it
 4. **Task Directives:** Language, Code Standards, Image Files, Asset Files, Source Files per task
 5. **Subset rule:** every Task Code Standards + Image/Asset path must appear in Required Context
 6. **Code docs:** `docs/code/<lang-or-topic>/CORE.md` mandatory per language; add specific files only when needed (e.g. `docs/code/react/theme-styling.md`)
-7. **Changes:** append file-level change log during implementation — required for sign-off
+7. **Changes:** append file-level change log during implementation ï¿½ required for sign-off
 8. **Sign-off:** user confirms after reviewing Changes before archive
-9. **`spec_id`:** 3-digit from parent feature `NNN` (e.g. `014`) — used in git branch `task/014-001-slug`
+9. **`spec_id`:** 3-digit from parent feature `NNN` (e.g. `014`) ï¿½ used in git branch `task/014-001-slug`
 10. **Task slug:** each task block includes kebab slug ? branch `task/{spec_id}-{task_seq}-{slug}`
 11. **Token Budget (required):** set `estimated_tokens` + per-task estimates at creation; at sign-off set `tokens_used`, compute `token_variance`; sum tasks into spec totals
-12. **Work Records path:** `docs/specs/work-records/SPEC-{spec_id}/` — populated after **specloom-validator** passes (not at spec creation)
+12. **Work Records path:** `docs/specs/work-records/SPEC-{spec_id}/` ï¿½ populated after **specloom-validator** passes (not at spec creation)
 
 Git base branch: **`ai-workflow`**. See `docs/automation/git-workflow.md`.
 
@@ -45,11 +48,12 @@ List **only** paths needed for this spec. Allowed locations:
 
 | Location | Example |
 |----------|---------|
+| `docs/phases/` | `docs/phases/01-Prototype/PHASE.md` |
 | `docs/code/` | `docs/code/typescript/CORE.md`, `docs/code/react/theme-styling.md` |
 | `docs/architecture/` | `docs/architecture/system_overview.md` |
 | `docs/knowledge/` | `docs/knowledge/pitfalls.md` |
-| `docs/images/` | `docs/images/auth/login.png` — design/reference image only |
-| `docs/images/assets/` | `docs/images/assets/logo.png` — application asset to copy/import/use |
+| `docs/images/` | `docs/images/auth/login.png` ï¿½ design/reference image only |
+| `docs/images/assets/` | `docs/images/assets/logo.png` ï¿½ application asset to copy/import/use |
 | `docs/workflows/` | `docs/workflows/daily-spec-automation.md` |
 | `docs/decisions/` | `docs/decisions/ux.md` |
 | `docs/specs/archived/` | prior completed specs |
@@ -61,7 +65,7 @@ Always include parent feature (issue or path). Include repo `docs/code/` extensi
 
 **Image directory rule:** `docs/images/assets/**` are application assets to use in the app. Every other `docs/images/**` file is a design/reference image only. Do not treat reference images as shippable assets, and do not treat assets as validation/reference screenshots unless explicitly duplicated/listed as such.
 
-**Do not** list entire folders. **Do not** say "read architecture/" — list exact files.
+**Do not** list entire folders. **Do not** say "read architecture/" ï¿½ list exact files.
 
 ## Task directive rules
 
@@ -75,7 +79,7 @@ Always include parent feature (issue or path). Include repo `docs/code/` extensi
 
 Validate before `Pending`:
 
-- [ ] Required Context table complete — no vague entries
+- [ ] Required Context table complete ï¿½ no vague entries
 - [ ] Every Task Code Standards path ? Required Context
 - [ ] Every Task Image path ? Required Context and is not under `docs/images/assets/` (or None)
 - [ ] Every Task Asset path ? Required Context and is under `docs/images/assets/` (or None)
@@ -88,11 +92,11 @@ Validate before `Pending`:
 ## Create Workflow
 
 ```
-- [ ] Step 1: Pick parent feature — lowest NNN Ready, deps met, next Spec Queue row
+- [ ] Step 1: Pick parent feature ï¿½ lowest NNN Ready, deps met, next Spec Queue row
 - [ ] Step 2: Read parent feature
-- [ ] Step 3: Search docs/decisions/ — no duplicate questions
+- [ ] Step 3: Search docs/decisions/ ï¿½ no duplicate questions
 - [ ] Step 4: Decide exact Required Context paths (minimal set)
-- [ ] Step 5: Build Task Directives — subsets of Required Context
+- [ ] Step 5: Build Task Directives ï¿½ subsets of Required Context
 - [ ] Step 6: Filename MMDDYY_short-description.md
 - [ ] Step 7: Fill spec-template.md
 - [ ] Step 8: Validate subset rule + directive completeness

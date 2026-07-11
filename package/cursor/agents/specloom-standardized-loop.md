@@ -23,6 +23,7 @@ No valid `STANDARDIZED_LOOP_HANDOFF` from **specloom-validator** → reply JSON 
 | **specloom-frontend-validator** | frontend |
 | **specloom-backend-validator** | backend |
 | **specloom-database-validator** | database |
+| **specloom-game-validator** | game |
 
 Parallel when `parallel: yes` and multiple layers.
 

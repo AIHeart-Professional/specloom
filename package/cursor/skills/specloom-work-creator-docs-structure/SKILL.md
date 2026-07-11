@@ -9,13 +9,15 @@ disable-model-invocation: true
 
 Repo root `docs/`. One tree per repo.
 
-## Ideas vs Features vs Specs
+## Ideas vs Features vs Specs vs Phases
 
-| | Idea | Feature | Spec |
-|---|------|---------|------|
-| Location | `docs/ideas/NNN_*.md` | `docs/features/NNN_*.md` | `docs/specs/MMDDYY_*.md` |
-| Meaning | May be valuable | Approved outcome | Exactly how we build |
-| Archive | `docs/ideas/archived/` | `docs/features/archived/` | `docs/specs/archived/` |
+| | Phase | Idea | Feature | Spec |
+|---|-------|------|---------|------|
+| Location | `docs/phases/NN-Name/PHASE.md` | `docs/ideas/NNN_*.md` | `docs/features/NNN_*.md` | `docs/specs/MMDDYY_*.md` |
+| Meaning | Product focus / boundaries | May be valuable | Approved outcome | Exactly how we build |
+| Archive | `docs/phases/archived/` | `docs/ideas/archived/` | `docs/features/archived/` | `docs/specs/archived/` |
+
+Load **specloom-phase-alignment** when authoring or validating features/specs.
 
 Skill: **specloom-work-creator-docs-planning** for queue rules.
 
@@ -68,6 +70,7 @@ Repo `docs/code/` holds **project extensions only** (e.g. `react-native-ui.md`, 
 | specloom-frontend-developer-react, specloom-frontend-developer-react-native | specloom-frontend-developer |
 | specloom-backend-developer-python | specloom-backend-developer |
 | specloom-database-developer-postgres | specloom-database-developer |
+| specloom-game-developer-csharp, specloom-game-developer-monogame | specloom-game-developer |
 
 Spec **Required Context** lists repo extension paths. Skills load automatically per layer.
 
@@ -82,6 +85,8 @@ docs/code/
   typescript/react-native-ui.md   # app UI patterns
   integrations/entra-id.md        # project integration config
   python/fastapi-routes.md        # stack-specific topics
+  csharp/CORE.md                  # C# project extensions (MonoGame games)
+  monogame/CORE.md                # MonoGame project extensions
 ```
 
 - **Topic files** ? listed in spec **Required Context** only when needed
@@ -96,12 +101,14 @@ Goal ? **Required Context** ? Requirements ? Task Directives ? **Changes** ? Val
 
 Explicit path table. **Only** listed paths may be read. Sources:
 
-`code/`, `architecture/`, `knowledge/`, `images/` (design refs), `images/assets/` (application assets), `workflows/`, `decisions/`, `specs/archived/`, parent feature (`docs/features/NNN_*.md`).
+`phases/`, `code/`, `architecture/`, `knowledge/`, `images/` (design refs), `images/assets/` (application assets), `workflows/`, `decisions/`, `specs/archived/`, parent feature (`docs/features/NNN_*.md`).
 
 ## Tree
 
 | Path | Purpose |
 |------|---------|
+| `docs/phases/` | Active product phases (`NN-Name/PHASE.md`) |
+| `docs/phases/archived/` | Complete phases |
 | `docs/ideas/` | Backlog ideas |
 | `docs/ideas/archived/` | Promoted ideas |
 | `docs/features/` | Active WHAT |
@@ -122,6 +129,8 @@ Explicit path table. **Only** listed paths may be read. Sources:
 
 | Skill | Loaded by |
 |-------|-----------|
+| **specloom-work-creator-create-phase** | specloom-work-creator |
+| **specloom-phase-alignment** | work-creator, validator, tester, worker-validation |
 | **specloom-work-creator-docs-planning** | work-creator, validator, update-knowledgebase |
 | **specloom-work-creator-create-idea/feature/spec** | specloom-work-creator |
 | **specloom-work-creator-workflow-setup** | specloom-work-creator (bootstrap) |
@@ -135,7 +144,7 @@ Explicit path table. **Only** listed paths may be read. Sources:
 ## Validation pipeline
 
 ```
-tasks Complete → worker-validation → validator (impl) → tester → update-knowledgebase → git merge
+tasks Complete → worker-validation → tester → validator (final + archive) → update-knowledgebase → git merge
 ```
 
 Draft: **specloom-work-creator** → **specloom-validator** (draft).

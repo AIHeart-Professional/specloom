@@ -88,6 +88,10 @@ function antigravityGlobalSkillsDir() {
   return path.join(homeDir(), ".gemini", "config", "skills");
 }
 
+function antigravityGlobalAgentsDir() {
+  return path.join(homeDir(), ".gemini", "config", "agents");
+}
+
 function antigravityGlobalWorkflowsDir() {
   return path.join(homeDir(), ".gemini", "antigravity", "global_workflows");
 }
@@ -248,13 +252,24 @@ function installCodex({ force, dryRun }) {
 }
 
 function installAntigravity({ force, dryRun }) {
+  const cursorAgentsSrc = path.join(PACKAGE_ROOT, "cursor", "agents");
   const cursorSkillsSrc = path.join(PACKAGE_ROOT, "cursor", "skills");
   const sharedSkillsSrc = path.join(PACKAGE_ROOT, "shared-skills");
   const workflowsSrc = path.join(PACKAGE_ROOT, "antigravity", "workflows");
+  const agentsDest = antigravityGlobalAgentsDir();
   const skillsDest = antigravityGlobalSkillsDir();
   const workflowsDest = antigravityGlobalWorkflowsDir();
 
   console.log("\n== Google Antigravity ==");
+
+  const specloomAgents = copyTree({
+    source: cursorAgentsSrc,
+    target: agentsDest,
+    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
+    force,
+    dryRun,
+    label: "antigravity/agents",
+  });
 
   const specloomSkills = copyTree({
     source: cursorSkillsSrc,
@@ -283,7 +298,7 @@ function installAntigravity({ force, dryRun }) {
     label: "antigravity/global_workflows",
   });
 
-  return { specloomSkills, sharedSkills, workflows };
+  return { specloomAgents, specloomSkills, sharedSkills, workflows };
 }
 
 function readTemplate(name) {
@@ -330,6 +345,10 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   writeIfMissing(path.join(repoRoot, "docs", "README.md"), readTemplate("docs-readme.template.md"), { force, dryRun });
 
   const dirs = [
+    "docs/phases",
+    "docs/phases/archived",
+    "docs/phases/01-Prototype",
+    "docs/phases/phase-template",
     "docs/specs",
     "docs/specs/archived",
     "docs/specs/work-records",
@@ -425,6 +444,35 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
     });
   }
 
+  // Code CORE stubs (project extensions — universal rules in code-* skills)
+  const codeCoreTemplates = [
+    ["csharp", "CORE.template.md", "CORE.md"],
+    ["monogame", "CORE.template.md", "CORE.md"],
+  ];
+  for (const [subdir, templateName, destName] of codeCoreTemplates) {
+    const templatePath = path.join(PACKAGE_ROOT, "repo-templates", "code", subdir, templateName);
+    if (fs.existsSync(templatePath)) {
+      writeIfMissing(
+        path.join(repoRoot, "docs", "code", subdir, destName),
+        fs.readFileSync(templatePath, "utf8"),
+        { force, dryRun },
+      );
+    }
+  }
+
+  // Phase stubs
+  const phasesSrc = path.join(PACKAGE_ROOT, "repo-templates", "phases");
+  if (fs.existsSync(phasesSrc)) {
+    copyTree({
+      source: phasesSrc,
+      target: path.join(repoRoot, "docs", "phases"),
+      filter: () => true,
+      force,
+      dryRun,
+      label: "bootstrap/phases",
+    });
+  }
+
   // Architecture stubs
   const archStubs = {
     "system_overview.md": "# System Overview\n\n_Describe the system at a high level._\n",
@@ -506,6 +554,7 @@ function main() {
   if (opts.codex) console.log(`Codex peers:  ${peers}`);
   if (opts.antigravity) {
     console.log(`Antigravity:  /${peers.replace(/, /g, ", /")}`);
+    console.log(`  agents:    ${antigravityGlobalAgentsDir()}`);
     console.log(`  skills:    ${antigravityGlobalSkillsDir()}`);
     console.log(`  workflows: ${antigravityGlobalWorkflowsDir()}`);
   }

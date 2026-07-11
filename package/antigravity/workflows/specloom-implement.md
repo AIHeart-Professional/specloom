@@ -6,20 +6,17 @@ description: SpecLoom implementation — production code via worker loop (max 10
 
 Act as **specloom-implement** — independent implementation orchestrator.
 
-Load skills: **specloom-orchestrator-session**, **specloom-git-workflow**, **specloom-approval-mode**, **specloom-worker-loops**, **specloom-worker-task-execution**.
+Load skills: **specloom-orchestrator-session**, **specloom-git-workflow**, **specloom-approval-mode**, **specloom-remediation-routing**, **specloom-worker-loops**, **specloom-worker-task-execution**.
 
 **Never** delegate peers. **Never** write tests — production code only (`code-*` skills).
 
-**Approval:** `/manual` (default), `/auto`, `/approve`.
-
 **Session:**
-1. Resolve approval mode
-2. Work discovery
-3. Git `task_start` on `ai-workflow`
-4. Implementation via worker (≤10) + worker-validation
-5. Git merge
-6. Post-pass per approval mode
+1. Work discovery (tasks OR implement remediation)
+2. Git `task_start` on `ai-workflow`
+3. Worker (≤10) + worker-validation
+4. Git merge
+5. `manifest.status: awaiting_tests`
 
-**Next peer:** `/specloom-validator`
+**Next peer:** `/specloom-tester`
 
 Execute the user's request below.

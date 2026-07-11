@@ -16,6 +16,7 @@ Use when `target_repo: docs` or `both`.
 |------|---------|
 | `docs/specs/*.md` | Spec status, Changes table, Validation Results |
 | `docs/features/*.md` | Feature status, Token Budget |
+| `docs/phases/` | Phase roster, completion criteria, status |
 | `docs/specs/work-records/` | manifest, implementation.md, testing.md |
 | `docs/knowledge/` | Implementation memory from completed work |
 | `docs/decisions/` | Only when handoff explicitly requests |
@@ -37,7 +38,9 @@ After each task:
 
 ## Archive spec
 
-Respect `active_work.json` **approvalMode** (see **specloom-approval-mode**):
+**Only specloom-validator** triggers `archive_spec` after final validation pass.
+
+Respect `active_work.json` **approvalMode**:
 
 | Mode | When to archive |
 |------|-----------------|
@@ -50,6 +53,19 @@ Steps when archive allowed:
 2. Move to `docs/specs/archived/`
 3. Update parent feature progress
 4. `manifest.status: archived`
+5. If last feature in phase → run **archive_phase** (below)
+
+## Archive phase
+
+When all features for a phase path are `Complete` in `docs/features/archived/`:
+
+1. Verify `PHASE.md` **Completion criteria** checkboxes
+2. Set phase frontmatter `status: Complete`
+3. Move `docs/phases/NN-Name/` → `docs/phases/archived/NN-Name/`
+4. Update `docs/README.md` Phase Queue
+5. Set `active_work.json` `activeProductPhase: null` until user activates next phase
+
+Respect sign-off: phase archive follows same **approvalMode** as feature archive when user review required.
 
 ## Token Budget
 

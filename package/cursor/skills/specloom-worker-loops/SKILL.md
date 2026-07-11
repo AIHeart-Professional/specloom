@@ -27,6 +27,7 @@ Only these may appear in `delegations`:
 - **specloom-frontend-developer**
 - **specloom-backend-developer**
 - **specloom-database-developer**
+- **specloom-game-developer**
 - **specloom-worker-validation**
 
 ## Continuous execution

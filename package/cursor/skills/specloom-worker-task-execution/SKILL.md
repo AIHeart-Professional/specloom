@@ -41,6 +41,7 @@ Keep implementing while tasks show `Status: Ready`. Do not stop after one task.
 | frontend | specloom-frontend-developer |
 | backend | specloom-backend-developer |
 | database | specloom-database-developer |
+| game | specloom-game-developer |
 
 ## Parallel
 

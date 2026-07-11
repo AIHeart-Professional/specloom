@@ -3,6 +3,7 @@
 date: MM-DD-YYYY
 status: Pending
 parent_feature: docs/features/NNN_short-description.md
+parent_phase: docs/phases/01-Prototype
 spec_id: "014"
 spec_queue_row: 1
 layers: frontend, backend, database
@@ -24,16 +25,19 @@ token_variance: null
 
 | Path | Purpose |
 |------|---------|
+| `docs/phases/01-Prototype/PHASE.md` | **Active product phase** ï¿½ in/out of scope, quality bar |
 | `docs/features/NNN_short-description.md` | Parent feature (WHAT) |
 | `docs/architecture/system_overview.md` | System boundaries |
 | `docs/code/typescript/CORE.md` | Language rules (mandatory per language used) |
-| `docs/code/react/theme-styling.md` | Styling rules — example optional code doc |
+| `docs/code/react/theme-styling.md` | Styling rules ï¿½ example optional code doc |
 | `docs/images/auth/login-form.png` | Design/reference image |
 | `docs/images/assets/logo.png` | Application asset to copy/import/use |
 | `docs/knowledge/pitfalls.md` | Known traps |
 | `docs/specs/archived/MMDDYY_prior-spec.md` | Prior related work |
 
-Allowed sources: `docs/code/`, `docs/architecture/`, `docs/knowledge/`, `docs/images/` (design refs, except `docs/images/assets/` app assets), `docs/workflows/`, `docs/decisions/`, `docs/specs/archived/`, parent feature (GitHub issue).
+Allowed sources: `docs/phases/`, `docs/code/`, `docs/architecture/`, `docs/knowledge/`, `docs/images/` (design refs, except `docs/images/assets/` app assets), `docs/workflows/`, `docs/decisions/`, `docs/specs/archived/`, parent feature (GitHub issue).
+
+**Phase rule:** `parent_phase` / phase `PHASE.md` path is **mandatory** ï¿½ validators and testers score phase alignment.
 
 **Not listed = do not read.**
 
@@ -116,7 +120,7 @@ Data flow: user action ? API ? persistence ? client state
 
 | Date | Task | File | What changed |
 |------|------|------|--------------|
-| MM-DD-YYYY | T1 | `src/example.tsx` | Example — replace with actual changes |
+| MM-DD-YYYY | T1 | `src/example.tsx` | Example ï¿½ replace with actual changes |
 
 ## Token Budget
 
@@ -147,6 +151,12 @@ Data flow: user action ? API ? persistence ? client state
 # project build/test from AGENTS.md
 ```
 
+### Phase alignment
+
+- [ ] All requirements stay within phase **In scope** (`PHASE.md`)
+- [ ] No **Out of scope** capabilities unless Open Questions approved
+- [ ] Test coverage matches phase **Quality bar**
+
 ### Test coverage
 
 | Type | Why | Where | How |
@@ -164,7 +174,7 @@ Data flow: user action ? API ? persistence ? client state
 
 | Date | Question | Answer |
 |------|----------|--------|
-| MM-DD-YYYY | Example — unresolved scope choice | _Pending_ |
+| MM-DD-YYYY | Example ï¿½ unresolved scope choice | _Pending_ |
 
 > Shown on review card before user sign-off. Answer in chat or leave default noted in review.
 
@@ -174,7 +184,7 @@ Data flow: user action ? API ? persistence ? client state
 
 - [ ] All task checklists complete
 - [ ] **Changes** section accurate and reviewed
-- [ ] **Token Budget** finalized (Used, Variance — no `_pending_`)
+- [ ] **Token Budget** finalized (Used, Variance ï¿½ no `_pending_`)
 - [ ] Validation commands passed
 - [ ] User confirmed Complete
 

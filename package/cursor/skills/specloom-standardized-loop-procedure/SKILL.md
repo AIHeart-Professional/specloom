@@ -34,6 +34,7 @@ On iteration 3 fail → return `status: fail` with full findings for **specloom-
 | frontend | specloom-frontend-validator |
 | backend | specloom-backend-validator |
 | database | specloom-database-validator |
+| game | specloom-game-validator |
 
 ## Skip inactive layers
 

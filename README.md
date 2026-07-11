@@ -91,18 +91,21 @@ SpecLoom optimizes for **sustained engineering**, not spike hacks.
 
 ## How it works
 
-### Three planning layers
+### Four planning layers
 
 ```
-Idea (GitHub Issue)  →  Feature (GitHub Issue)  →  Spec (docs/specs/)
-     sdd:idea              sdd:feature              dated .md + tasks
+Phase (docs/phases/)  →  Idea  →  Feature  →  Spec (docs/specs/)
+  01-Prototype            optional   WHAT        HOW
 ```
 
 | Layer | Where | Purpose |
 |-------|-------|---------|
+| **Phase** | `docs/phases/NN-Name/PHASE.md` | Core product focus — in/out of scope for this stage |
 | **Idea** | GitHub issue `sdd:idea` + `sdd:status:backlog` | Raw problem or opportunity |
-| **Feature** | GitHub issue `sdd:feature` | What to build; spawns spec queue |
+| **Feature** | GitHub issue `sdd:feature` + `phase:` frontmatter | What to build within active phase |
 | **Spec** | `docs/specs/MMDDYY_slug.md` | How to build one unit of work |
+
+`active_work.json` → **`activeProductPhase`** tracks the current phase. Validators and testers score **phase alignment** alongside spec/feature criteria. When all phase features are archived, the phase moves to `docs/phases/archived/` like features and specs.
 
 ### Coordinator priority (automation)
 
@@ -120,8 +123,8 @@ The workflow coordinator always prefers **finishing in-flight work** over starti
 ```
 @specloom-work-creator   → planning + sign-off
 @specloom-implement      → worker loop (≤10) + worker-validation
-@specloom-validator      → standardized loop (≤3)
 @specloom-tester         → test loop (≤5)
+@specloom-validator      → final validation (impl + tests) + sign-off
 ```
 
 Each step is a **separate chat invocation**. No orchestrator auto-chains the next.
@@ -141,12 +144,12 @@ flowchart LR
   USER --> GIT[specloom-git]
 
   IMP --> WRK[specloom-worker]
-  VAL --> STD[specloom-standardized-loop]
   TST --> TLP[specloom-test-loop]
+  VAL --> STD[specloom-standardized-loop]
 
   WRK --> DEV[specloom-*-developer]
-  STD --> VLD[specloom-*-validator]
   TLP --> TSTSTD[specloom-*-test-standards]
+  STD --> VLD[specloom-*-validator]
 ```
 
 **Critical rule:** Five peer orchestrators speak to you in natural language. Sub-agents return JSON only. **Peers never Task-delegate each other.**
@@ -447,7 +450,7 @@ See `docs/automation/git-workflow.md` in bootstrapped repos for full detail.
 | **specloom-worker** | Implementation sub-loop |
 | **specloom-standardized-loop** | Validation sub-loop |
 | **specloom-test-loop** | Test sub-loop |
-| **specloom-*-developer** | Per-layer code |
+| **specloom-*-developer** | Per-layer code (frontend, backend, database, **game**) |
 | **specloom-update-knowledgebase** | Work-records sync |
 | **specloom-system-advisor** | SpecLoom system help |
 
@@ -459,7 +462,7 @@ See `docs/automation/git-workflow.md` in bootstrapped repos for full detail.
 | **specloom-worker** | specloom-worker |
 | **specloom-work-creator** | specloom-work-creator |
 | **specloom-validator** | specloom-validator |
-| **specloom-frontend / backend / database** | domain developers |
+| **specloom-frontend / backend / database / game** | domain developers |
 | **specloom-update-knowledgebase** | specloom-update-knowledgebase |
 | **specloom-git** | specloom-git |
 | **specloom-system-advisor** | specloom-system-advisor |
@@ -470,15 +473,18 @@ See `docs/automation/git-workflow.md` in bootstrapped repos for full detail.
 
 | Gate | When | Pass threshold | After pass |
 |------|------|----------------|------------|
-| **feature** | After feature draft | ≥99% confidence | **Pause** — review card → your chat sign-off → promote |
-| **spec** | After spec draft | ≥99% confidence | **Pause** — review card → your chat sign-off → tasks start |
-| **work** | All tasks done | ≥99% alignment + quality | Auto-advance to test gate |
-| **test** | After work passes | ≥99% coverage + quality + regression | Auto closeout (PR, merge, archive) |
+| **feature** | After feature draft | ≥99% confidence | **Pause** — review card → sign-off → promote |
+| **spec** | After spec draft | ≥99% confidence | **Pause** — review card → tasks start |
+| **work** | All tasks done | ≥99% + app runs | → `@specloom-tester` |
+| **test** | After work | 100% coverage + green | → `@specloom-validator` |
+| **final** | After tests | Tests + impl ≥99% | **Sign-off** — archive (auto or `/approve`) |
 
 On pass:
 
-- **feature / spec** — session stops at `awaiting_sign_off` until you approve in chat
-- **work + test** — auto closeout (finalize, PR, merge, archive)
+- **feature / spec drafts** — pause for user sign-off
+- **final validation** — validator archives spec and updates feature
+
+On failure at final gate → issues routed to **implement** or **tester** per owner tags.
 
 On 3 failures → `docs/automation/state/blocked_work.json` + session stops.
 
@@ -493,8 +499,11 @@ SpecLoom splits **production code** from **tests**:
 | Frontend | `specloom-*-developer` | `specloom-frontend-test-standards` | `code-*` vs `test-*` |
 | Backend | `specloom-*-developer` | `specloom-backend-test-standards` | `code-*` vs `test-*` |
 | Database | `specloom-database-developer` | `specloom-database-test-standards` | `code-postgres` vs `test-postgres` |
+| Game (MonoGame/C#) | `specloom-game-developer` | `specloom-game-test-standards` | `code-csharp` + `code-monogame` vs `test-csharp` + `test-monogame` |
 
 **Never** cross-load: implement agents use `code-*` only; tester agents use `test-*` only.
+
+**Skill families:** `code-*` (production standards) and `test-*` (testing only). There is **no** separate `security-*` skill family — security rules live inside each `code-*` skill (e.g. `code-csharp`, `code-python`).
 
 ### Four required test styles
 
@@ -518,6 +527,8 @@ Regression for acceptance criteria is covered **inside** these four styles, not 
 | **Python** | [PEP 8](https://peps.python.org/pep-0008/) (test code style) + [pytest docs](https://docs.pytest.org/en/stable/) ([assertions](https://docs.pytest.org/en/stable/how-to/assert.html), fixtures, parametrize, markers) |
 | **TypeScript** | Jest/Vitest + Testing Library (see `test-typescript`) |
 | **Postgres / Supabase** | RLS matrix + migration verification (see `test-postgres`) |
+| **C#** | [Microsoft C# coding conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions) + xUnit (see `test-csharp`) |
+| **MonoGame** | [docs.monogame.net](https://docs.monogame.net/articles/) — testable code, game loop, content pipeline (see `test-monogame`) |
 
 Skills live in `package/shared-skills/test-*/` and install to `~/.cursor/skills/`, `~/.agents/skills/`, and `~/.gemini/config/skills/`.
 
@@ -530,12 +541,16 @@ Skills live in `package/shared-skills/test-*/` and install to `~/.cursor/skills/
 ### Layout (recommended)
 
 ```
-tests/
+tests/                    # Python / JS
   unit/
   integration/
   system/
   performance/
-  conftest.py          # Python; or jest/vitest config at root for JS
+Tests/                    # C# / MonoGame (PascalCase convention)
+  Unit/
+  Integration/
+  System/
+  Performance/
 ```
 
 ---

@@ -52,12 +52,12 @@ User runs each orchestrator **separately** in pipeline order.
 
 ```
 @specloom-work-creator   → planning + sign-off
-@specloom-git            → task_start (or git runs inside each orchestrator session)
 @specloom-implement      → worker loop (≤10) + worker-validation
-@specloom-validator      → standardized loop (≤3)
-@specloom-tester         → test loop (≤5)
-@specloom-git            → merge (or merge at end of each orchestrator session)
+@specloom-tester         → test loop (≤5) — all tests
+@specloom-validator      → final validation (impl + tests) + sign-off / archive
 ```
+
+Load **specloom-remediation-routing** when re-running after validator failure.
 
 Each step is a **separate invocation**. No orchestrator auto-chains the next.
 
@@ -86,7 +86,7 @@ Load **specloom-approval-mode** at session start.
 | Command | Default | Effect |
 |---------|---------|--------|
 | **`/manual`** | **yes** | Review card; **no archive** until `/approve` |
-| **`/auto`** | | Auto-approve; tester runs `archive_spec` on pass |
+| **`/auto`** | | Validator auto-archives on final pass |
 | **`/approve`** | | Confirm pending sign-off (manual follow-up) |
 
 Persist `approvalMode` in `docs/automation/state/active_work.json`.
@@ -115,9 +115,9 @@ No feature planning while open spec work exists (unless user names a feature).
 | Agent | `no_work` when |
 |-------|----------------|
 | **work-creator** | No planning queue work; blocked; awaiting sign-off |
-| **implement** | No Ready/In Progress tasks; all tasks already Complete |
-| **validator** | Nothing to validate for chosen mode; preconditions fail |
-| **tester** | Tasks incomplete; validator not passed; `tests_passed` |
+| **implement** | No Ready tasks AND no implement remediation; OR all tasks Complete → suggest tester |
+| **tester** | `awaiting_tests` or tester remediation; NOT before implement done |
+| **validator** | `tests_passed` for final gate; draft mode separate |
 | **git** | No git action requested and no branch context in user message |
 
 ---

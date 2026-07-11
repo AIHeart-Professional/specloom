@@ -1,6 +1,14 @@
 # Features (WHAT)
 
-**Feature** = approved high-level outcome. Specs in `docs/specs/` carry the HOW.
+**Feature** = approved high-level outcome within an active **phase**. Specs in `docs/specs/` carry the HOW.
+
+Every feature **must** declare:
+
+```yaml
+phase: docs/phases/01-Prototype
+```
+
+See **Phase Alignment** section in feature body and `docs/phases/<NN-Name>/PHASE.md`.
 
 ## Format
 

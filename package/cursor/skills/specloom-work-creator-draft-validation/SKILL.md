@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 Invoked when `validation_mode: draft` on `VALIDATOR_HANDOFF`.
 
-Load **specloom-work-creator-docs-planning** for path conventions.
+Load **specloom-work-creator-docs-planning** for path conventions and **specloom-phase-alignment** for phase checks.
 
 ## Types
 
@@ -23,11 +23,21 @@ Load **specloom-work-creator-docs-planning** for path conventions.
 
 Critical format gates + coverage scoring (idea → feature alignment). See legacy `qa-tester-feature-validation` rubric.
 
+**Phase gates (mandatory):**
+- `phase` frontmatter points to existing `docs/phases/NN-Name/`
+- **Phase Alignment** section present
+- Scope does not violate phase **Out of scope** without Open Question
+
 **Pass:** `confidence_score >= 99` AND zero `critical` findings.
 
 ## Spec draft checks
 
 Spec Queue row scope, Requirements, Required Context, Task Directives, Token Budget. See legacy `qa-tester-spec-validation` rubric.
+
+**Phase gates (mandatory):**
+- `PHASE.md` listed in Required Context
+- `parent_phase` matches feature `phase`
+- Requirements stay within phase **In scope**
 
 **Pass:** `confidence_score >= 99` AND zero `critical` findings.
 

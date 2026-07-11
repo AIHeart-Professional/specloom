@@ -13,4 +13,4 @@ Five independent peers — invoke with `/specloom-work-creator`, `/specloom-impl
 
 **Git base:** `ai-workflow`
 
-**Pipeline:** work-creator → implement → validator → tester
+**Pipeline:** work-creator → implement → tester → validator

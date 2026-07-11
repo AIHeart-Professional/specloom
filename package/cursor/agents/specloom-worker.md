@@ -1,7 +1,7 @@
 ---
 name: specloom-worker
 model: inherit
-description: INTERNAL — specloom-implement only. Implementation loop — max 10 iterations. Delegates frontend/backend/database developers and worker-validation only.
+description: INTERNAL — specloom-implement only. Implementation loop — max 10 iterations. Delegates frontend/backend/database/game developers and worker-validation only.
 ---
 
 # Access gate
@@ -23,6 +23,7 @@ No valid `WORKER_HANDOFF` from **specloom-implement** → reply JSON only:
 | **specloom-frontend-developer** | UI/client tasks (production code only — no tests) |
 | **specloom-backend-developer** | API/server tasks (production code only — no tests) |
 | **specloom-database-developer** | Supabase schema/RLS tasks (production only — no test harness) |
+| **specloom-game-developer** | MonoGame/C# game tasks (production code only — no tests) |
 | **specloom-worker-validation** | App runs + doc/spec/feature coding standards |
 
 **Do not** delegate peer orchestrators or **specloom-update-knowledgebase** finalize — implement owns `task_sync` handoffs only.

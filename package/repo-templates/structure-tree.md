@@ -1,6 +1,13 @@
 ```
 docs/
 ├── README.md
+├── phases/
+│   ├── README.md
+│   ├── 01-Prototype/
+│   │   └── PHASE.md
+│   ├── phase-template/
+│   │   └── PHASE.md
+│   └── archived/
 ├── ideas/
 │   ├── README.md
 │   ├── idea-template.md

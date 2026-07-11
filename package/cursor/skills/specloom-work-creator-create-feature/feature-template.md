@@ -3,6 +3,7 @@ id: NNN_short-description
 priority: NNN
 spec_id: NNN
 status: Draft
+phase: docs/phases/01-Prototype
 source_idea: docs/ideas/NNN_short-description.md
 git_base_branch: ai-workflow
 estimated_tokens: 0
@@ -19,6 +20,8 @@ dependencies: []
 
 Promoted from `docs/ideas/NNN_short-description.md`. Omit promotion line only when not created from an idea; set `source_idea: null` in frontmatter.
 
+**Phase:** `docs/phases/01-Prototype` — must match `activeProductPhase` unless user overrides.
+
 ## Summary
 
 One paragraph: what this feature is and why it matters.
@@ -33,6 +36,16 @@ One paragraph: what this feature is and why it matters.
 
 - Who benefits
 - What they can do after this ships that they cannot do today
+
+## Phase Alignment
+
+> Must align with `docs/phases/<NN-Name>/PHASE.md` listed in frontmatter `phase`.
+
+| Phase doc | In scope (this feature) | Out of scope (deferred) |
+|-----------|-------------------------|-------------------------|
+| `docs/phases/01-Prototype/PHASE.md` | What this feature delivers in this phase | What this feature explicitly does **not** do yet |
+
+**Rule:** Feature scope must not include phase **Out of scope** items without an Open Question approval.
 
 ## Dependencies
 

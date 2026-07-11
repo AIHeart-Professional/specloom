@@ -5,20 +5,29 @@ Root `docs/` is the project source of truth for specs, queues, architecture, dec
 ## Start Here
 
 1. Read `AGENTS.md`.
-2. Check **Active Specs**, **Feature Queue** (`docs/features/`), and **Idea Queue** (`docs/ideas/`).
+2. Check **Active Phase** (`docs/phases/`), **Active Specs**, **Feature Queue** (`docs/features/`), and **Idea Queue** (`docs/ideas/`).
 3. Finish approved specs/tasks before promoting new ideas.
 4. If no task is ready, spawn a spec from the lowest Ready feature Spec Queue row.
 5. Read `docs/automation/state/active_work.json` when automation state exists.
 
-**Ideas** (`docs/ideas/`) are optional. Automations never promote them — you promote manually via **specloom-implement**.
+**Ideas** (`docs/ideas/`) are optional. Automations never promote them ï¿½ you promote manually via **specloom-implement**.
 
-## Three Layers
+## Four Layers
 
 | Layer | Location | Meaning |
 |-------|----------|---------|
+| **Phase** | `docs/phases/NN-Name/` | Product focus ï¿½ in/out of scope |
 | **Idea** | `docs/ideas/` (optional) | Backlog scratch pad |
-| **Feature** | `docs/features/` | WHAT to build |
+| **Feature** | `docs/features/` | WHAT to build (within active phase) |
 | **Spec** | `docs/specs/` | HOW to build one unit |
+
+## Active Phase
+
+> `docs/automation/state/active_work.json` ? `activeProductPhase`
+
+| Phase | Status | Notes |
+| --- | --- | --- |
+| _Agent updates_ | `docs/phases/01-Prototype` | _feature rollup_ |
 
 Prefer finishing approved specs/tasks first. Coordinator automation: **tasks ? ready features ? specs ? idle**.
 
@@ -35,9 +44,11 @@ Cursor Automations: `docs/automation/cursor-schedules.md`.
 
 | Folder | Purpose |
 |--------|---------|
+| `docs/phases/` | Product phases (`NN-Name/PHASE.md`) ï¿½ core focus |
+| `docs/phases/archived/` | Complete phases |
 | `docs/ideas/` | Backlog ideas |
 | `docs/ideas/archived/` | Promoted ideas |
-| `docs/features/` | Active WHAT — scope, deps, Spec Queue |
+| `docs/features/` | Active WHAT ï¿½ scope, deps, Spec Queue |
 | `docs/features/archived/` | Complete features |
 | `docs/specs/` | Low-level HOW |
 | `docs/specs/archived/` | Completed specs |

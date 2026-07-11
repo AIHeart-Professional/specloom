@@ -1,7 +1,7 @@
 ---
 name: specloom-work-creator-workflow-setup
 description: >-
-  INTERNAL — specloom-work-creator agent only. Bootstrap repo docs/ tree and automation stubs.
+  INTERNAL ï¿½ specloom-work-creator agent only. Bootstrap repo docs/ tree and automation stubs.
   Not user-invokable.
 disable-model-invocation: true
 ---
@@ -44,6 +44,8 @@ Confirm (if unknown):
 Per [structure-tree.md](structure-tree.md). **Always repo root.**
 
 ```
+docs/phases/
+docs/phases/archived/
 docs/ideas/
 docs/ideas/archived/
 docs/features/
@@ -64,6 +66,16 @@ automation_inputs/
 automation_outputs/
 local_data/
 ```
+
+Set `active_work.json` ? `"activeProductPhase": "docs/phases/01-Prototype"` after bootstrap.
+
+### Step 5b: Phases stubs
+
+| Source | Destination |
+|--------|-------------|
+| `phases/README.md` | `docs/phases/README.md` |
+| `phases/01-Prototype/PHASE.md` | `docs/phases/01-Prototype/PHASE.md` |
+| `phases/phase-template/PHASE.md` | `docs/phases/phase-template/PHASE.md` (reference copy) |
 
 ### Step 2: AGENTS.md
 
@@ -113,7 +125,7 @@ docs/images/private/
 
 `docs/automation/state/` is **committed**.
 
-### Step 8–9: Verify
+### Step 8ï¿½9: Verify
 
 - `active_work.json` uses `workflow` id (e.g. `coordinator`)
 - Idea/feature folders exist
@@ -124,7 +136,7 @@ docs/images/private/
 ## Gate order
 
 ```
-tasks ? manifest ? qa-tester(work)×3 ? qa-tester(test)×3 ? finalize ? auto_closeout ? git
+tasks ? manifest ? qa-tester(work)ï¿½3 ? qa-tester(test)ï¿½3 ? finalize ? auto_closeout ? git
 ```
 
 ## Models
@@ -132,8 +144,9 @@ tasks ? manifest ? qa-tester(work)×3 ? qa-tester(test)×3 ? finalize ? auto_close
 | Layer | Location | Skill |
 |-------|----------|-------|
 | Ideas | `docs/ideas/` | specloom-work-creator-create-idea + specloom-work-creator-docs-planning |
+| Phases | `docs/phases/` | specloom-work-creator-create-phase + specloom-phase-alignment |
 | Features | `docs/features/` | specloom-work-creator-create-feature + specloom-work-creator-docs-planning |
 | Specs | `docs/specs/` | specloom-work-creator-create-spec |
 | Work done | `docs/specs/work-records/SPEC-{id}/manifest.json` | specloom-knowledgebase-work-records |
 | Workflows | Global **specloom-worker-*** skills | specloom-worker-loops |
-| Execute | — | **specloom-work-creator** ? sub-agents |
+| Execute | ï¿½ | **specloom-work-creator** ? sub-agents |

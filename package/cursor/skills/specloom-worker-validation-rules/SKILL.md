@@ -10,6 +10,8 @@ disable-model-invocation: true
 
 Invoked after all spec tasks complete.
 
+Load **specloom-phase-alignment** for phase boundary checks.
+
 ## Dimension 1: Application runs (50%)
 
 Run commands from:
@@ -33,6 +35,7 @@ Traverse and verify:
 |--------|--------|
 | Spec | Goal, Requirements, tasks, Validation commands listed |
 | Parent feature | Scope alignment, acceptance criteria |
+| Phase `PHASE.md` | In scope / Out of scope alignment |
 | `required_context[]` | Every referenced doc rule followed in changed files |
 | `standards[]` | Repo code standards applied |
 | `docs/code/*/CORE.md` | Language rules from spec Required Context |
@@ -61,7 +64,7 @@ confidence_score = round((app_score + rules_compliance.score) / 2)
 
 ```yaml
 remediation:
-  layer: frontend | backend | database
+  layer: frontend | backend | database | game
   files: []
   issues: [{ severity, rule, source, file, fix }]
 ```

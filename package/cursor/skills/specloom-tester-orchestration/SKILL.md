@@ -6,46 +6,54 @@ disable-model-invocation: true
 
 # Tester Orchestration
 
+Runs **after specloom-implement** (worker-validation pass). **Before specloom-validator**.
+
+Load **specloom-remediation-routing** when `manifest.status: validation_failed`.
+
 ## Skill boundary
 
 **specloom-tester** and sub-agents load **test-*** skills only.
 
-**Forbidden:** `code-*`, `specloom-*-developer-*` — those are **specloom-implement** scope.
+**Forbidden:** `code-*`, `specloom-*-developer-*`.
 
 ## Preconditions check
 
 Read `manifest.json`:
-- Any task `status != complete` → `TEST_RESULT.status: no_work`
-- Implementation validation passed (`manifest.status` post-validator)
-- `manifest.status` should be `awaiting_tests` or post-validation
+
+| Condition | Result |
+|-----------|--------|
+| Any task `status != complete` | `no_work` — run `@specloom-implement` first |
+| `status: awaiting_tests` | **Proceed** (happy path) |
+| `status: validation_failed` + `owner:tester` issues in spec | **Proceed** (remediation) |
+| `status: tests_passed` + no tester remediation | `no_work` — run `@specloom-validator` |
+| `status: archived` | `no_work` |
+
+**Do not** require validator pass — validator runs **after** tests.
 
 ## Spec / feature as test oracle
 
-Before delegating test-loop, load:
-1. Active **spec** — Requirements, per-task acceptance criteria
-2. Parent **feature** — acceptance criteria, scope
-3. `manifest.files_index` — production files to cover
+Before test-loop:
 
-Tests must assert **expected behavior from spec/feature**, not invent requirements.
+1. Active **spec** — Requirements, acceptance criteria
+2. Parent **feature** + **phase** `PHASE.md`
+3. `manifest.files_index` — production files to cover
+4. If remediation: `## Validation Results` → `owner:tester` issues only
 
 ## Procedure
 
 1. Build `TEST_LOOP_HANDOFF` with `max_loop_iterations: 5`
-2. Delegate **specloom-test-loop** (Task) — tester executes
-3. Aggregate layer results into `TEST_RESULT`
-4. **Pass:** `coverage_percent == 100`, all `tests_passing: true`, all spec criteria covered
-5. **Fail after 5 loops:** return failure with `uncovered_files[]` and missing spec criteria
+2. Delegate **specloom-test-loop**
+3. **Pass:** `coverage_percent == 100`, all tests green
+4. **Fail after 5 loops:** failure report; stay `awaiting_tests` or `validation_failed`
 
-## Post-pass (approval mode)
+## Post-pass
 
-Load **specloom-approval-mode** after test loop pass:
+1. **specloom-update-knowledgebase** `finalize_work_records`
+2. `manifest.status: tests_passed`
+3. Tell user **`@specloom-validator`** (final gate — validates impl + tests)
 
-| Mode | Actions |
-|------|---------|
-| **manual** | `finalize_work_records` only; set `pendingSignOff`; review card; **no archive** |
-| **auto** | `finalize_work_records` + `archive_spec` + `sync_knowledge` |
-| **`/approve`** | Deferred `archive_spec` + `sync_knowledge` when `pendingSignOff` exists |
+**Never** `archive_spec` — validator owns sign-off.
 
 ## Parallel test creation
 
-When `layers: [frontend, backend]` → test-loop runs both test-standards agents same iteration.
+Multiple layers in `manifest.layers[]` → parallel test-standards agents per iteration.

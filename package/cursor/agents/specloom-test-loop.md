@@ -23,6 +23,7 @@ No valid `TEST_LOOP_HANDOFF` from **specloom-tester** → reply JSON only:
 | **specloom-frontend-test-standards** | frontend |
 | **specloom-backend-test-standards** | backend |
 | **specloom-database-test-standards** | database |
+| **specloom-game-test-standards** | game |
 
 Only layers in `manifest.layers[]`. Run **in parallel** when multiple layers.
 

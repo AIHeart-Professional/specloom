@@ -10,6 +10,8 @@ disable-model-invocation: true
 
 Map every test to spec **Requirements**, task acceptance criteria, or parent **feature** acceptance criteria. Record `spec_ref` on `tests_added[]`.
 
+Load **specloom-phase-alignment** — phase **Out of scope** must not appear in test assertions.
+
 ## Test styles (all required per spec work)
 
 Per [PEP 8](https://peps.python.org/pep-0008/) (test code style) and [pytest](https://docs.pytest.org/en/stable/) (runner, assertions, fixtures):

@@ -9,19 +9,17 @@ disable-model-invocation: true
 
 # Approval Mode
 
-Controls whether successful gate passes **require human sign-off before archive** or **auto-approve**.
+Controls human review before **final archive**. **Final sign-off is owned by specloom-validator** after tests pass.
 
-Applies to: **specloom-implement**, **specloom-validator**, **specloom-tester** only.
+Pipeline: **implement → tester → validator (archive)**.
 
 ## Commands (user message)
 
 | Command | Effect |
 |---------|--------|
-| **`/manual`** | Require sign-off before archive / gate closeout **(default)** |
-| **`/auto`** | Auto-approve — no human sign-off wait |
+| **`/manual`** | Review card before **validator** archives **(default)** |
+| **`/auto`** | Validator auto-archives on pass — no review card |
 | **`/approve`** | Confirm pending sign-off (manual follow-up only) |
-
-Aliases: `approval: manual`, `approval: auto`, `mode manual`, `mode auto`, `--manual`, `--auto`
 
 **Default when omitted:** `manual`
 
@@ -31,7 +29,7 @@ Aliases: `approval: manual`, `approval: auto`, `mode manual`, `mode auto`, `--ma
 1. Parse user message for /auto, /manual, /approve
 2. If /auto or /manual found → set active_work.json approvalMode
 3. Else read active_work.json approvalMode (default "manual")
-4. If /approve and pendingSignOff set → run deferred closeout (see below); STOP
+4. If /approve and pendingSignOff set → run deferred closeout; STOP
 ```
 
 Persist in `docs/automation/state/active_work.json`:
@@ -44,56 +42,6 @@ Persist in `docs/automation/state/active_work.json`:
 }
 ```
 
-## manual mode — on gate pass
-
-After git merge, **before** archive:
-
-1. Set `humanApprovalRequired: true`
-2. Set `pendingSignOff`:
-
-```json
-{
-  "gate": "implement | validator | tester",
-  "spec_id": "014",
-  "spec": "docs/specs/MMDDYY_slug.md",
-  "parent_feature": "docs/features/NNN_slug.md",
-  "summary": "short outcome",
-  "approvalMode": "manual"
-}
-```
-
-3. Present **review card** (user must reply `/approve` or "approved" / "sign off")
-4. **Do not** `archive_spec` until approved
-
-### Review card template
-
-```markdown
-## Review required — [gate] complete
-
-**Spec:** {id} · **Mode:** manual
-
-**Summary:** {what was done}
-
-**Confidence / coverage:** {score or %}
-
-**Approve to archive?** Reply `/approve` or "sign off" to archive and close out.
-**Or** reply with changes needed — do not archive.
-```
-
-## auto mode — on gate pass
-
-1. Set `humanApprovalRequired: false`, `pendingSignOff: null`
-2. Run post-pass actions immediately (per gate table)
-3. Reply success — no review card
-
-## /approve — deferred closeout
-
-When `pendingSignOff` exists and user sends `/approve` or sign-off phrases:
-
-1. Run gate-specific deferred actions (tester → `archive_spec`)
-2. Clear `pendingSignOff`, set `humanApprovalRequired: false`
-3. Reply confirmation
-
 ---
 
 ## Per-gate behavior
@@ -102,53 +50,76 @@ When `pendingSignOff` exists and user sends `/approve` or sign-off phrases:
 
 | Mode | On pass |
 |------|---------|
-| **manual** | Merge; `manifest.status: awaiting_validation`; review card; **no archive** |
-| **auto** | Merge; `manifest.status: awaiting_validation`; tell user `@specloom-validator` |
+| **manual** | Merge; `manifest.status: awaiting_tests`; suggest `@specloom-tester` |
+| **auto** | Merge; `manifest.status: awaiting_tests`; suggest `@specloom-tester` |
 
-Implement **never** archives spec in either mode.
-
-### specloom-validator (pass)
-
-| Mode | On pass |
-|------|---------|
-| **manual** | Merge; append validation pass to spec; `manifest.status: validation_passed`; review card; **do not** set `awaiting_tests` until `/approve` |
-| **auto** | Merge; validation pass on spec; `manifest.status: awaiting_tests`; tell user `@specloom-tester` |
-
-Validator **never** archives spec.
+Implement **never** archives. No review card at implement gate.
 
 ### specloom-tester (pass)
 
 | Mode | On pass |
 |------|---------|
-| **manual** | `finalize_work_records`; `manifest.status: tests_passed`; review card; **do not** `archive_spec` |
-| **auto** | `finalize_work_records` + **`archive_spec`** + `sync_knowledge`; `manifest.status: archived`; update parent feature |
+| **manual** | `finalize_work_records`; `manifest.status: tests_passed`; suggest `@specloom-validator` |
+| **auto** | Same — `finalize_work_records`; `manifest.status: tests_passed`; suggest `@specloom-validator` |
 
-### specloom-tester (/approve after manual pass)
+Tester **never** archives. No review card at test gate.
+
+### specloom-validator (pass — final sign-off)
+
+Validates **implementation + tests** together after `tests_passed`.
+
+| Mode | On pass |
+|------|---------|
+| **manual** | Review card; **`pendingSignOff`**; **do not** `archive_spec` until `/approve` |
+| **auto** | **`archive_spec`** + `sync_knowledge`; `manifest.status: archived`; update parent feature |
+
+### specloom-validator (/approve after manual pass)
 
 1. `archive_spec` via **specloom-update-knowledgebase**
-2. `sync_knowledge` when applicable
+2. `sync_knowledge`
 3. Clear `pendingSignOff`
+
+### specloom-validator (fail)
+
+1. Append `## Validation Results` with `owner:implement` / `owner:tester` tags
+2. `manifest.status: validation_failed`
+3. Tell user `@specloom-implement` and/or `@specloom-tester` per **specloom-remediation-routing**
 
 ---
 
+## Review card template (validator manual only)
+
+```markdown
+## Review required — final validation complete
+
+**Spec:** {id} · **Mode:** manual
+
+**Summary:** Implementation + tests validated.
+
+**Confidence:** {score}/100 · **Coverage:** 100%
+
+**Approve to archive?** Reply `/approve` or "sign off" to archive and close out.
+**Or** reply with changes — issues route to implement/tester per owner tags.
+```
+
 ## blocked when manual + pendingSignOff
 
-If `pendingSignOff` is set and user runs same gate **without** `/approve`:
+If `pendingSignOff` is set and user runs validator **without** `/approve`:
 
-- Reply: pending sign-off exists — `/approve` or revise work first
-- **no_work** for new work on that spec until resolved or user clears sign-off
+- Reply: pending sign-off — `/approve` first
+- **no_work** for duplicate final validation until resolved
 
-Exception: user explicitly names different spec/feature in message.
+Exception: user explicitly names different spec.
 
 ## Automations
 
-Cursor Automations should pass `/auto` in prompt for hands-off runs, or set `approvalMode: "auto"` in `active_work.json` before invoke.
+Pass `/auto` in prompt for hands-off archive on validator pass.
 
 ## Examples
 
 ```
-@specloom-implement /auto
-@specloom-validator
-@specloom-tester /manual
-@specloom-tester /approve
+@specloom-implement
+@specloom-tester
+@specloom-validator /auto
+@specloom-validator /approve
 ```

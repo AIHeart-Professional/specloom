@@ -24,10 +24,10 @@ Path: `docs/specs/work-records/SPEC-{spec_id}/`
 
 ```
 task complete → specloom-update-knowledgebase updates manifest + work-done + spec Changes
-all tasks done → specloom-worker-validation
-validator pass → specloom-validator
-tester pass → finalize implementation.md, testing.md, completion.json
-archive → manifest.status = archived
+all tasks done → specloom-worker-validation → manifest.status: awaiting_tests
+tester pass → finalize_work_records → manifest.status: tests_passed
+validator pass → archive → manifest.status: archived
+validator fail → manifest.status: validation_failed → implement/tester remediation
 ```
 
 ## manifest.json schema
@@ -37,7 +37,7 @@ archive → manifest.status = archived
   "spec_id": "042",
   "spec_path": "docs/specs/MMDDYY_name.md",
   "parent_feature": "docs/features/NNN_short-description.md",
-  "status": "in_progress | awaiting_tests | tests_passed | archived",
+  "status": "in_progress | awaiting_tests | tests_passed | validation_failed | archived",
   "updated_at": "ISO-8601",
   "git_task_branch": "task/042-001-slug",
   "layers": ["frontend", "backend"],
@@ -57,6 +57,7 @@ archive → manifest.status = archived
 
 ## Finalize (finalize_work_records)
 
-After `TEST_RESULT.status: pass`:
+After `TEST_RESULT.status: pass` (**specloom-tester** only):
 - Write `implementation.md`, `testing.md`, `completion.json`
 - Set `manifest.status: tests_passed`
+- **Do not** archive — **specloom-validator** owns sign-off

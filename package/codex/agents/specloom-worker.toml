@@ -9,6 +9,7 @@ Allowed delegations only:
 - specloom-frontend-developer
 - specloom-backend-developer
 - specloom-database-developer
+- specloom-game-developer
 - specloom-worker-validation
 
 Max 10 iterations. Return JSON WORKER_RESULT only.

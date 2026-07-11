@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code Csharp"
+  short_description: "Internal application-development workflow skill for code-csharp."
+  default_prompt: "Use $code-csharp only from its assigned SDD custom agent."
+policy:
+  allow_implicit_invocation: false

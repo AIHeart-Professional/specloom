@@ -13,6 +13,7 @@ disable-model-invocation: true
 | Spec **Requirements** | Assert each requirement has test coverage |
 | Spec task acceptance criteria | Cases per task across test styles |
 | Parent **feature** acceptance criteria | System + integration flows |
+| Phase **PHASE.md** In scope | Tests prove phase-appropriate outcomes only |
 | Spec **Goal** | System smoke happy paths |
 
 Record `spec_ref` on each `tests_added[]` entry (e.g. `REQ-3`, `T2 acceptance`).

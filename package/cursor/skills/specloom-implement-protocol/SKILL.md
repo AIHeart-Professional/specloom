@@ -17,7 +17,7 @@ Load **specloom-orchestrator-session** for work discovery, no_work, git bookends
 | Command | Default | Effect |
 |---------|---------|--------|
 | `/manual` | **yes** | Review card; archive only after `/approve` |
-| `/auto` | | Auto-approve; tester archives on pass |
+| `/auto` | | Validator auto-archives on final pass |
 | `/approve` | | Confirm pending sign-off |
 
 See **specloom-approval-mode**. Persist `approvalMode` in `active_work.json`.
@@ -40,28 +40,33 @@ Peer orchestrators **never** delegate each other. User runs each step manually.
 ## User pipeline order (recommended)
 
 ```
-specloom-work-creator → specloom-implement → specloom-validator → specloom-tester
+specloom-work-creator → specloom-implement → specloom-tester → specloom-validator
 ```
 
-Git bookends: each orchestrator runs **specloom-git-workflow** via shell, or user invokes `@specloom-git`.
+Load **specloom-remediation-routing** on validation failure retry paths.
 
 ## specloom-implement scope only
 
 ```
-Ready tasks → specloom-worker (≤10) → worker-validation
-```
-
-## specloom-validator scope only
-
-```
-specloom-standardized-loop (≤3) OR draft-validation skill
+Ready tasks OR implement remediation → specloom-worker (≤10) → worker-validation
+→ manifest.status: awaiting_tests
 ```
 
 ## specloom-tester scope only
 
 ```
-specloom-test-loop (≤5)
+awaiting_tests OR tester remediation → specloom-test-loop (≤5)
+→ finalize_work_records → manifest.status: tests_passed
 ```
+
+## specloom-validator scope only
+
+```
+tests_passed → re-run tests + specloom-standardized-loop (≤3)
+→ pass: archive (sign-off) | fail: remediation routing
+```
+
+Draft mode (work-creator): unchanged — **specloom-work-creator-draft-validation**.
 
 ## WORKER_HANDOFF → specloom-worker
 
@@ -86,14 +91,14 @@ IMPLEMENTATION_HANDOFF:
   from: specloom-implement
   spec: docs/specs/MMDDYY_name.md
   task_id: T1
-  layer: frontend | backend | database
+  layer: frontend | backend | database | game
   required_context: []
   standards: []
   image_files: []
   asset_files: []
   source_files: []
   parallel_with: null | backend
-  fix_instructions: []
+  fix_instructions: []   # from ## Validation Results owner:implement
 ```
 
 ## WORKER_VALIDATION_HANDOFF → specloom-worker-validation
@@ -117,16 +122,16 @@ Called by **specloom-validator** only — never from **specloom-implement** or o
 ```yaml
 VALIDATOR_HANDOFF:
   from: specloom-validator
-  validation_mode: draft | implementation
+  validation_mode: draft | final
   session_owner: true | false
   git_task_branch: ""   # required when session_owner: false
   draft_type: feature | spec          # when validation_mode: draft
   source: docs/ideas/001_slug.md      # feature draft: idea path
   draft: docs/features/014_auth.md    # feature or spec draft path
   parent_feature: docs/features/014_auth.md  # spec draft only
-  spec: docs/specs/MMDDYY_name.md     # implementation mode
+  spec: docs/specs/MMDDYY_name.md     # final or draft mode
   spec_id: "014"
-  manifest_path: docs/specs/work-records/SPEC-014/manifest.json  # implementation only
+  manifest_path: docs/specs/work-records/SPEC-014/manifest.json  # final mode only
   layers: [frontend, backend]
   max_loop_iterations: 3
   attempt: 1
@@ -184,7 +189,7 @@ STANDARDIZED_LOOP_HANDOFF:
 ```yaml
 DOMAIN_VALIDATION_HANDOFF:
   from: specloom-standardized-loop
-  layer: frontend | backend | database
+  layer: frontend | backend | database | game
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
   required_context: []
@@ -217,6 +222,7 @@ TEST_LOOP_HANDOFF:
   parallel: true
   attempt: 1
   uncovered_files: []
+  remediation_issues: []   # owner:tester from Validation Results
 ```
 
 ## TEST_STANDARDS_HANDOFF → specloom-*-test-standards
@@ -224,7 +230,7 @@ TEST_LOOP_HANDOFF:
 ```yaml
 TEST_STANDARDS_HANDOFF:
   from: specloom-test-loop
-  layer: frontend | backend | database
+  layer: frontend | backend | database | game
   spec: docs/specs/MMDDYY_name.md
   manifest_path: docs/specs/work-records/SPEC-014/manifest.json
   target_files: []
@@ -260,9 +266,9 @@ KNOWLEDGEBASE_HANDOFF:
 | Gate | Pass |
 |------|------|
 | Draft validation (work-creator) | `confidence_score >= 99`, zero critical |
-| Worker validation | `confidence_score >= 99` AND `app_runs: true` |
-| Validator (implementation) | `confidence_score >= 99` |
-| Tester | `coverage_percent == 100` AND all tests green |
+| Worker validation (implement) | `confidence_score >= 99` AND `app_runs: true` |
+| Tester (test-loop) | `coverage_percent == 100` AND all tests green |
+| Validator (final) | Tests green + `confidence_score >= 99` → sign-off / archive |
 
 ## Spec validation section (on validator fail)
 
@@ -276,7 +282,8 @@ Append to spec under `## Validation Results`:
 **Attempt:** {n}/3
 
 ### Issues
-1. [{layer}] {file} — {issue} → {remediation}
+1. [owner:implement|frontend] {file} — {issue} → {remediation}
+2. [owner:tester|backend] {test_file} — {issue} → {remediation}
 ```
 
 ## Default implementation skills per layer (specloom-implement only)
@@ -286,6 +293,7 @@ Append to spec under `## Validation Results`:
 | frontend | code-typescript, code-react, code-react-native |
 | backend | code-python |
 | database | code-postgres |
+| game | code-csharp, code-monogame |
 
 **No test-* skills.** Domain developers never write test files.
 
@@ -296,5 +304,6 @@ Append to spec under `## Validation Results`:
 | frontend | test-typescript, test-react, test-react-native |
 | backend | test-python, test-typescript (when Node tests) |
 | database | test-postgres |
+| game | test-csharp, test-monogame |
 
 **No code-* skills.** Test agents validate against spec + parent feature.
