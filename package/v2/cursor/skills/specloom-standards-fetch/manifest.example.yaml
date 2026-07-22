@@ -1,0 +1,41 @@
+version: 1
+root: specloom-standards
+
+languages:
+  python:
+    dir: python
+    aliases: [py, python3]
+  typescript:
+    dir: typescript
+    aliases: [ts, javascript, js]
+  react-native:
+    dir: react-native
+    aliases: [rn, reactnative]
+  sql:
+    dir: sql
+    aliases: [postgres, postgresql, supabase-sql]
+  csharp:
+    dir: csharp
+    aliases: [cs, c#]
+
+coding:
+  core_template: "{language}/CORE.md"
+  exclude_from_topics: ["CORE.md"]
+
+testing:
+  core_template: "test/{language}/CORE.md"
+  exclude_from_topics: ["CORE.md"]
+
+topics: []
+# Example:
+# - id: python-entraid
+#   language: python
+#   path: python/entraid.md
+#   kind: coding
+#   when: ["entra", "msal", "azure ad"]
+
+rules:
+  - Resolve language from Brief Task Directives
+  - Always load CORE for that language
+  - Load only Brief-listed topic paths
+  - Never browse the standards tree

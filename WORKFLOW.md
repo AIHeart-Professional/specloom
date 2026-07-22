@@ -1,4 +1,7 @@
-# SpecLoom — Five Independent Orchestrators
+# SpecLoom — Five Independent Orchestrators (v1)
+
+> **v1 (legacy).** Package path: `package/v1/`. Install: `node scripts/install.mjs --v1`.  
+> **v2 (Linear Brief):** see [`WORKFLOW-LINEAR.md`](WORKFLOW-LINEAR.md) + `package/v2/`.
 
 Five **peer** orchestrators. **None call each other.** User chains manually.
 

@@ -8,10 +8,12 @@
     "specloom-install": "scripts/install.mjs"
   },
   "scripts": {
-    "install:specloom": "node scripts/install.mjs --all",
-    "install:cursor": "node scripts/install.mjs --cursor",
-    "install:codex": "node scripts/install.mjs --codex",
-    "bootstrap": "node scripts/install.mjs --bootstrap"
+    "install:specloom": "node scripts/install.mjs --v1 --all",
+    "install:v1": "node scripts/install.mjs --v1 --all",
+    "install:v2": "node scripts/install.mjs --v2 --cursor --force",
+    "install:cursor": "node scripts/install.mjs --v1 --cursor",
+    "install:codex": "node scripts/install.mjs --v1 --codex",
+    "bootstrap": "node scripts/install.mjs --v1 --bootstrap"
   },
   "engines": {
     "node": ">=18"

@@ -2,6 +2,22 @@
 
 **Weave ideas into shipped code.**
 
+Two package versions:
+
+| Version | Path | Planning | Peers | Install |
+|---------|------|----------|-------|---------|
+| **v1** (legacy) | `package/v1/` | In-app `docs/` ideas→features→specs | `@specloom-work-creator` · `implement` · `tester` · `validator` · `git` | `node scripts/install.mjs --v1` |
+| **v2** (current design) | `package/v2/` | Linear Overview→Phase→Brief | `@specloom-init` · `brief` · `build` · `test` · `validate` · `git` | `node scripts/install.mjs --v2 --cursor --force` |
+
+- v1 contract: [`WORKFLOW.md`](WORKFLOW.md)  
+- v2 contract: [`WORKFLOW-LINEAR.md`](WORKFLOW-LINEAR.md)
+
+**Do not mix v1 and v2 agents in the same `~/.cursor` install** — use `--force` when switching.
+
+---
+
+## v1 (below)
+
 SpecLoom is an installable spec-driven workflow for [Cursor](https://cursor.com), [OpenAI Codex](https://openai.com/codex), and [Google Antigravity](https://antigravity.google/). It turns a codebase into a **spec loom**: ideas become features, features become dated specs, specs become validated implementation, and completed work merges back to a stable integration branch — with human sign-off at the draft stage and automation everywhere else.
 
 You invoke **five peer orchestrators** independently — they **never** call each other:

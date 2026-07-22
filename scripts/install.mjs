@@ -21,25 +21,27 @@ Usage:
   node scripts/install.mjs [options]
 
 Options:
+  --v1              Use package/v1 (legacy docs/ features+specs) [default]
+  --v2              Use package/v2 (Linear Overview→Phase→Brief)
   --cursor          Install Cursor agents + skills (~/.cursor/)
   --codex           Install Codex agents + shared skills (~/.codex/, ~/.agents/)
   --antigravity     Install Antigravity skills + global workflows (~/.gemini/)
   --all             Install Cursor, Codex, and Antigravity (default)
-  --bootstrap <dir> Scaffold docs/ tree in target repo after install
+  --bootstrap <dir> Scaffold target repo after install (v1=docs tree; v2=minimal note)
   --force           Overwrite existing files (backs up first)
   --dry-run         Print actions without writing
   -h, --help        Show this help
 
 Examples:
-  node scripts/install.mjs --all
-  node scripts/install.mjs --antigravity --force
-  node scripts/install.mjs --cursor --bootstrap ./my-app
-  ./install.sh --codex
+  node scripts/install.mjs --v1 --all
+  node scripts/install.mjs --v2 --cursor --force
+  node scripts/install.mjs --v2 --cursor --bootstrap ./my-app
 `);
 }
 
 function parseArgs(argv) {
   const opts = {
+    version: "v1",
     cursor: false,
     codex: false,
     antigravity: false,
@@ -53,6 +55,8 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "-h" || arg === "--help") opts.help = true;
+    else if (arg === "--v1") opts.version = "v1";
+    else if (arg === "--v2") opts.version = "v2";
     else if (arg === "--cursor") opts.cursor = true;
     else if (arg === "--codex") opts.codex = true;
     else if (arg === "--antigravity") opts.antigravity = true;
@@ -74,6 +78,12 @@ function parseArgs(argv) {
   }
 
   return opts;
+}
+
+function versionPackageRoot(version) {
+  const root = path.join(PACKAGE_ROOT, version);
+  if (!fs.existsSync(root)) throw new Error(`Missing package version dir: ${root}`);
+  return root;
 }
 
 function homeDir() {
@@ -175,9 +185,9 @@ function copyTree({ source, target, filter, transform, force, dryRun, label }) {
   return { copied, skipped };
 }
 
-function installCursor({ force, dryRun }) {
-  const cursorAgentsSrc = path.join(PACKAGE_ROOT, "cursor", "agents");
-  const cursorSkillsSrc = path.join(PACKAGE_ROOT, "cursor", "skills");
+function installCursor({ force, dryRun, pkgRoot }) {
+  const cursorAgentsSrc = path.join(pkgRoot, "cursor", "agents");
+  const cursorSkillsSrc = path.join(pkgRoot, "cursor", "skills");
   const cursorAgentsDest = path.join(homeDir(), ".cursor", "agents");
   const cursorSkillsDest = path.join(homeDir(), ".cursor", "skills");
 
@@ -212,35 +222,42 @@ function rewriteCodexAgent(text) {
     .replace(/~\/\.agents\/skills/g, skillsHome);
 }
 
-function installCodex({ force, dryRun }) {
-  const codexAgentsSrc = path.join(PACKAGE_ROOT, "codex", "agents");
-  const sharedSkillsSrc = path.join(PACKAGE_ROOT, "shared-skills");
+function installCodex({ force, dryRun, pkgRoot, version }) {
+  const codexAgentsSrc = path.join(pkgRoot, "codex", "agents");
+  const cursorAgentsSrc = path.join(pkgRoot, "cursor", "agents");
+  const sharedSkillsSrc = path.join(pkgRoot, "shared-skills");
   const codexAgentsDest = path.join(homeDir(), ".codex", "agents");
   const sharedSkillsDest = path.join(homeDir(), ".agents", "skills");
 
   console.log("\n== Codex ==");
 
+  const agentsSrc = fs.existsSync(codexAgentsSrc) ? codexAgentsSrc : cursorAgentsSrc;
   const agents = copyTree({
-    source: codexAgentsSrc,
+    source: agentsSrc,
     target: codexAgentsDest,
     filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
-    transform: rewriteCodexAgent,
+    transform: version === "v1" ? rewriteCodexAgent : undefined,
     force,
     dryRun,
-    label: "codex/agents",
+    label: fs.existsSync(codexAgentsSrc) ? "codex/agents" : "cursor/agents→codex",
   });
 
-  const shared = copyTree({
-    source: sharedSkillsSrc,
-    target: sharedSkillsDest,
-    filter: (base) => isManagedSkillName(base),
-    force,
-    dryRun,
-    label: "shared-skills",
-  });
+  let shared = { copied: 0, skipped: 0 };
+  if (fs.existsSync(sharedSkillsSrc)) {
+    shared = copyTree({
+      source: sharedSkillsSrc,
+      target: sharedSkillsDest,
+      filter: (base) => isManagedSkillName(base),
+      force,
+      dryRun,
+      label: "shared-skills",
+    });
+  } else {
+    console.log("[skip] shared-skills (not in this version)");
+  }
 
   const specloomSkills = copyTree({
-    source: path.join(PACKAGE_ROOT, "cursor", "skills"),
+    source: path.join(pkgRoot, "cursor", "skills"),
     target: sharedSkillsDest,
     filter: (base) => base.startsWith("specloom-"),
     force,
@@ -251,11 +268,11 @@ function installCodex({ force, dryRun }) {
   return { agents, skills: shared, specloomSkills };
 }
 
-function installAntigravity({ force, dryRun }) {
-  const cursorAgentsSrc = path.join(PACKAGE_ROOT, "cursor", "agents");
-  const cursorSkillsSrc = path.join(PACKAGE_ROOT, "cursor", "skills");
-  const sharedSkillsSrc = path.join(PACKAGE_ROOT, "shared-skills");
-  const workflowsSrc = path.join(PACKAGE_ROOT, "antigravity", "workflows");
+function installAntigravity({ force, dryRun, pkgRoot }) {
+  const cursorAgentsSrc = path.join(pkgRoot, "cursor", "agents");
+  const cursorSkillsSrc = path.join(pkgRoot, "cursor", "skills");
+  const sharedSkillsSrc = path.join(pkgRoot, "shared-skills");
+  const workflowsSrc = path.join(pkgRoot, "antigravity", "workflows");
   const agentsDest = antigravityGlobalAgentsDir();
   const skillsDest = antigravityGlobalSkillsDir();
   const workflowsDest = antigravityGlobalWorkflowsDir();
@@ -280,29 +297,39 @@ function installAntigravity({ force, dryRun }) {
     label: "antigravity/skills (specloom)",
   });
 
-  const sharedSkills = copyTree({
-    source: sharedSkillsSrc,
-    target: skillsDest,
-    filter: (base) => isManagedSkillName(base),
-    force,
-    dryRun,
-    label: "antigravity/skills (code/test)",
-  });
+  let sharedSkills = { copied: 0, skipped: 0 };
+  if (fs.existsSync(sharedSkillsSrc)) {
+    sharedSkills = copyTree({
+      source: sharedSkillsSrc,
+      target: skillsDest,
+      filter: (base) => isManagedSkillName(base),
+      force,
+      dryRun,
+      label: "antigravity/skills (code/test)",
+    });
+  } else {
+    console.log("[skip] shared-skills (not in this version)");
+  }
 
-  const workflows = copyTree({
-    source: workflowsSrc,
-    target: workflowsDest,
-    filter: () => true,
-    force,
-    dryRun,
-    label: "antigravity/global_workflows",
-  });
+  let workflows = { copied: 0, skipped: 0 };
+  if (fs.existsSync(workflowsSrc)) {
+    workflows = copyTree({
+      source: workflowsSrc,
+      target: workflowsDest,
+      filter: () => true,
+      force,
+      dryRun,
+      label: "antigravity/global_workflows",
+    });
+  } else {
+    console.log("[skip] antigravity/workflows (not in this version)");
+  }
 
   return { specloomAgents, specloomSkills, sharedSkills, workflows };
 }
 
-function readTemplate(name) {
-  return fs.readFileSync(path.join(PACKAGE_ROOT, "repo-templates", name), "utf8");
+function readTemplate(pkgRoot, name) {
+  return fs.readFileSync(path.join(pkgRoot, "repo-templates", name), "utf8");
 }
 
 function writeIfMissing(file, content, { force, dryRun }) {
@@ -323,8 +350,8 @@ function writeIfMissing(file, content, { force, dryRun }) {
   return true;
 }
 
-function copyTemplateDir(rel, destRoot, { force, dryRun }) {
-  const src = path.join(PACKAGE_ROOT, "repo-templates", rel);
+function copyTemplateDir(pkgRoot, rel, destRoot, { force, dryRun }) {
+  const src = path.join(pkgRoot, "repo-templates", rel);
   if (!fs.existsSync(src)) return;
   copyTree({
     source: src,
@@ -336,13 +363,29 @@ function copyTemplateDir(rel, destRoot, { force, dryRun }) {
   });
 }
 
-function bootstrapRepo(repoRoot, { force, dryRun }) {
+function bootstrapRepoV2(repoRoot, { force, dryRun }) {
+  console.log(`\n== Bootstrap repo (v2): ${repoRoot} ==`);
+  if (!dryRun) fs.mkdirSync(repoRoot, { recursive: true });
+  const note = `# SpecLoom v2
+
+Planning: Linear (Overview → Phase → Brief).
+Standards: external specloom-standards (pinned ref).
+App: code + tests + CI + runtime assets only.
+
+Peers: \`@specloom-brief\` → \`@specloom-build\` → \`@specloom-test\` → \`@specloom-validate\`
+Git base: \`ai-workflow\`
+`;
+  writeIfMissing(path.join(repoRoot, "SPECLOOM.md"), note, { force, dryRun });
+  console.log("\nBootstrap v2 complete. Wire Linear MCP + standards clone for automations.");
+}
+
+function bootstrapRepoV1(repoRoot, { force, dryRun, pkgRoot }) {
   console.log(`\n== Bootstrap repo: ${repoRoot} ==`);
 
   if (!dryRun) fs.mkdirSync(repoRoot, { recursive: true });
 
-  writeIfMissing(path.join(repoRoot, "AGENTS.md"), readTemplate("AGENTS.template.md"), { force, dryRun });
-  writeIfMissing(path.join(repoRoot, "docs", "README.md"), readTemplate("docs-readme.template.md"), { force, dryRun });
+  writeIfMissing(path.join(repoRoot, "AGENTS.md"), readTemplate(pkgRoot, "AGENTS.template.md"), { force, dryRun });
+  writeIfMissing(path.join(repoRoot, "docs", "README.md"), readTemplate(pkgRoot, "docs-readme.template.md"), { force, dryRun });
 
   const dirs = [
     "docs/phases",
@@ -374,7 +417,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   }
 
   // Automation bundle
-  const automationSrc = path.join(PACKAGE_ROOT, "repo-templates", "automation");
+  const automationSrc = path.join(pkgRoot, "repo-templates", "automation");
   if (fs.existsSync(automationSrc)) {
     copyTree({
       source: automationSrc,
@@ -387,7 +430,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   }
 
   // Work records templates
-  const wrSrc = path.join(PACKAGE_ROOT, "repo-templates", "work-records");
+  const wrSrc = path.join(pkgRoot, "repo-templates", "work-records");
   if (fs.existsSync(wrSrc)) {
     copyTree({
       source: wrSrc,
@@ -400,7 +443,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   }
 
   // GitHub planning config
-  const planningTemplate = path.join(PACKAGE_ROOT, "repo-templates", "automation", "github-planning.template.json");
+  const planningTemplate = path.join(pkgRoot, "repo-templates", "automation", "github-planning.template.json");
   const planningDest = path.join(repoRoot, "docs", "automation", "github-planning.json");
   if (fs.existsSync(planningTemplate)) {
     writeIfMissing(planningDest, fs.readFileSync(planningTemplate, "utf8"), { force, dryRun });
@@ -409,7 +452,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   // Workflow stub
   writeIfMissing(
     path.join(repoRoot, "docs", "workflows", "daily-spec-automation.md"),
-    readTemplate("daily-spec-automation.template.md"),
+    readTemplate(pkgRoot, "daily-spec-automation.template.md"),
     { force, dryRun },
   );
 
@@ -420,7 +463,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   );
 
   // Antigravity workspace workflows + rules
-  const agyWorkflowsSrc = path.join(PACKAGE_ROOT, "antigravity", "workflows");
+  const agyWorkflowsSrc = path.join(pkgRoot, "antigravity", "workflows");
   if (fs.existsSync(agyWorkflowsSrc)) {
     copyTree({
       source: agyWorkflowsSrc,
@@ -432,7 +475,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
     });
   }
 
-  const agyRulesSrc = path.join(PACKAGE_ROOT, "antigravity", "rules");
+  const agyRulesSrc = path.join(pkgRoot, "antigravity", "rules");
   if (fs.existsSync(agyRulesSrc)) {
     copyTree({
       source: agyRulesSrc,
@@ -450,7 +493,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
     ["monogame", "CORE.template.md", "CORE.md"],
   ];
   for (const [subdir, templateName, destName] of codeCoreTemplates) {
-    const templatePath = path.join(PACKAGE_ROOT, "repo-templates", "code", subdir, templateName);
+    const templatePath = path.join(pkgRoot, "repo-templates", "code", subdir, templateName);
     if (fs.existsSync(templatePath)) {
       writeIfMissing(
         path.join(repoRoot, "docs", "code", subdir, destName),
@@ -461,7 +504,7 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   }
 
   // Phase stubs
-  const phasesSrc = path.join(PACKAGE_ROOT, "repo-templates", "phases");
+  const phasesSrc = path.join(pkgRoot, "repo-templates", "phases");
   if (fs.existsSync(phasesSrc)) {
     copyTree({
       source: phasesSrc,
@@ -531,6 +574,14 @@ function bootstrapRepo(repoRoot, { force, dryRun }) {
   console.log("  4. Run: gh auth login");
 }
 
+function bootstrapRepo(repoRoot, { force, dryRun, pkgRoot, version }) {
+  if (version === "v2") {
+    bootstrapRepoV2(repoRoot, { force, dryRun });
+    return;
+  }
+  bootstrapRepoV1(repoRoot, { force, dryRun, pkgRoot });
+}
+
 function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) {
@@ -538,8 +589,12 @@ function main() {
     return;
   }
 
+  const pkgRoot = versionPackageRoot(opts.version);
+  opts.pkgRoot = pkgRoot;
+
   console.log("SpecLoom installer");
-  console.log(`Package: ${PACKAGE_ROOT}`);
+  console.log(`Version: ${opts.version}`);
+  console.log(`Package: ${pkgRoot}`);
   console.log(`Home:    ${homeDir()}`);
 
   if (opts.cursor) installCursor(opts);
@@ -549,7 +604,9 @@ function main() {
 
   console.log("\nDone.");
   const peers =
-    "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
+    opts.version === "v2"
+      ? "specloom-init, specloom-brief, specloom-build, specloom-test, specloom-validate, specloom-git"
+      : "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
   if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
   if (opts.codex) console.log(`Codex peers:  ${peers}`);
   if (opts.antigravity) {
