@@ -1,24 +1,28 @@
 ---
 name: specloom-build-protocol
 description: >
-  INTERNAL — specloom-build + build-worker. Handoffs, loops, Linear updates. Not user-invokable.
+  INTERNAL — specloom-build + build-worker. Queue-aware build; auto Task test unless manual.
+  Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Build protocol
 
+Also load **specloom-queue**.
+
 ## Session
 
-1. Load **specloom-v2-contract** + **specloom-resolve-work** + **specloom-git-workflow**
-2. Brief must be Ready (→ set Building) or Building, or Failed with build-owned remediation
-3. `task_start` from `ai-workflow`
-4. Delegate **specloom-build-worker** only (≤10)
-5. On all tasks complete + build-check pass → push/PR → Linear status **Testing** + comment summary
-6. Reply user: run `@specloom-test`. Never call test/validate peers.
+1. Contract + resolve-work + git-workflow + queue  
+2. Resolve Brief = queue head Ready/`specloom:ready` or Building/`specloom:building`  
+3. Set stage **Building** (`specloom:building`; clear ready)  
+4. Checkout/pull **`ai-workflow` only** (no task branch)  
+5. Delegate **specloom-build-worker** ≤10  
+6. On pass → push `ai-workflow` + Linear comment (SHAs) → stage **Testing** (`specloom:testing`)  
+7. Unless user said `manual`: **Task specloom-test**; else tell user `@specloom-test`
 
 ## Worker loop (≤10)
 
-Each iter: lowest unchecked task → domain agent by layer → check box only after code+git confirm → comment progress.
+Unchecked task → layer agent → checkbox after git confirm → comment.
 
 | Layer | Agent |
 |-------|--------|
@@ -26,26 +30,14 @@ Each iter: lowest unchecked task → domain agent by layer → check box only af
 | backend | specloom-backend |
 | database | specloom-database |
 
-All tasks checked → **specloom-build-check**. Pass → complete. Fail → fix or Failed + comment.
-
-## Domain rules
-
-- Production code only. No tests.
-- Load **specloom-coding** before edits.
-- Source files from Task Directives only unless Brief says otherwise.
+All checked → **specloom-build-check**. Fail → Failed + comment.
 
 ## Caps
 
-Max 10 worker iters → status Failed + comment `attempt cap` → stop.
-
-## Handoff (minimal)
-
-```json
-{"type":"BUILD_HANDOFF","brief_key":"","task_id":"","layer":"","language":"","standards":[],"sources":[],"fix_instructions":[]}
-```
+Max 10 → Failed `attempt cap`.
 
 ## Result
 
 ```json
-{"type":"BUILD_RESULT","status":"complete|blocked|failed","brief_key":"","tasks_done":[],"tasks_open":[],"pr_url":null,"notes":""}
+{"type":"BUILD_RESULT","status":"complete|blocked|failed","brief_key":"","tasks_done":[],"tasks_open":[],"branch":"ai-workflow","commit_shas":[],"auto_test":true,"notes":""}
 ```

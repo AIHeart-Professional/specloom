@@ -62,10 +62,17 @@ Create/update **Initiative** = full Overview (Linear — not GitHub). Labels: `b
 {
   "type": "GIT_HANDOFF",
   "from": "specloom-planner",
-  "actions": ["ensure_repo", "ensure_default_branch", "ensure_ai_workflow_branch", "push_if_needed"],
+  "actions": [
+    "ensure_repo",
+    "ensure_default_branch",
+    "ensure_ai_workflow_branch",
+    "ensure_docs_repo",
+    "push_if_needed"
+  ],
   "github": {
     "owner": "",
     "name": "",
+    "docs_name": "",
     "visibility": "private|public",
     "create_if_missing": true,
     "existing_remote": null
@@ -73,25 +80,49 @@ Create/update **Initiative** = full Overview (Linear — not GitHub). Labels: `b
 }
 ```
 
-Then Linear↔GitHub link or document steps.
+`docs_name` default: `<name>-docs`. Then Linear↔GitHub link or document steps.
+
+## Docs bootstrap
+
+After git OK, Task **specloom-document** once:
+
+```json
+{
+  "type": "DOCUMENT_HANDOFF",
+  "from": "specloom-planner",
+  "mode": "bootstrap",
+  "app_repo_url": "",
+  "docs_repo_url": "",
+  "linear_overview_url": "",
+  "product_name": "",
+  "planning_mode": "high|low"
+}
+```
+
+Expect stubs: README + architecture/system/workflow/specs per **specloom-document**.
 
 ## Phases + work Briefs
 
-Use **specloom-brief-plan**. Almost always multiple Briefs per Phase.  
-**Ready** only if no blocking Open Questions. Else **Backlog** + `blocks: Qx`.
+Use **specloom-brief-plan** + **specloom-queue**. Almost always multiple Briefs per Phase.  
+Every Brief: `queue_order` + `depends_on` + `blocks`.  
+Promote **one** queue head → `specloom:ready` (label fallback OK). Others Backlog.  
+Optional: Task **specloom-document** `sync_brief` for each new Brief (or batch once).
 
 ## Done
 
 - [ ] Overview on Linear  
 - [ ] `planning_mode` + languages recorded  
 - [ ] Advisory paths attached  
-- [ ] GitHub + `ai-workflow`  
-- [ ] Phases + Briefs created  
-- [ ] Next: `@specloom-build` on first Ready (ongoing edits: `@specloom-brief`)
+- [ ] GitHub app + `ai-workflow`  
+- [ ] Docs repo + **specloom-document** bootstrap  
+- [ ] Phases + **all** Briefs with Queue fields  
+- [ ] Queue head Ready → init **Tasks specloom-build** (unless `manual`)
 
 ## Forbidden
 
 - Static question-script only (must be dynamic dialogue)  
 - Overview as files in GitHub app repo as SoT  
 - Domain agents writing code  
+- Blocking on custom Linear workflow states (use labels)  
 - Replacing specloom-brief peer (init bootstraps; brief maintains)
+- Fat v1 docs tree inside app repo

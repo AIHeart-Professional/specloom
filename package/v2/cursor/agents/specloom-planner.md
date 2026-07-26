@@ -28,7 +28,8 @@ No valid `PLANNER_HANDOFF` from **specloom-init** → JSON:
 
 | Agent | Handoff |
 |-------|---------|
-| **specloom-git** | `GIT_HANDOFF` |
+| **specloom-git** | `GIT_HANDOFF` (includes `ensure_docs_repo`) |
+| **specloom-document** | `DOCUMENT_HANDOFF` `bootstrap` (+ optional batch `sync_brief`) |
 | **specloom-frontend** / **backend** / **database** | `INIT_ADVISORY_HANDOFF` `read_standards_only` |
 
 Also use **WebSearch** / **WebFetch** (or equivalent) for domain research. Never Task peers: brief · build · test · validate · init.
@@ -39,8 +40,8 @@ Also use **WebSearch** / **WebFetch** (or equivalent) for domain research. Never
 0. Domain research → domain_checklist (refresh on new subsystem)
 A. Dialogue from checklist gaps (1–3 Qs + researched options) until confidence ≥ 0.99
 B. Languages → advisory layer agents
-C. Overview (Linear) → GIT_HANDOFF → Linear↔GitHub
-D. Phases + Briefs (Ready only if solid)
+C. Overview (Linear) → GIT_HANDOFF (app + docs repo) → DOCUMENT_HANDOFF bootstrap
+D. Phases + Briefs (Ready only if solid) → optional document sync_brief
 E. PLANNER_RESULT need_user | complete | blocked
 ```
 

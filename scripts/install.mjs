@@ -370,10 +370,12 @@ function bootstrapRepoV2(repoRoot, { force, dryRun }) {
 
 Planning: Linear (Overview → Phase → Brief).
 Standards: external specloom-standards (pinned ref).
+Docs: separate \`<app>-docs\` repo (\`architecture\` / \`system\` / \`workflow\` / \`specs\`) — \`@specloom-document\`.
 App: code + tests + CI + runtime assets only.
 
 Peers: \`@specloom-brief\` → \`@specloom-build\` → \`@specloom-test\` → \`@specloom-validate\`
-Git base: \`ai-workflow\`
+Also: \`@specloom-document\` · \`@specloom-git\`
+App git base: \`ai-workflow\` · Docs: \`main\`
 `;
   writeIfMissing(path.join(repoRoot, "SPECLOOM.md"), note, { force, dryRun });
   console.log("\nBootstrap v2 complete. Wire Linear MCP + standards clone for automations.");
@@ -605,7 +607,7 @@ function main() {
   console.log("\nDone.");
   const peers =
     opts.version === "v2"
-      ? "specloom-init, specloom-brief, specloom-build, specloom-test, specloom-validate, specloom-git"
+      ? "specloom-init, specloom-brief, specloom-build, specloom-test, specloom-validate, specloom-document, specloom-git"
       : "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
   if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
   if (opts.codex) console.log(`Codex peers:  ${peers}`);

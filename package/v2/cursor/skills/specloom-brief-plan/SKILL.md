@@ -1,7 +1,7 @@
 ---
 name: specloom-brief-plan
 description: >
-  INTERNAL — specloom-brief. Create/edit Phases and work Briefs (Issues) from Overview. Not user-invokable.
+  INTERNAL — specloom-brief (+ planner). Phases + ordered work Briefs. Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -9,36 +9,43 @@ disable-model-invocation: true
 
 ## Create Phase (from Overview)
 
-1. Read Overview (Initiative): end goal + Reason + phase list gaps
-2. Create Linear Project + Document:
-   - **Reason** (why this milestone toward Overview)
-   - Goal · In scope · Out of scope · Quality bar · Completion criteria
-3. Status Project → Planned or In Progress (only one In Progress unless user says otherwise)
-4. Almost always plan **multiple** Briefs for the Phase — never one mega-Brief for whole phase
+1. Read Overview Initiative  
+2. Create Linear Project + Document (Reason · Goal · In/Out · Quality · Completion)  
+3. One Project **In Progress**; rest Planned  
+4. Multiple Briefs per Phase — never one mega-Brief  
 
 ## Create Brief (from Phase)
 
-1. Read Phase Document Reason/Goal/In-Out scope
-2. Create Issue on that Project:
-   - Title: clear work slice
-   - Labels: `brief` + layers
-   - Body sections in order:
-     1. **Reason** (why toward Phase/Overview)
-     2. Goal
-     3. Required Context (Code Standards · Test Standards · asset URLs)
-     4. Requirements
-     5. Task Directives (Language, layer, source files)
-     6. Task checklist `- [ ]`
-     7. Acceptance criteria
-3. Attach standards paths via manifest `topics.when` keywords — only matches
-4. Status → **Ready** when body complete
+Every Issue must be **implementation-complete** as a spec:
+
+1. Title: `SPE-n short-name` or Linear key + clear slice  
+2. Labels: `brief` + layers (`frontend`|`backend`|`database`)  
+3. Body sections:
+   1. Reason  
+   2. Goal  
+   3. **Queue** (`queue_order`, `depends_on`, `blocks`) — **required**  
+   4. Required Context (Code + Test Standards paths)  
+   5. Requirements (functional / data / API / security as needed)  
+   6. Task Directives (Language, layer, source files)  
+   7. Task checklist  
+   8. Acceptance criteria  
+4. Attach standards via advisory paths / manifest `when:`  
+
+## Ordering (with specloom-queue)
+
+Before finishing session:
+
+1. Assign `queue_order` + `depends_on` from architecture (e.g. scaffold → schema → API → UI)  
+2. Validate no cycles  
+3. Promote **only queue head** to Ready (`specloom:ready` + mapped state)  
+4. All other complete Briefs → Backlog until deps Done  
 
 ## Edit rules
 
-- Align Brief scope to Phase In scope; refuse Phase Out of scope without user OK
-- Keep Reason ≤ ~3 sentences
-- Do not invent architecture paths not in Overview/Phase/prior Briefs
+- Align to Phase In scope  
+- Reason ≤ ~3 sentences  
+- No invented architecture outside Overview/Phase  
 
 ## Templates
 
-See `brief-body.md` + `phase-document.md` in this skill folder.
+`brief-body.md` · `phase-document.md`

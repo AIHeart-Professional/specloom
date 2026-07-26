@@ -1,10 +1,20 @@
 # Reason
 
-Why this Brief exists toward Phase (and Overview) end goal. ≤3 sentences.
+Why this Brief exists toward Phase (and Overview). ≤3 sentences.
 
 # Goal
 
 - Measurable outcomes
+
+# Queue
+
+```
+queue_order: 10
+depends_on: []
+blocks: []
+```
+
+Lower `queue_order` runs first. `depends_on` = Brief ids that must be **Done**.
 
 # Required Context
 

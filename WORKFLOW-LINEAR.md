@@ -21,6 +21,7 @@ This document describes the **new** SpecLoom workflow: product planning in **Lin
 | Token-efficient standards | Small topic `.md` files; Brief lists subset |
 | Universal standards loaders | `specloom-coding` + `specloom-testing` |
 | Cloud automations can run the loop | External Linear + external standards + external SpecLoom package; app = code only |
+| Browseable product docs | Lightweight **docs repo** (`architecture` / `system` / `workflow` / `specs`) via `@specloom-document` |
 
 ---
 
@@ -33,6 +34,7 @@ flowchart TB
   subgraph external["External — not the app"]
     LIN[Linear - Overview / Phase / Brief / work log]
     STD[specloom-standards repo - coding + test rules]
+    DOCS[docs repo - architecture / system / workflow / specs]
     PKG[specloom package - agents / skills / prompts]
     CLOUD_ASSETS[Supabase Storage / Linear attachments]
     AUTO[Cursor Cloud Automations]
@@ -45,6 +47,7 @@ flowchart TB
 
   AUTO --> LIN
   AUTO --> STD
+  AUTO --> DOCS
   AUTO --> PKG
   AUTO --> SRC
   LIN -->|Required Context paths| STD
@@ -88,9 +91,9 @@ flowchart TB
   ISS1 -->|Required Context| STD
   ISS2 -->|Required Context| STD
   ISSN -->|Required Context| STD
-  ISS1 -->|PRs| APP
-  ISS2 -->|PRs| APP
-  ISSN -->|PRs| APP
+  ISS1 -->|commits on ai-workflow| APP
+  ISS2 -->|commits on ai-workflow| APP
+  ISSN -->|commits on ai-workflow| APP
 ```
 
 | Concept | Store | Replaces |
@@ -99,7 +102,7 @@ flowchart TB
 | **Phase** | Linear Project + Document | `docs/phases/` + feature container role |
 | **Brief** | Linear Issue | Features + specs |
 | **Ideas** | — | Removed |
-| **Work done** | Issue comments + status + linked PR | `docs/specs/work-records/*.md` |
+| **Work done** | Issue comments + status + commit SHAs on `ai-workflow` | `docs/specs/work-records/*.md` |
 | **Coding / test rules** | External `specloom-standards` | Fat language skills + in-app `docs/code/` |
 
 ### Phase ↔ Brief cardinality
@@ -153,34 +156,40 @@ All names keep the **`specloom-`** prefix. Rename so the label matches the job.
 
 | Old | New | Job |
 |-----|-----|-----|
-| `specloom-work-creator` / ideas | **`specloom-init`** | NEW project: Q&A → Overview + GitHub/`ai-workflow` (Tasks **specloom-git**) |
-| `specloom-work-creator` (ongoing) | **`specloom-brief`** | Phases + work Briefs (Issues) under Overview |
+| `specloom-work-creator` / ideas | **`specloom-init`** | NEW project: Overview + app/`ai-workflow` + docs repo |
+| `specloom-work-creator` (ongoing) | **`specloom-brief`** | Phases + work Briefs; sync docs specs |
 | `specloom-implement` | **`specloom-build`** | Implement production code for in-flight Brief |
 | `specloom-tester` | **`specloom-test`** | Write and run tests for Brief |
-| `specloom-validator` | **`specloom-validate`** | Final gate; mark Brief Done on pass |
-| `specloom-git` | **`specloom-git`** | Git/GitHub; callable by user or **specloom-init** bootstrap |
+| `specloom-validator` | **`specloom-validate`** | Final gate; Done + docs closeout |
+| — | **`specloom-document`** | Docs repo bootstrap / scan / sync / closeout |
+| `specloom-git` | **`specloom-git`** | App + docs remotes; callable by planner/document |
 
-**Independence:** peers never Task each other **except** `specloom-init` → `specloom-git` (`GIT_HANDOFF`). User/automation chains the rest.
+**Allowed auto Tasks:** brief→document sync + build → test → validate → document closeout → build(next). Say `manual` to skip Task handoffs.
 
 ```mermaid
 flowchart LR
   I[specloom-init]
   G[specloom-git]
+  D[specloom-document]
   B[specloom-brief]
   BU[specloom-build]
   T[specloom-test]
   V[specloom-validate]
 
   I -->|GIT_HANDOFF| G
+  I -->|DOCUMENT bootstrap| D
   I -->|Overview ready| B
-  B -->|automation / user| BU
-  BU -->|automation / user| T
-  T -->|automation / user| V
+  B -->|sync_brief| D
+  B -->|Task| BU
+  BU -->|Task| T
+  T -->|Task| V
+  V -->|closeout| D
+  V -->|next queue head| BU
 ```
 
 | Runtime | Invoke |
 |---------|--------|
-| Cursor chat | `@specloom-init` · `@specloom-brief` · `@specloom-build` · `@specloom-test` · `@specloom-validate` · `@specloom-git` |
+| Cursor chat | `@specloom-init` · `@specloom-brief` · `@specloom-build` · `@specloom-test` · `@specloom-validate` · `@specloom-document` · `@specloom-git` |
 | Cloud Automation | Same agent names in automation instructions |
 
 **Greenfield:** always `@specloom-init` first. Then `@specloom-brief`.
@@ -265,26 +274,31 @@ Backlog → Ready → Building → Testing → Validating → Done
 
 *(State name **Building** matches `specloom-build`; avoid “Implementing” after rename.)*
 
-**Labels:** `brief` + **only** `frontend` / `backend` / `database` as needed. No `game` label or layer.
+**Status fallback:** if team lacks custom workflow states, use labels `specloom:ready|building|testing|validating` on Todo/In Progress. **Never block** pipeline on MCP inability to create states.
+
+**Labels:** `brief` + layer (`frontend`/`backend`/`database`) + stage labels when needed. No `game`.
+
+**Queue (required on every Brief):** `queue_order`, `depends_on`, `blocks` — see skill **specloom-queue**. Default: one Ready head; others Backlog until deps Done.
 
 **Body sections:**
 
 1. **Reason** — short: why this Brief exists toward the Phase goal (and Overview)  
 2. Goal  
-3. Required Context  
-4. Requirements  
-5. Task Directives  
-6. Task checklist  
-7. Acceptance criteria
+3. **Queue** — order + deps  
+4. Required Context  
+5. Requirements  
+6. Task Directives  
+7. Task checklist  
+8. Acceptance criteria
 
 ### 5.4 Persistence (no `active_work.json`)
 
 | Signal | Store |
 |--------|-------|
-| Pipeline stage | Issue status |
+| Pipeline stage | Issue status **and/or** `specloom:*` labels |
 | Task progress | Checkboxes |
 | Narrative / errors | Comments |
-| Code truth | GitHub PR + branch |
+| Code truth | Commits on **`ai-workflow`** (fixed automation branch) |
 | Phase / product rollup | Project / Initiative status |
 
 Loop limits live in skills / automation config.
@@ -293,11 +307,11 @@ Loop limits live in skills / automation config.
 
 ## 6. Resolve active work
 
-1. **Brief** — Issue in `Building` / `Testing` / `Validating` (or key in prompt). Prefer one in-flight Brief per product (phase still has many Ready/Done Briefs).  
+1. **Brief** — by stage label / status, or key in prompt. Prefer **queue head** (lowest `queue_order` with deps Done). One in-flight Brief per product by default.  
 2. **Phase** — Issue’s Project + Document.  
 3. **Overview** — Initiative if needed.  
 4. **Resume** — unchecked tasks; verify git before trusting checkboxes.  
-5. **Branch** — `task/<LINEAR-KEY>-<slug>` and/or linked PR.
+5. **Branch** — always **`ai-workflow`** (fetch/pull). No per-Brief task branches (automations pin one branch).
 
 ---
 
@@ -308,31 +322,31 @@ Loop limits live in skills / automation config.
 1. User `@specloom-init` — thin orchestrator.  
 2. Tasks **`specloom-planner`** (dialogue, Overview, advisory, git, Phases/Briefs).  
 3. Planner `need_user` → init asks user → `continue` HANDOFF.  
-4. Planner `complete` → init summarizes → `@specloom-build` on first Ready.  
+4. Planner `complete` → init summarizes → Tasks **`specloom-build`** on queue head (unless `manual`).  
 5. Later plan edits: `@specloom-brief` (not init).
 
 ### 7.1b Ongoing plan — `specloom-brief`
 
-Add/edit Phases and Briefs under existing Overview (not greenfield bootstrap).
+Create/edit **all** Phases + Briefs with Queue fields; topo-sort; promote one Ready head; **Task specloom-build** unless `manual`.
 
 ### 7.2 Build
 
-1. `@specloom-build` or cloud automation.  
-2. Status → **Building**.  
+1. `@specloom-build` (or Task from brief/validate).  
+2. Stage → **Building** (`specloom:building`).  
 3. `specloom-coding` → manifest → `<lang>/CORE.md` + listed topics.  
-4. Tasks → checkboxes → comments → PR.  
-5. All tasks done → **Testing**; hand off to `specloom-test`.  
+4. Tasks → checkboxes → comments → push **`ai-workflow`**.  
+5. Pass → **Testing**; **Task specloom-test** (unless `manual`).  
 
 ### 7.3 Test
 
-1. `@specloom-test` / automation.  
+1. `@specloom-test` / Task from build.  
 2. `specloom-testing` → `test/<lang>/CORE.md` + listed topics.  
-3. Pass → **Validating**. Fail → comment + **Failed** or back to **Building**.  
+3. Pass → **Validating**; **Task specloom-validate** (unless `manual`). Fail → comment + **Failed** or stay Testing.  
 
 ### 7.4 Validate (full-auto)
 
-1. `@specloom-validate` / automation.  
-2. Pass → **Done** immediately.  
+1. `@specloom-validate` / Task from test.  
+2. Pass → **Done**; promote next queue head Ready; **Task specloom-build** (unless `manual` / empty).  
 3. Fail → owner tags; re-run build or test.  
 
 ### 7.5 Phase close
@@ -454,7 +468,7 @@ Each automation prompt:
 1. Resolve in-flight Brief from Linear.  
 2. Ensure standards checkout at pinned SHA (from Brief or workspace default pin).  
 3. Run peer algorithm (§14).  
-4. Update Linear status / comments; open or update PR on app repo.
+4. Update Linear status / comments; push commits on **`ai-workflow`** (fixed automation branch).
 
 ### 9.3 Pinning
 

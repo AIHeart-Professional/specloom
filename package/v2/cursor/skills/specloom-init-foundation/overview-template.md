@@ -56,8 +56,10 @@ Final product when Initiative Complete.
 
 # GitHub
 
-- Repo URL:
-- Branch: `ai-workflow`
+- App repo URL:
+- App branch: `ai-workflow`
+- Docs repo URL: (`<app>-docs`)
+- Docs branch: `main`
 
 # Phase roadmap
 

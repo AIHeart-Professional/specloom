@@ -1,8 +1,8 @@
 ---
 name: specloom-v2-contract
 description: >
-  INTERNAL — all v2 peers. Hierarchy, Linear map, independence, full-auto, persistence.
-  Load first every session. Not user-invokable.
+  INTERNAL — all v2 peers. Hierarchy, queue, Linear map, docs repo, full-auto chain.
+  Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -11,54 +11,46 @@ disable-model-invocation: true
 ## Hierarchy
 
 ```
-Overview (Linear Initiative) = end goal + planning_mode + languages
-  └─ Phase (Project + Document) = milestone  [many work Briefs]
-       └─ Brief (Issue) = work unit
+Overview (Linear Initiative)
+  └─ Phase (Project + Document)
+       └─ Brief (Issue) + Queue fields
 ```
 
-Overview SoT = **Linear**, never GitHub app repo.
+Overview SoT = **Linear**.  
+Docs repo = browseable mirror (architecture / system / workflow / specs) — **not** planning SoT.
 
 ## Peers
 
 ```
 @specloom-init → @specloom-brief → @specloom-build → @specloom-test → @specloom-validate
+@specloom-document · @specloom-git
 ```
-
-| Peer | Job |
-|------|-----|
-| **specloom-init** | NEW project orchestrator → Tasks **specloom-planner** only |
-| **specloom-brief** | Later add/edit Phases & Briefs |
-| **specloom-build** | Prod code |
-| **specloom-test** | Tests |
-| **specloom-validate** | Done auto |
-| **specloom-git** | Git/GitHub |
-
-## Internal (not user @)
-
-| Agent | Parent |
-|-------|--------|
-| **specloom-planner** | init — dialogue, Overview, Phases/Briefs, git + advisory Tasks |
-| **specloom-build-worker** | build |
-| **specloom-test-loop** | test |
-| **specloom-validate-loop** | validate |
 
 ## Allowed Tasks
 
-- `specloom-init` → `specloom-planner` only  
-- `specloom-planner` → `specloom-git` (`GIT_HANDOFF`)  
-- `specloom-planner` → `specloom-frontend|backend|database` (`INIT_ADVISORY_HANDOFF` / `read_standards_only`)  
+| From | To | When |
+|------|-----|------|
+| init | planner | always |
+| planner | git, document bootstrap, layer advisory | bootstrap |
+| **brief** | **document** sync_brief; **build** | plan done |
+| **build** | **test** | build pass |
+| **test** | **validate** | test pass |
+| **validate** | **document** closeout; **build** next | Brief Done |
 
-No other peer→peer Task.
+## Docs repo (lightweight)
 
-## planning_mode
+Only: `README.md` · `architecture/` · `system/` · `workflow/` · `specs/{active,archived}/`  
+Skill: **specloom-document**. App branch `ai-workflow`; docs branch `main`.
 
-On Overview: `high` | `low`. Sticky. High = agent owns tech defaults. Low = user owns tech.
+## Queue
 
-## Work Brief states
+Every Brief: `queue_order`, `depends_on`, `blocks`. See **specloom-queue**.  
+One Ready head by default. Status via labels if custom workflow states missing.
 
-`Backlog → Ready → Building → Testing → Validating → Done`
+## Stages
 
-Ready only if unblocked. Init may leave Backlog + `blocks: Qx`.
+`Backlog → Ready → Building → Testing → Validating → Done`  
+Mapped with `specloom:*` labels when needed.
 
 ## Layers
 

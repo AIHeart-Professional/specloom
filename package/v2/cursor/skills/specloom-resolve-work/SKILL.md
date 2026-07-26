@@ -1,33 +1,43 @@
 ---
 name: specloom-resolve-work
 description: >
-  INTERNAL — v2 peers. Resolve Overview/Phase/Brief from Linear + git. Not user-invokable.
+  INTERNAL — v2 peers. Resolve Overview/Phase/Brief from Linear + queue. Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Resolve work
 
+Load **specloom-queue** for stage labels + ordering.
+
 ## Algorithm
 
 1. Linear MCP required. Fail if missing.
-2. If peer is **specloom-init**: bootstrap mode — no Phase/Issue required.
-3. If user names Issue key → that work Brief.
-4. Else find **one** Issue status ∈ {Building, Testing, Validating}. Prefer label `brief`.
-5. If peer is **specloom-brief** and no in-flight Issue: use Overview + active Phase (`In Progress`).
-6. Load work Brief body + Phase Document. Load Overview if Phase unclear.
-7. Branch: linked PR → its branch; else `task/<KEY>-<slug>`; else from `ai-workflow`.
-8. Tasks: unchecked = remaining. Checked → verify git before skip.
-9. `standards_ref` from Brief or workspace pin (**specloom-standards-fetch**).
+2. If peer is **specloom-init**: bootstrap — no Brief required.
+3. If user names Issue key → that Brief.
+4. Else resolve by **pipeline stage** (label preferred — see specloom-queue):
+   - **build:** `specloom:building` OR (`specloom:ready` / Ready) — pick **lowest queue_order**
+   - **test:** `specloom:testing`
+   - **validate:** `specloom:validating`
+5. If none in-flight for build: promote/find queue head via **specloom-queue** (deps Done, no blocks).
+6. If peer is **specloom-brief**: Overview + active Phase; plan full queue.
+7. Load Brief + Phase Document (+ Overview if needed).
+8. Branch: **always** `ai-workflow` (fetch + pull). Never `task/*`. See **specloom-git-workflow**.
+9. Tasks: unchecked remaining; checked → verify commits on `ai-workflow`.
+10. `standards_ref` from Brief / pin (**specloom-standards-fetch**).
+
+## Multiple Briefs
+
+Never ask user to pick when queue_order + depends_on define a unique head.  
+Ask only if `parallel` mode and ambiguous.
 
 ## no_work
 
-- No matching Brief for build/test/validate state
-- Status `Done` / `Blocked` without user override
-- Multiple in-flight without disambiguation → ask once, stop
-- specloom-brief with no Overview → tell user `@specloom-init`
+- No runnable Brief for this peer  
+- Done/Blocked without override  
+- specloom-brief with no Overview → `@specloom-init`
 
-## Output pointers (internal)
+## Output pointers
 
 ```
-brief_key, phase_project, overview_id, branch, open_tasks[], standards_root, standards_ref
+brief_key, queue_order, depends_on, stage, phase_project, overview_id, branch=ai-workflow, open_tasks[], standards_root
 ```
