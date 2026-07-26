@@ -46,9 +46,9 @@ Final product when Initiative Complete.
 
 # Standards paths (from advisory)
 
-| Layer | Paths |
-|-------|-------|
-| | |
+| Layer | Languages | code skills | test skills | Standards paths |
+|-------|-----------|-------------|-------------|-----------------|
+| | | code-… | test-… | `lang/CORE.md` |
 
 # Architecture sketch
 

@@ -1,7 +1,8 @@
 ---
 name: specloom-coding
 description: >
-  INTERNAL — production code agents. Load language CORE + Brief Code Standards only. Not user-invokable.
+  INTERNAL — production code agents. Load code-{lang} skills + standards CORE + Brief paths.
+  Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -9,11 +10,11 @@ disable-model-invocation: true
 
 Before any production edit:
 
-1. **specloom-standards-fetch** → standards root + `manifest.yaml`
-2. Languages = Brief Task Directives `Language` column (aliases via manifest)
-3. **Always** read `{language}/CORE.md` per language
-4. Read **only** Brief **Code Standards** paths (normalize with manifest `root`)
-5. Topic wins over CORE on conflict for that topic
-6. **Never** browse other files under language dir; **never** load `test/`
+1. Languages = Brief Task Directives `Language` column (normalize via **specloom-lang-ensure** map / manifest aliases)
+2. For each language slug `L`: **load skill `code-L` if it exists** (Cursor/Codex skills). If missing → fail and tell parent to run lang-ensure / `@specloom-init` language fix — do not invent rules ad hoc mid-build
+3. **specloom-standards-fetch** → standards root + `manifest.yaml` (when available)
+4. If standards present: always read `{language}/CORE.md`; then **only** Brief **Code Standards** topic paths
+5. Topic / `code-L` skill: more specific wins for that topic; never browse other standards files
+6. **Never** load `test/` or `test-*` skills here
 
-No production code without steps 3–4 complete.
+No production code without steps 2 complete (and 4 when standards root exists).

@@ -15,17 +15,17 @@ Else JSON `ACCESS_DENIED`.
 
 ## Skills
 
-**specloom-coding**
+**specloom-coding** (loads `code-{lang}` per Task languages — e.g. `code-tauri`, `code-rust`, `code-typescript`)
 
 ## Advisory (init)
 
-Load CORE + relevant topics for `language`. Return:
+Assume **specloom-lang-ensure** already ran for these languages. Load each `code-{L}` + standards CORE if present. Return:
 
 ```json
-{"type":"INIT_ADVISORY_RESULT","layer":"frontend","paths":[],"must":[],"forbid":[]}
+{"type":"INIT_ADVISORY_RESULT","layer":"frontend","languages":[],"code_skills":[],"paths":[],"must":[],"forbid":[]}
 ```
 
-No repo edits.
+No repo edits. If `code-{L}` missing → return `status`-like note in forbid/must empty and list `missing_skills` in paths as `missing:code-L` so planner re-runs lang-ensure.
 
 ## Build
 

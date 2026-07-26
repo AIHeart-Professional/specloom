@@ -1,7 +1,8 @@
 ---
 name: specloom-testing
 description: >
-  INTERNAL — test agents. Load test/<lang>/CORE.md + Brief Test Standards only. Not user-invokable.
+  INTERNAL — test agents. Load test-{lang} skills + test CORE + Brief Test Standards.
+  Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -9,8 +10,7 @@ disable-model-invocation: true
 
 Before any test write:
 
-1. **specloom-standards-fetch** → standards root + `manifest.yaml`
-2. Languages under test from Brief
-3. **Always** read `test/{language}/CORE.md`
-4. Read **only** Brief **Test Standards** paths
-5. **Never** browse; **never** write production code; **never** load coding topics unless listed under Test Standards
+1. Languages under test from Brief (same slug map as coding)
+2. For each slug `L`: **load `test-L` if it exists**. Missing → fail to parent (lang-ensure), do not freestyle
+3. **specloom-standards-fetch** when available → `test/{language}/CORE.md` + Brief **Test Standards** paths only
+4. **Never** browse; **never** write production features; **never** load `code-*` unless listed under Test Standards

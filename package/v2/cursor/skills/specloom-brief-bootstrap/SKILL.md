@@ -35,7 +35,17 @@ planning_mode: high|low
 | database | … |
 ```
 
-## Standards advisory (after languages)
+## Language skills (required after languages)
+
+Run **specloom-lang-ensure** for every locked stack slug:
+
+- Create missing `code-{slug}` + `test-{slug}` under `~/.cursor/skills/` (research-backed from official docs)
+- Stub standards `CORE.md` when standards repo writable
+- Record skill names on Overview Standards paths table
+
+**Do not** Task layer advisory until lang-ensure returns `ok` or `partial` with explicit gaps.
+
+## Standards advisory (after lang-ensure)
 
 Per layer present, Task once:
 
@@ -112,6 +122,7 @@ Optional: Task **specloom-document** `sync_brief` for each new Brief (or batch o
 
 - [ ] Overview on Linear  
 - [ ] `planning_mode` + languages recorded  
+- [ ] **code-* / test-* skills ensured** (lang-ensure)  
 - [ ] Advisory paths attached  
 - [ ] GitHub app + `ai-workflow`  
 - [ ] Docs repo + **specloom-document** bootstrap  

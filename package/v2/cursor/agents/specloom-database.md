@@ -15,11 +15,11 @@ Else JSON `ACCESS_DENIED`.
 
 ## Skills
 
-**specloom-coding**
+**specloom-coding** (e.g. `code-postgres`, `code-sql` when present)
 
 ## Advisory (init)
 
-Return `INIT_ADVISORY_RESULT` for sql/db paths/must/forbid. No migrations/MCP applies.
+`INIT_ADVISORY_RESULT` for db languages. No migrations/MCP applies in advisory.
 
 ## Build
 

@@ -211,7 +211,22 @@ function installCursor({ force, dryRun, pkgRoot }) {
     label: "cursor/skills",
   });
 
-  return { agents, skills };
+  const sharedSkillsSrc = path.join(pkgRoot, "shared-skills");
+  let shared = { copied: 0, skipped: 0 };
+  if (fs.existsSync(sharedSkillsSrc)) {
+    shared = copyTree({
+      source: sharedSkillsSrc,
+      target: cursorSkillsDest,
+      filter: (base) => isManagedSkillName(base),
+      force,
+      dryRun,
+      label: "shared-skills→cursor",
+    });
+  } else {
+    console.log("[skip] shared-skills (not in this version)");
+  }
+
+  return { agents, skills, shared };
 }
 
 function rewriteCodexAgent(text) {

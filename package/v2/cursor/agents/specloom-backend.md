@@ -15,11 +15,11 @@ Else JSON `ACCESS_DENIED`.
 
 ## Skills
 
-**specloom-coding**
+**specloom-coding** (loads `code-{lang}` for Task languages)
 
 ## Advisory (init)
 
-Return `INIT_ADVISORY_RESULT` for backend language paths/must/forbid. No repo edits.
+Same shape as frontend `INIT_ADVISORY_RESULT` for backend languages. No repo edits. Report `missing:code-L` if skill absent.
 
 ## Build
 

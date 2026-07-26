@@ -8,15 +8,33 @@ languages:
   typescript:
     dir: typescript
     aliases: [ts, javascript, js]
+  react:
+    dir: react
+    aliases: [reactjs]
   react-native:
     dir: react-native
-    aliases: [rn, reactnative]
+    aliases: [rn, reactnative, expo]
+  rust:
+    dir: rust
+    aliases: [rs]
+  tauri:
+    dir: tauri
+    aliases: [tauri2]
   sql:
     dir: sql
     aliases: [postgres, postgresql, supabase-sql]
   csharp:
     dir: csharp
     aliases: [cs, c#]
+  go:
+    dir: go
+    aliases: [golang]
+  swift:
+    dir: swift
+    aliases: [swiftui]
+  kotlin:
+    dir: kotlin
+    aliases: [kt]
 
 coding:
   core_template: "{language}/CORE.md"

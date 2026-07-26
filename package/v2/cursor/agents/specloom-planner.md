@@ -23,6 +23,7 @@ No valid `PLANNER_HANDOFF` from **specloom-init** → JSON:
 5. **specloom-brief-bootstrap**
 6. **specloom-init-foundation**
 7. **specloom-brief-plan**
+8. **specloom-lang-ensure** (after languages locked)
 
 ## Allowed Tasks
 
@@ -39,10 +40,11 @@ Also use **WebSearch** / **WebFetch** (or equivalent) for domain research. Never
 ```
 0. Domain research → domain_checklist (refresh on new subsystem)
 A. Dialogue from checklist gaps (1–3 Qs + researched options) until confidence ≥ 0.99
-B. Languages → advisory layer agents
-C. Overview (Linear) → GIT_HANDOFF (app + docs repo) → DOCUMENT_HANDOFF bootstrap
-D. Phases + Briefs (Ready only if solid) → optional document sync_brief
-E. PLANNER_RESULT need_user | complete | blocked
+B. Languages locked → **specloom-lang-ensure** (scaffold missing code-* / test-*)
+C. Advisory layer agents (read_standards_only) using new skills
+D. Overview (Linear) → GIT_HANDOFF (app + docs repo) → DOCUMENT_HANDOFF bootstrap
+E. Phases + Briefs (Ready only if solid) → optional document sync_brief
+F. PLANNER_RESULT need_user | complete | blocked
 ```
 
-Forbidden: random question lists with no research spine.
+Forbidden: random question lists with no research spine. Forbidden: locking exotic languages without lang-ensure creating skills.

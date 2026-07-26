@@ -31,7 +31,7 @@ Docs repo = browseable mirror (architecture / system / workflow / specs) — **n
 | From | To | When |
 |------|-----|------|
 | init | planner | always |
-| planner | git, document bootstrap, layer advisory | bootstrap |
+| planner | git, document, lang-ensure, layer advisory | bootstrap |
 | **brief** | **document** sync_brief; **build** | plan done |
 | **build** | **test** | build pass |
 | **test** | **validate** | test pass |
@@ -55,3 +55,8 @@ Mapped with `specloom:*` labels when needed.
 ## Layers
 
 `frontend` | `backend` | `database` only.
+
+## Languages / skills
+
+Locked stacks → **specloom-lang-ensure** creates `code-{slug}` + `test-{slug}` if missing.  
+Layer agents load them via **specloom-coding** / **specloom-testing**. No per-language peers.
