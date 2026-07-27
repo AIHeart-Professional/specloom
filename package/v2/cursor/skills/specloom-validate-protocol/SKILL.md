@@ -20,10 +20,11 @@ Invoked under **specloom-run**. **Does not** mark Done / promote / Task build.
 ## code_quality
 
 - Load **code-{lang}** skills + Brief Code Standards  
-- If UX refs / Image Files listed → load **specloom-ux-refs**; score UI against refs  
-- Domain validators as needed  
-- Score adherence to professional standards + Brief acceptance for implementation  
-- `confidence` ∈ [0,1]; pass iff ≥ threshold  
+- Detect visual via **specloom-ux-refs**; if visual:
+  - Load listed Image Files; compare implemented UI (read refs + UI/screenshot)
+  - Set `ux_required: true`, `ux_confidence` ∈ [0,1]
+  - Pass only if `confidence ≥ require_confidence` **and** `ux_confidence ≥ require_ux_confidence` (default **0.99**)
+- Non-visual: `ux_required: false`, `ux_confidence: null`
 - Failures → `owner:build`
 
 ## test_quality
@@ -43,6 +44,8 @@ Invoked under **specloom-run**. **Does not** mark Done / promote / Task build.
   "mode":"code_quality|test_quality",
   "brief_key":"",
   "confidence":0.0,
+  "ux_confidence":null,
+  "ux_required":false,
   "coverage":null,
   "issues":[{"owner":"build|test","detail":""}]
 }

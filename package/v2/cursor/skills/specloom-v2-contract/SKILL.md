@@ -56,4 +56,4 @@ Specloom team = SpecLoom meta only.
 
 ## Docs / queue / layers / languages / Linear / UX
 
-Docs repo lightweight (+ **`ux/refs`** for mockups); queue via **specloom-queue**; layers frontend|backend|database; **specloom-lang-ensure** for `code-*`/`test-*`; **specloom-linear-team** for per-product Team; **specloom-ux-refs** for design images (docs repo / Linear attachments; app repo = shippable assets only).
+Docs repo lightweight (+ **`ux/refs`**); **specloom-ux-refs** auto-generates/screenshots missing refs for **visual** tasks only; validate requires **ux_confidence ≥ 0.99** on those Briefs. Queue / layers / lang-ensure / linear-team unchanged.

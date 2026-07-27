@@ -1,8 +1,8 @@
 ---
 name: specloom-run-protocol
 description: >
-  INTERNAL — specloom-run only. One-Brief autonomous loop: build → code validate →
-  test → test validate; ≤5 retries per gate; push on Done. Not user-invokable.
+  INTERNAL — specloom-run only. One-Brief autonomous loop: UX ensure → build → code
+  validate → test → test validate; ≤5 retries; push on Done. Not user-invokable.
 disable-model-invocation: true
 ---
 
@@ -20,52 +20,46 @@ Orchestrator owns the whole execution path. Sub-agents never Task each other.
 
 | Gate | After | Pass criteria |
 |------|-------|----------------|
-| **code_quality** | build | Validate mode `code_quality`; load **code-{lang}** + specloom-coding; **confidence ≥ 0.99** |
-| **test_quality** | tests | Validate mode `test_quality`; load **test-{lang}** + specloom-testing; **confidence ≥ 0.99** AND **100% coverage** on Brief production files (manifest / changed source set) |
+| **code_quality** | build | **confidence ≥ 0.99**; if visual also **ux_confidence ≥ 0.99** |
+| **test_quality** | tests | **confidence ≥ 0.99** AND **coverage = 1.0** on Brief production files |
 
 ## Retry
 
 - Each gate loop: **max 5** attempts  
-- Attempt = (build or test work) + validate for that gate  
-- On fail: pass issues + `owner:build|test` back to correct sub-agent; increment attempt  
-- After 5 fails on same gate → **BLOCKED**: Linear comment + status Failed/Blocked + **alert user**; do not continue  
+- On fail: route `owner:build|test`; increment attempt  
+- After 5 fails → **BLOCKED** + alert user  
 
 ## Loop
 
 ```
-0. Resolve Brief (Ready / Building / or key). Checkout+pull ai-workflow.
-1. Stage Building (specloom:building)
-2. BUILD_GATE (attempt 1..5):
-   a. Task specloom-build (internal) — implement unchecked tasks via build-worker
+0. Resolve Brief. Checkout+pull ai-workflow.
+0b. Visual? → specloom-ux-refs ensure (generate/screenshot missing page images → patch Brief → commit docs)
+1. Stage Building
+2. BUILD_GATE (1..5):
+   a. Task specloom-build
    b. Task specloom-validate mode=code_quality
-   c. if confidence ≥ 0.99 → break
-   d. else remediate owner:build → retry
-   e. if attempt==5 and fail → BLOCKED stop
-3. Stage Testing (specloom:testing)
-4. TEST_GATE (attempt 1..5):
-   a. Task specloom-test (internal) — write/run tests via test-loop
-   b. Task specloom-validate mode=test_quality (coverage must be 100% on scoped files)
-   c. if confidence ≥ 0.99 AND coverage 100% → break
-   d. else owner:test → retry test; owner:build → Task build then re-enter test gate (counts as attempt)
-   e. if attempt==5 and fail → BLOCKED stop
-5. Push origin ai-workflow (all commits)
-6. Stage Done; clear specloom stage labels; comment SHAs + confidence
-7. Task specloom-document closeout (optional failure → note, do not reopen SPE)
-8. Promote next Brief Ready — **do not** auto-start next SPE (one-SPE focus). Tell user next key.
+   c. pass if confidence≥0.99 AND (not visual OR ux_confidence≥0.99)
+   d. else retry build; at 5 → BLOCKED
+3. Stage Testing
+4. TEST_GATE (1..5):
+   a. Task specloom-test
+   b. Task specloom-validate mode=test_quality (require_coverage 1.0)
+   c. pass if confidence≥0.99 AND coverage 100%
+   d. else retry; owner:build → build then re-test; at 5 → BLOCKED
+5. Push origin ai-workflow
+6. Done + comment SHAs + confidences
+7. Task specloom-document closeout
+8. Promote next Ready — do not auto-run next SPE
 ```
+
+Load **specloom-ux-refs** for step 0b.
 
 ## Handoff shapes
 
-### To build
+### To build / test
 
 ```json
-{"type":"RUN_HANDOFF","from":"specloom-run","to":"specloom-build","brief_key":"","attempt":1,"issues":[]}
-```
-
-### To test
-
-```json
-{"type":"RUN_HANDOFF","from":"specloom-run","to":"specloom-test","brief_key":"","attempt":1,"issues":[]}
+{"type":"RUN_HANDOFF","from":"specloom-run","to":"specloom-build|specloom-test","brief_key":"","attempt":1,"issues":[]}
 ```
 
 ### To validate
@@ -79,11 +73,14 @@ Orchestrator owns the whole execution path. Sub-agents never Task each other.
   "mode":"code_quality|test_quality",
   "attempt":1,
   "require_confidence":0.99,
-  "require_coverage":null
+  "require_ux_confidence":0.99,
+  "require_coverage":null,
+  "visual":false
 }
 ```
 
-For `test_quality`, set `"require_coverage": 1.0`.
+Set `visual: true` and `require_ux_confidence: 0.99` when Brief is visual.  
+For `test_quality`, set `require_coverage: 1.0`.
 
 ### From validate
 
@@ -94,19 +91,17 @@ For `test_quality`, set `"require_coverage": 1.0`.
   "mode":"code_quality|test_quality",
   "brief_key":"",
   "confidence":0.0,
+  "ux_confidence":null,
+  "ux_required":false,
   "coverage":null,
   "issues":[{"owner":"build|test","detail":""}]
 }
 ```
 
-## User alert (blocked)
-
-NL must include: Brief key, gate name, attempt count, top issues, what user can decide.  
-Do not silently stop.
-
 ## Forbidden
 
-- Tasking build→test→validate as a peer chain (orchestrator only)  
-- Starting a second SPE in same session without user ask  
-- Marking Done without both gates passed  
+- Peer-chaining build→test→validate  
+- Skipping UX ensure on visual Briefs  
+- Passing visual Briefs without ux_confidence ≥ 0.99  
+- Auto-starting next SPE  
 - Skipping push after success

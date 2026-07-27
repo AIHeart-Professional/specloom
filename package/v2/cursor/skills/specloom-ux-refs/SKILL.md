@@ -1,87 +1,135 @@
 ---
 name: specloom-ux-refs
 description: >
-  INTERNAL — brief/build/validate/document. UX design-reference images hybrid for v2.
-  Refs live in docs repo; shippable assets in app. Not user-invokable.
+  INTERNAL — brief/build/run/validate/document. UX refs in docs repo; auto-generate or
+  screenshot when visual tasks lack images; ≥99% image-match confidence. Not user-invokable.
 disable-model-invocation: true
 ---
 
 # UX image hybrid (v2)
 
-Bring back v1 **design/reference vs shippable asset** split — without stuffing mockups into the app repo.
+Design refs vs shippable assets. **Visual tasks must have refs** — create them if missing.
 
 ## Where images live
 
-| Kind | Store | Path / form |
-|------|--------|-------------|
-| **UX / design refs** (mockups, wireframes, screen targets) | **Docs repo** | `ux/refs/<flow-or-screen>/…` |
-| **Same refs (optional mirror)** | Linear Issue **attachments** + Brief links | MCP-visible without docs clone |
-| **Shippable app assets** (icons used at runtime) | **App repo only** | e.g. `assets/`, `public/`, platform content dirs |
+| Kind | Store | Path |
+|------|--------|------|
+| **UX / design refs** | **Docs repo** | `ux/refs/<flow-or-screen>/…` |
+| **Optional mirror** | Linear Issue attachments | URLs on Brief |
+| **Shippable assets** | **App repo** | `assets/`, `public/`, … |
 
-**Never** treat `ux/refs/**` as runtime assets.  
-**Never** put design-only mockups in app `assets/` as SoT.
+Never treat `ux/refs/**` as runtime assets.
 
-Cloud: docs repo on `main` is enough for automations that already clone docs; Linear attachments help when only Linear MCP is available.
+## When is a task “visual”?
 
-## Docs repo layout
+**Yes** if any:
+
+- Layer **frontend** and task touches UI (screen, layout, nav, theme chrome, form, widget, page shell)  
+- Acceptance / Goal names screens, tabs, mockups, “looks like”, dark theme UI  
+- Task **Image Files** column is present (even if empty / to-fill)  
+- Brief frontmatter / Queue note `visual: true`
+
+**No** (skip image pipeline): pure API, schema, migrations, non-UI scaffolding with no screens, docs-only.
+
+Scaffold that **creates pages/tabs** = visual → generate one ref **per page/tab** if none provided.
+
+## Ensure refs (before UI build)
+
+Run by **specloom-run** (or brief) when Brief is visual:
 
 ```
-ux/
-  README.md           # index + rules
-  refs/
-    home/
-    budget/
-    settings/
-    …
-  private/            # optional — gitignored local-only drafts (not required in cloud)
+1. Collect needed screens from Goal / Phase IA / Task list / tab names
+2. For each screen, resolve existing ref:
+   - Path in Required Context / Image Files that exists on disk, OR
+   - Linear attachment URL that loads
+3. If any screen missing a ref → CREATE (below)
+4. Patch Brief Required Context + Image Files with final paths
+5. Commit docs repo main; optional Linear attach
+6. Return UX_ENSURE_RESULT
 ```
 
-Bootstrap via **specloom-document** creates `ux/README.md` + empty `ux/refs/.gitkeep`.
+### Create — prefer generate, then screenshot
 
-## Brief rules (like v1)
+| Situation | Action |
+|-----------|--------|
+| App UI **not** built yet (or screen missing) | **Generate** image with Cursor **GenerateImage** (or equivalent) from Brief + Overview theme/IA. Save under `ux/refs/<slug>/<screen>.png` |
+| App UI **already** runnable for that screen | **Screenshot** running UI (browser / emulator / Expo web) → save same path if no designer ref exists |
+| Designer later drops real mockup | Replace generated file; keep path stable when possible |
 
-### Required Context
+Generation prompt must include: product name, dark/light from Overview, screen purpose, key regions/labels from Brief, “mobile app UI mockup” (or platform), no random marketing chrome.
 
-Must list every UX ref the implementer may open:
+Mark generated files in `ux/README.md` index as `source: generated|screenshot|designer`.
+
+### Result
+
+```json
+{
+  "type": "UX_ENSURE_RESULT",
+  "status": "ok|skipped|failed",
+  "visual": true,
+  "screens": ["home", "budget"],
+  "created": ["ux/refs/home/placeholder.png"],
+  "existing": [],
+  "brief_updated": true
+}
+```
+
+## Brief rules
+
+### Required Context — UX references
 
 | Ref | Purpose |
 |-----|---------|
-| `ux/refs/budget/envelope-list.png` | Budget screen target |
-| `https://…` or Linear attachment URL | Same if mirrored |
+| `ux/refs/budget/envelope-list.png` | … |
 
-Unlisted = **do not read** (same discipline as standards paths).
+Unlisted = do not read.
 
 ### Task Directives
 
-Restore columns:
+| ID | … | **Image Files** | **Asset Files** | … |
 
-| ID | Task | Layer | Language | Code Standards | **Image Files** | **Asset Files** | Source Files |
-|----|------|-------|----------|----------------|-----------------|-----------------|--------------|
+- Image Files = `ux/refs/**` or URLs (never `None` on visual tasks after ensure)  
+- Asset Files = app shippable only  
 
-- **Image Files** = design refs under `ux/refs/**` (or Linear/HTTPS URLs), or `None`  
-- **Asset Files** = app-repo shippable paths only, or `None`  
-- Every Image/Asset path must appear in Required Context  
+## Build
 
-### Frontend build
+Before UI edits: **Read** every Image File (vision). Match hierarchy, spacing, theme, labels.  
+Deviation only with Linear comment + Open Question if it breaks acceptance.
 
-Before UI work: **Read** each listed Image File (vision). Match layout hierarchy, spacing intent, dark/light, and labeled states. Note intentional deviations in Linear comment.
+## Validate — image confidence ≥ 0.99
 
-### Validate (`code_quality`)
+For visual Briefs, `code_quality` must report:
 
-If Brief lists UX refs: score visual/IA alignment against them (confidence penalty if ignored or contradicted without comment).
+```json
+"ux_confidence": 0.0,
+"ux_required": true
+```
 
-## Who writes files
+Pass code gate only if:
+
+- overall `confidence ≥ 0.99` **and**  
+- `ux_confidence ≥ 0.99` (UI vs listed refs)
+
+Score by reading refs + inspecting implemented UI (screenshot or code+vision).  
+Fail → `owner:build` with concrete mismatches (layout, missing regions, theme, typography).
+
+Non-visual Briefs: `ux_required: false`; skip `ux_confidence`.
+
+## Who does what
 
 | Actor | Action |
 |-------|--------|
-| User / designer | Drop mockups into docs `ux/refs/…` (or attach on Linear) |
-| **specloom-brief** | Link paths/URLs into Brief Required Context + Task Image Files |
-| **specloom-document** | Keep `ux/README.md` index updated on sync/scan |
-| **specloom-run** / build | Consume refs; do not invent alternate UX when refs exist |
+| User / designer | Optional real mockups into `ux/refs/` |
+| **specloom-brief** | Scope screens; call ensure if visual and empty |
+| **specloom-run** | **Must** UX ensure before first build when visual |
+| **specloom-build** / frontend | Read refs; implement |
+| **specloom-validate** | Enforce `ux_confidence ≥ 0.99` |
+| **specloom-document** | Index `ux/README.md` |
 
 ## Forbidden
 
-- Design refs only inside app repo  
-- Fat `docs/images` tree inside **app**  
-- Reading random mockups not listed on Brief  
-- Using reference PNGs as bundled runtime assets without copying into app asset paths via Task Asset Files
+- Visual frontend work with Image Files still `None` after ensure  
+- Passing validate below 0.99 ux_confidence on visual Briefs  
+- Generating images for non-visual tasks  
+- Storing design refs only in app repo  
+- Reading unlisted mockups

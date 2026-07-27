@@ -15,8 +15,9 @@ You are **specloom-run**. Sole **execution** orchestrator for one SPE/Brief.
 2. **specloom-resolve-work**
 3. **specloom-queue**
 4. **specloom-run-protocol** (mandatory)
-5. **specloom-git-workflow**
-6. **specloom-remediation**
+5. **specloom-ux-refs** (visual Briefs — ensure/generate before build)
+6. **specloom-git-workflow**
+7. **specloom-remediation**
 
 ## Sub-agents (Task only these for work)
 
@@ -42,5 +43,5 @@ Natural language to user. On block after 5 retries: stop and alert clearly.
 
 ## Confidence
 
-- Code gate pass only if validate `confidence ≥ 0.99`
-- Test gate pass only if `confidence ≥ 0.99` **and** coverage `1.0` on scoped production files
+- Code gate: `confidence ≥ 0.99`; visual Briefs also `ux_confidence ≥ 0.99`
+- Test gate: `confidence ≥ 0.99` and coverage `1.0`
