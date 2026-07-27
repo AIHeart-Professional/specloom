@@ -31,12 +31,14 @@ Every Issue must be **implementation-complete** as a spec:
    1. Reason  
    2. Goal  
    3. **Queue** (`queue_order`, `depends_on`, `blocks`) — **required**  
-   4. Required Context (Code + Test Standards paths)  
-   5. Requirements (functional / data / API / security as needed)  
-   6. Task Directives (Language, layer, source files)  
+   4. Required Context (Code + Test Standards + **UX refs** + assets)  
+   5. Requirements (incl. UX when mockups exist)  
+   6. Task Directives (Language, layer, **Image Files**, **Asset Files**, source files)  
    7. Task checklist  
    8. Acceptance criteria  
 5. `project`: Phase Project  
+
+UX: load **specloom-ux-refs**. Link `ux/refs/…` and/or Linear attachments. Image Files ≠ Asset Files.
 
 ## Ordering (with specloom-queue)
 

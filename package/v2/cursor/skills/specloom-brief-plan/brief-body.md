@@ -28,12 +28,21 @@ Lower `queue_order` runs first. `depends_on` = Brief ids that must be **Done**.
 |------|---------|
 | `test/lang/topic.md` | … |
 
+### UX references (design only)
+| Ref | Purpose |
+|-----|---------|
+| `ux/refs/flow/screen.png` | … |
+| Linear attachment / HTTPS URL | … |
+
+Unlisted UX refs = do not open. See **specloom-ux-refs**.
+
 ### Assets / other
 | Ref | Purpose |
 |-----|---------|
-| URL | … |
+| `assets/…` (app repo) | Shippable runtime asset |
+| Overview URL | … |
 
-Unlisted standards paths = do not read.
+Unlisted standards/UX/asset paths = do not read.
 
 # Requirements
 
@@ -41,12 +50,17 @@ Unlisted standards paths = do not read.
 ### Data
 ### API
 ### Security
+### UX
+
+- Match listed UX refs unless Open Question documents exception
 
 # Task Directives
 
-| ID | Task | Layer | Language | Source files |
-|----|------|-------|----------|--------------|
-| T1 | … | frontend\|backend\|database | … | … |
+| ID | Task | Layer | Language | Code Standards | Image Files | Asset Files | Source files |
+|----|------|-------|----------|----------------|-------------|-------------|--------------|
+| T1 | … | frontend\|backend\|database | … | … | `ux/refs/…` or None | app `assets/…` or None | … |
+
+Image Files = design refs only. Asset Files = app-repo shippable only.
 
 # Task checklist
 
@@ -56,3 +70,4 @@ Unlisted standards paths = do not read.
 # Acceptance criteria
 
 - [ ] …
+- [ ] UI matches listed UX refs (if any) or documented deviation

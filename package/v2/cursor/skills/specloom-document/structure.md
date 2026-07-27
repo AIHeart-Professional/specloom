@@ -2,29 +2,32 @@
 
 ```
 <docs-repo>/
-├── README.md                 # Command center — always detailed, always current
+├── README.md
 ├── architecture/
 │   ├── README.md
-│   ├── system_overview.md    # Boundaries, layers, major flows
-│   ├── app_structure.md      # Folders / modules map (from scan)
-│   ├── repositories.md       # App + docs + related remotes
-│   └── dependencies.md       # Runtime / build deps that matter
+│   ├── system_overview.md
+│   ├── app_structure.md
+│   ├── repositories.md
+│   └── dependencies.md
 ├── system/
 │   ├── README.md
-│   ├── overview.md           # Product systems (auth, offline, sync, …)
-│   ├── runtime.md            # How it runs (platforms, envs)
-│   └── integrations.md       # External services (or explicit none)
+│   ├── overview.md
+│   ├── runtime.md
+│   └── integrations.md
 ├── workflow/
 │   ├── README.md
-│   ├── specloom.md           # Peers + stages for this product
-│   ├── git.md                # ai-workflow (app) + main (docs)
-│   └── queue.md              # Mirror of Linear Brief queue
+│   ├── specloom.md
+│   ├── git.md
+│   └── queue.md
+├── ux/                         # design refs only (v1 images hybrid)
+│   ├── README.md
+│   └── refs/
+│       └── <flow>/…
 └── specs/
     ├── README.md
-    ├── active/               # Open Brief mirrors
-    │   └── SPE-N_slug.md
-    └── archived/             # Done Brief mirrors
-        └── SPE-N_slug.md
+    ├── active/
+    └── archived/
 ```
 
-**Not included (by design):** ideas/, features/, automation/, knowledge/, decisions/, code/, images/ — keep lightweight. Planning lives in Linear; standards in `specloom-standards`.
+**Not included:** ideas/, features/, automation/, knowledge/, decisions/, code/ standards dumps.  
+**UX refs** = `ux/refs/**` only. Shippable runtime assets stay in **app** repo.

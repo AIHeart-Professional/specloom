@@ -54,6 +54,6 @@ Specloom team = SpecLoom meta only.
 2. Test → validate `test_quality` ≥ **99%** + **100%** coverage (≤5 retries)  
 3. Push `ai-workflow` → Done → docs closeout → promote next Ready (**no** auto-run next)
 
-## Docs / queue / layers / languages / Linear
+## Docs / queue / layers / languages / Linear / UX
 
-Docs repo lightweight; queue via **specloom-queue**; layers frontend|backend|database; **specloom-lang-ensure** for `code-*`/`test-*`; **specloom-linear-team** for per-product Team.
+Docs repo lightweight (+ **`ux/refs`** for mockups); queue via **specloom-queue**; layers frontend|backend|database; **specloom-lang-ensure** for `code-*`/`test-*`; **specloom-linear-team** for per-product Team; **specloom-ux-refs** for design images (docs repo / Linear attachments; app repo = shippable assets only).

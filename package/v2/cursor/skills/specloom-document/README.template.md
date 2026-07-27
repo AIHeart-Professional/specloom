@@ -32,6 +32,7 @@ Root of the **docs repo**. Humans and SpecLoom agents read this first for archit
 | [architecture/](architecture/) | System shape, app structure, repos, dependencies |
 | [system/](system/) | Runtime product systems & integrations |
 | [workflow/](workflow/) | SpecLoom peers, git rules, queue mirror |
+| [ux/](ux/) | Design/mockup refs (`ux/refs/`) — not shippable assets |
 | [specs/](specs/) | Brief mirrors (active + archived) |
 
 ## Phase roster (from Linear)
@@ -73,9 +74,14 @@ Root of the **docs repo**. Humans and SpecLoom agents read this first for archit
 - [Git](workflow/git.md)
 - [Queue](workflow/queue.md)
 
+## UX refs
+
+- [UX index](ux/README.md) — mockups under `ux/refs/` (design only)
+
 ## Agent rules
 
 - Do **not** treat this repo as replacement for Linear Brief bodies when implementing — read Linear Issue.
 - Do use architecture/system when understanding boundaries.
+- Frontend Briefs with UX refs: read **only** listed `ux/refs` / attachment URLs (**specloom-ux-refs**).
 - After Brief **Done**, validate/closeout must update `specs/archived/` + queues here.
 - `@specloom-document` may rewrite stubs from app scan; preserve `# Notes` sections.

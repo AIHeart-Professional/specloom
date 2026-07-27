@@ -16,5 +16,6 @@ Before any production edit:
 4. If standards present: always read `{language}/CORE.md`; then **only** Brief **Code Standards** topic paths
 5. Topic / `code-L` skill: more specific wins for that topic; never browse other standards files
 6. **Never** load `test/` or `test-*` skills here
+7. If Brief Task lists **Image Files** / UX refs → follow **specloom-ux-refs** (read listed only)
 
 No production code without steps 2 complete (and 4 when standards root exists).

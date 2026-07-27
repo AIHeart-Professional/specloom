@@ -104,9 +104,12 @@ flowchart TB
 | **Brief** | Linear Issue on product team | Features + specs |
 | **Ideas** | — | Removed |
 | **Work done** | Issue comments + status + commit SHAs on `ai-workflow` | `docs/specs/work-records/*.md` |
-| **Coding / test rules** | External `specloom-standards` | Fat language skills + in-app `docs/code/` |
+| **UX / design refs** | Docs repo `ux/refs/` (+ optional Linear attachments) | v1 `docs/images/` (non-assets) |
+| **Shippable assets** | App repo (`assets/`, etc.) | v1 `docs/images/assets/` |
 
 Init runs **specloom-linear-team**: create/find Team (GraphQL `teamCreate` if MCP cannot); copy settings from Specloom when useful; ensure labels. All Issues live on that team (`{KEY}-n`).
+
+**UX images:** see **specloom-ux-refs**. Mockups in docs `ux/refs/`; Briefs list them in Required Context + Task Image Files; runtime assets stay in the app repo.
 
 ### Phase ↔ Brief cardinality
 

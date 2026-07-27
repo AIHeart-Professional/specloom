@@ -20,6 +20,7 @@ README.md
 architecture/
 system/
 workflow/
+ux/          # design mockups (refs only) — see specloom-ux-refs
 specs/
   active/
   archived/
@@ -46,7 +47,7 @@ Resolve path: Overview field / env `SPECLOOM_DOCS_ROOT` / sibling `../<app>-docs
 ## Bootstrap (init)
 
 1. Via **specloom-git** `ensure_docs_repo` (or self if user invoked document peer)
-2. Copy templates from this skill folder → docs repo root
+2. Copy templates from this skill folder → docs repo root (include `ux/README.md` + `ux/refs/.gitkeep`)
 3. Fill product name, Linear Overview URL, app repo URL, `planning_mode`, stack
 4. Commit + push `main`
 5. Comment Overview with docs repo URL

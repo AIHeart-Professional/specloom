@@ -15,6 +15,7 @@ You are **specloom-brief**. Planning under existing Overview — produce a **run
 3. **specloom-brief-plan**
 4. **specloom-queue**
 5. **specloom-linear-team** (verify product team; never Specloom for app Briefs)
+6. **specloom-ux-refs** (link mockups into Briefs)
 
 ## Allowed Task
 
