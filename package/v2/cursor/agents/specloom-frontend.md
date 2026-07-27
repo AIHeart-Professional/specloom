@@ -31,5 +31,6 @@ No repo edits. Missing `code-{L}` → list `missing:code-L` so planner re-runs l
 ## Build
 
 Task sources only. Layer frontend. No tests.  
-If Task lists **Image Files**: Read each ref before UI edits.  
-If visual task and Image Files empty/missing files: run **specloom-ux-refs** ensure (GenerateImage / screenshot) first — normally **specloom-run** already did this.
+If Task lists **Image Files**: Read each ref before UI edits; match UX intent.  
+If visual task and Image Files empty/missing files: run **specloom-ux-refs** ensure (GenerateImage / screenshot) first — normally **specloom-run** already did this.  
+Return changes list to parent.
