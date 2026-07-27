@@ -1,7 +1,7 @@
 ---
 name: specloom-v2-contract
 description: >
-  INTERNAL — all v2 peers. Hierarchy, queue, Linear map, docs repo, full-auto chain.
+  INTERNAL — all v2 peers. Hierarchy, queue, single run orchestrator, docs repo.
   Not user-invokable.
 disable-model-invocation: true
 ---
@@ -11,52 +11,49 @@ disable-model-invocation: true
 ## Hierarchy
 
 ```
-Overview (Linear Initiative)
-  └─ Phase (Project + Document)
-       └─ Brief (Issue) + Queue fields
+Product Linear Team (not Specloom meta-team)
+  └─ Overview (Project + Document)
+       └─ Phase (Project + Document)
+            └─ Brief (Issue) + Queue fields
 ```
 
-Overview SoT = **Linear**.  
-Docs repo = browseable mirror (architecture / system / workflow / specs) — **not** planning SoT.
+Overview SoT = **Linear** on the **product team**.  
+Docs repo = browseable mirror — **not** planning SoT.
 
-## Peers
+## Linear team
+
+Init runs **specloom-linear-team**: one Team per product; Issues keyed `{KEY}-n`.  
+Specloom team = SpecLoom meta only.
+
+## User-facing peers
 
 ```
-@specloom-init → @specloom-brief → @specloom-build → @specloom-test → @specloom-validate
+@specloom-init → @specloom-brief → @specloom-run
 @specloom-document · @specloom-git
 ```
+
+**Execution:** one orchestrator **`@specloom-run`** completes **one SPE** via internal build / validate / test.
+
+## Internal (not user entry)
+
+`specloom-build` · `specloom-test` · `specloom-validate` · workers / loops / layer agents
 
 ## Allowed Tasks
 
 | From | To | When |
 |------|-----|------|
 | init | planner | always |
-| planner | git, document, lang-ensure, layer advisory | bootstrap |
-| **brief** | **document** sync_brief; **build** | plan done |
-| **build** | **test** | build pass |
-| **test** | **validate** | test pass |
-| **validate** | **document** closeout; **build** next | Brief Done |
+| planner | git, document, lang-ensure, linear-team, advisory | bootstrap |
+| **brief** | **document** sync; **specloom-run** | plan done (unless `manual`) |
+| **run** | **build**, **validate**, **test**, **document** | per run-protocol gates |
+| build / test / validate | only their workers | never peer-chain |
 
-## Docs repo (lightweight)
+## Run gates
 
-Only: `README.md` · `architecture/` · `system/` · `workflow/` · `specs/{active,archived}/`  
-Skill: **specloom-document**. App branch `ai-workflow`; docs branch `main`.
+1. Build → validate `code_quality` ≥ **99%** confidence (≤5 retries)  
+2. Test → validate `test_quality` ≥ **99%** + **100%** coverage (≤5 retries)  
+3. Push `ai-workflow` → Done → docs closeout → promote next Ready (**no** auto-run next)
 
-## Queue
+## Docs / queue / layers / languages / Linear
 
-Every Brief: `queue_order`, `depends_on`, `blocks`. See **specloom-queue**.  
-One Ready head by default. Status via labels if custom workflow states missing.
-
-## Stages
-
-`Backlog → Ready → Building → Testing → Validating → Done`  
-Mapped with `specloom:*` labels when needed.
-
-## Layers
-
-`frontend` | `backend` | `database` only.
-
-## Languages / skills
-
-Locked stacks → **specloom-lang-ensure** creates `code-{slug}` + `test-{slug}` if missing.  
-Layer agents load them via **specloom-coding** / **specloom-testing**. No per-language peers.
+Docs repo lightweight; queue via **specloom-queue**; layers frontend|backend|database; **specloom-lang-ensure** for `code-*`/`test-*`; **specloom-linear-team** for per-product Team.

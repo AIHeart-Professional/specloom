@@ -24,6 +24,7 @@ No valid `PLANNER_HANDOFF` from **specloom-init** → JSON:
 6. **specloom-init-foundation**
 7. **specloom-brief-plan**
 8. **specloom-lang-ensure** (after languages locked)
+9. **specloom-linear-team** (before Overview / Phases / Briefs)
 
 ## Allowed Tasks
 
@@ -33,18 +34,19 @@ No valid `PLANNER_HANDOFF` from **specloom-init** → JSON:
 | **specloom-document** | `DOCUMENT_HANDOFF` `bootstrap` (+ optional batch `sync_brief`) |
 | **specloom-frontend** / **backend** / **database** | `INIT_ADVISORY_HANDOFF` `read_standards_only` |
 
-Also use **WebSearch** / **WebFetch** (or equivalent) for domain research. Never Task peers: brief · build · test · validate · init.
+Also use **WebSearch** / **WebFetch** / Linear MCP / GraphQL for `teamCreate`. Never Task peers: brief · build · test · validate · init · run.
 
 ## Loop
 
 ```
-0. Domain research → domain_checklist (refresh on new subsystem)
-A. Dialogue from checklist gaps (1–3 Qs + researched options) until confidence ≥ 0.99
-B. Languages locked → **specloom-lang-ensure** (scaffold missing code-* / test-*)
-C. Advisory layer agents (read_standards_only) using new skills
-D. Overview (Linear) → GIT_HANDOFF (app + docs repo) → DOCUMENT_HANDOFF bootstrap
-E. Phases + Briefs (Ready only if solid) → optional document sync_brief
-F. PLANNER_RESULT need_user | complete | blocked
+0. Domain research → domain_checklist
+A. Dialogue until confidence ≥ 0.99 (include linear_team name/key)
+B. Languages → specloom-lang-ensure
+C. Advisory layer agents
+D. specloom-linear-team → Overview Project on product team
+E. GIT_HANDOFF → DOCUMENT bootstrap
+F. Phases + Briefs on product team → document sync
+G. PLANNER_RESULT need_user | complete | blocked
 ```
 
-Forbidden: random question lists with no research spine. Forbidden: locking exotic languages without lang-ensure creating skills.
+Forbidden: product Issues on Specloom meta-team. Forbidden: exotic languages without lang-ensure.

@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 Must be **solid** (automation-ready detail) before Ready Briefs for that scope — loop dialogue until **≥99%** confidence:
 
-`users | JTBD | success | non-goals | core_loop | platforms | auth_need | must_vs_later | languages | github | linear | planning_mode`
+`users | JTBD | success | non-goals | core_loop | platforms | auth_need | must_vs_later | languages | github | linear_team | linear | planning_mode`
 
 Plus product-class systems raised dynamically (e.g. MMO → trading/economy/progression/…). See **specloom-init-dialogue**.
 
@@ -62,9 +62,24 @@ Per layer present, Task once:
 
 Expect paths + must/forbid bullets. Attach to Overview + each work Brief Required Context. **No code writes.**
 
+## Linear team (required before Overview)
+
+Run **specloom-linear-team**:
+
+- One **Team per product** (not meta team Specloom)  
+- Derive `team_name` + `team_key` (2–5 letters); confirm with user if ambiguous  
+- Create via GraphQL if missing; else `need_user` to create in UI  
+- Ensure SpecLoom labels on that team  
+
+Do **not** create Overview/Phases/Briefs until `LINEAR_TEAM_RESULT.status = ok`.
+
 ## Linear Overview
 
-Create/update **Initiative** = full Overview (Linear — not GitHub). Labels: `brief`, `frontend`, `backend`, `database`.
+On the **product team** only:
+
+1. Project `Overview — {Product}` (+ Document = full Overview body)  
+2. Record `team_name` / `team_key` / `team_id` in Overview  
+3. Labels available: `brief`, `frontend`, `backend`, `database`, `specloom:*`
 
 ## Git (specloom-git only)
 
@@ -113,21 +128,24 @@ Expect stubs: README + architecture/system/workflow/specs per **specloom-documen
 
 ## Phases + work Briefs
 
-Use **specloom-brief-plan** + **specloom-queue**. Almost always multiple Briefs per Phase.  
+Use **specloom-brief-plan** + **specloom-queue**.  
+Every Phase Project + every Issue: **`team` = product team** from Overview.  
+Almost always multiple Briefs per Phase.  
 Every Brief: `queue_order` + `depends_on` + `blocks`.  
-Promote **one** queue head → `specloom:ready` (label fallback OK). Others Backlog.  
-Optional: Task **specloom-document** `sync_brief` for each new Brief (or batch once).
+Promote **one** queue head → `specloom:ready`. Others Backlog.  
+Optional: Task **specloom-document** `sync_brief`.
 
 ## Done
 
-- [ ] Overview on Linear  
+- [ ] **Product Linear team** ensured (not Specloom default)  
+- [ ] Overview on that team  
 - [ ] `planning_mode` + languages recorded  
 - [ ] **code-* / test-* skills ensured** (lang-ensure)  
 - [ ] Advisory paths attached  
 - [ ] GitHub app + `ai-workflow`  
 - [ ] Docs repo + **specloom-document** bootstrap  
-- [ ] Phases + **all** Briefs with Queue fields  
-- [ ] Queue head Ready → init **Tasks specloom-build** (unless `manual`)
+- [ ] Phases + **all** Briefs on product team  
+- [ ] Queue head Ready → init **Tasks specloom-run** (unless `manual`)
 
 ## Forbidden
 
@@ -135,5 +153,6 @@ Optional: Task **specloom-document** `sync_brief` for each new Brief (or batch o
 - Overview as files in GitHub app repo as SoT  
 - Domain agents writing code  
 - Blocking on custom Linear workflow states (use labels)  
-- Replacing specloom-brief peer (init bootstraps; brief maintains)
+- Putting product work on **Specloom** meta-team  
+- Replacing specloom-brief peer (init bootstraps; brief maintains)  
 - Fat v1 docs tree inside app repo

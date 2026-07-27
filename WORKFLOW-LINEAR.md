@@ -74,17 +74,17 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-  INIT[Initiative = Overview]
-  PROJ[Project = Phase]
-  DOC[Project Document = Phase charter]
+  TEAM[Linear Team = Product]
+  OV[Overview Project + Document]
+  PROJ[Phase Project + Document]
   ISS1[Brief 1]
   ISS2[Brief 2]
   ISSN[Brief N…]
   STD[specloom-standards]
   APP[App git repo]
 
-  INIT --> PROJ
-  PROJ --> DOC
+  TEAM --> OV
+  OV --> PROJ
   PROJ --> ISS1
   PROJ --> ISS2
   PROJ --> ISSN
@@ -98,12 +98,15 @@ flowchart TB
 
 | Concept | Store | Replaces |
 |---------|-------|----------|
-| **Overview** | Linear Initiative | Product README narrative in `docs/` |
-| **Phase** | Linear Project + Document | `docs/phases/` + feature container role |
-| **Brief** | Linear Issue | Features + specs |
+| **Product** | Linear **Team** (own key, e.g. `BUD`) — not Specloom meta-team | Shared Specloom dump |
+| **Overview** | Project `Overview — {Product}` + Document on product team | Product README in `docs/` |
+| **Phase** | Linear Project + Document | `docs/phases/` |
+| **Brief** | Linear Issue on product team | Features + specs |
 | **Ideas** | — | Removed |
 | **Work done** | Issue comments + status + commit SHAs on `ai-workflow` | `docs/specs/work-records/*.md` |
 | **Coding / test rules** | External `specloom-standards` | Fat language skills + in-app `docs/code/` |
+
+Init runs **specloom-linear-team**: create/find Team (GraphQL `teamCreate` if MCP cannot); copy settings from Specloom when useful; ensure labels. All Issues live on that team (`{KEY}-n`).
 
 ### Phase ↔ Brief cardinality
 
@@ -158,13 +161,13 @@ All names keep the **`specloom-`** prefix. Rename so the label matches the job.
 |-----|-----|-----|
 | `specloom-work-creator` / ideas | **`specloom-init`** | NEW project: Overview + app/`ai-workflow` + docs repo |
 | `specloom-work-creator` (ongoing) | **`specloom-brief`** | Phases + work Briefs; sync docs specs |
-| `specloom-implement` | **`specloom-build`** | Implement production code for in-flight Brief |
-| `specloom-tester` | **`specloom-test`** | Write and run tests for Brief |
-| `specloom-validator` | **`specloom-validate`** | Final gate; Done + docs closeout |
+| `specloom-implement` (+ test/validate peers) | **`specloom-run`** | **One orchestrator** — completes one SPE (build→code validate→test→test validate) |
 | — | **`specloom-document`** | Docs repo bootstrap / scan / sync / closeout |
-| `specloom-git` | **`specloom-git`** | App + docs remotes; callable by planner/document |
+| `specloom-git` | **`specloom-git`** | App + docs remotes |
 
-**Allowed auto Tasks:** brief→document sync + build → test → validate → document closeout → build(next). Say `manual` to skip Task handoffs.
+**Internal (not user entry):** `specloom-build` · `specloom-test` · `specloom-validate` (+ workers/loops).
+
+**Allowed Tasks:** brief→document + **specloom-run**. Run alone Tasks build/validate/test. Say `manual` to skip.
 
 ```mermaid
 flowchart LR
@@ -172,32 +175,43 @@ flowchart LR
   G[specloom-git]
   D[specloom-document]
   B[specloom-brief]
+  R[specloom-run]
   BU[specloom-build]
   T[specloom-test]
   V[specloom-validate]
 
   I -->|GIT_HANDOFF| G
   I -->|DOCUMENT bootstrap| D
-  I -->|Overview ready| B
+  I -->|Task| R
   B -->|sync_brief| D
-  B -->|Task| BU
-  BU -->|Task| T
-  T -->|Task| V
-  V -->|closeout| D
-  V -->|next queue head| BU
+  B -->|Task| R
+  R --> BU
+  R --> V
+  R --> T
+  R -->|closeout| D
 ```
 
 | Runtime | Invoke |
 |---------|--------|
-| Cursor chat | `@specloom-init` · `@specloom-brief` · `@specloom-build` · `@specloom-test` · `@specloom-validate` · `@specloom-document` · `@specloom-git` |
-| Cloud Automation | Same agent names in automation instructions |
+| Cursor chat | `@specloom-init` · `@specloom-brief` · `@specloom-run` · `@specloom-document` · `@specloom-git` |
+| Cloud Automation | Pin `@specloom-run` on Ready Briefs |
 
-**Greenfield:** always `@specloom-init` first. Then `@specloom-brief`.
+**Greenfield:** `@specloom-init` first. Ongoing plan: `@specloom-brief`. Execute SPE: `@specloom-run`.
+
+### Run loop (one SPE)
+
+1. Build → validate **code_quality** (load `code-*`) — pass at **≥99%** confidence; ≤5 retries  
+2. Test → validate **test_quality** (load `test-*`) — pass at **≥99%** + **100%** coverage; ≤5 retries  
+3. Push `ai-workflow` → Done → docs closeout → promote next Ready (**do not** auto-run next)  
+4. After 5 fails on a gate → BLOCKED + alert user
 
 ### 4.2 Internal agents (not user entry)
 
 | Old | New | Job |
 |-----|-----|-----|
+| implement worker | **`specloom-build`** | Production code (from run) |
+| tester peer | **`specloom-test`** | Tests (from run) |
+| validator peer | **`specloom-validate`** | Gate scoring only (from run) |
 | `specloom-worker` | **`specloom-build-worker`** | Build loop (≤N); owns domain developers |
 | `specloom-worker-validation` | **`specloom-build-check`** | App runs + standards compliance after tasks |
 | `specloom-frontend-developer` | **`specloom-frontend`** | Client / UI production code (web, RN, desktop UI, etc.) |
@@ -230,9 +244,14 @@ Domain agents load **`specloom-coding`** (builders) or **`specloom-testing`** (t
 
 ## 5. Linear setup
 
-### 5.1 Overview = Initiative
+### 5.0 Product = Team
 
-One Initiative per product. Vision, success criteria, ordered phases, product non-goals.
+One Linear **Team** per product (name + 2–5 letter key). Specloom workspace team stays meta for SpecLoom itself.  
+Skill: **specloom-linear-team** (MCP list; GraphQL create; or user creates in UI).
+
+### 5.1 Overview = Project + Document
+
+One Overview Project per product on that team (`Overview — {Name}`). Vision, success criteria, ordered phases, product non-goals, `team_id` / `team_key`.
 
 ### 5.2 Phase = Project + Document
 

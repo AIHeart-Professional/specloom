@@ -61,6 +61,16 @@ Final product when Initiative Complete.
 - Docs repo URL: (`<app>-docs`)
 - Docs branch: `main`
 
+# Linear
+
+```
+team_name: …
+team_key: …
+team_id: …
+```
+
+Product Team only — not Specloom meta-team.
+
 # Phase roadmap
 
 | Order | Phase | Outcome | Depends on |

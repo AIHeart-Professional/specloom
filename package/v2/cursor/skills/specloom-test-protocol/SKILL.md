@@ -1,29 +1,31 @@
 ---
 name: specloom-test-protocol
 description: >
-  INTERNAL — specloom-test. Queue stages; auto Task validate unless manual.
+  INTERNAL — specloom-test. Tests only; orchestrator owns validate gate.
   Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Test protocol
 
-Load **specloom-queue**.
+Invoked under **specloom-run**. No auto Task validate.
 
 ## Session
 
-1. Contract + resolve-work + git-workflow  
-2. Brief stage **Testing** / `specloom:testing`  
-3. **specloom-test-loop** ≤5  
-4. Pass → stage **Validating** (`specloom:validating`); unless `manual`: **Task specloom-validate**  
-5. Fail → comment; Failed or stay Testing; suggest `@specloom-build` if prod bug  
+1. Contract + resolve Brief  
+2. Stage **Testing**  
+3. Checkout/pull **`ai-workflow`**  
+4. Apply `issues[]`  
+5. **specloom-test-loop** ≤5  
+6. Measure coverage on Brief production files when possible  
+7. Commit; return **TEST_RESULT** — **do not** Task validate  
 
-## Loop (≤5)
+## Loop
 
-Per Brief layer: `specloom-test-frontend|backend|database`. Load **specloom-testing**. No prod features.
+Per Brief layer: `specloom-test-frontend|backend|database`. Load **specloom-testing** + `test-{lang}`. No prod features unless issue owner is build (then return fail with owner:build for orchestrator).
 
 ## Result
 
 ```json
-{"type":"TEST_RESULT","status":"pass|fail","brief_key":"","auto_validate":true,"commands":[],"failures":[],"notes":""}
+{"type":"TEST_RESULT","status":"pass|fail","brief_key":"","coverage":null,"uncovered_files":[],"commands":[],"failures":[],"notes":""}
 ```

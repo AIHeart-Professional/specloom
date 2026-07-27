@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Init dialogue
 
-**End goal:** plan so complete that `@specloom-build` → test → validate runs with **minimal human invention**.
+**End goal:** plan so complete that `@specloom-run` finishes one SPE with **minimal human invention**.
 
 Questions are **not random**. They come from **domain research + professional field standards** (**specloom-domain-research**), then gaps in the Overview.
 
@@ -58,7 +58,7 @@ Topic **solid** only if Briefs can be written without inventing product rules mi
 
 ## Coverage
 
-**Base:** users · JTBD · success · non-goals · core loop · platforms · auth · must_vs_later · personas · failure modes · languages · github · linear · planning_mode · phase roadmap · idea disposition  
+**Base:** users · JTBD · success · non-goals · core loop · platforms · auth · must_vs_later · personas · failure modes · languages · github · **linear_team** (name+key) · linear · planning_mode · phase roadmap · idea disposition  
 
 **Plus:** full `domain_checklist` from research (dynamic — MMO ≠ todo app).
 

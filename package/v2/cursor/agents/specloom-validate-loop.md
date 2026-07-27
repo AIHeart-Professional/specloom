@@ -18,4 +18,9 @@ Only from **specloom-validate**.
 
 ## Loop
 
-Max 3. Score Brief acceptance + Phase alignment + standards. JSON issues with `owner:build|test`.
+Max 3 internal iterations. Respect parent `mode`:
+
+- `code_quality` — score vs **code-*** skills + Brief implementation acceptance; `confidence` 0–1  
+- `test_quality` — score vs **test-*** skills + coverage vs `require_coverage`  
+
+JSON issues with `owner:build|test`. Return confidence (and coverage when test mode).

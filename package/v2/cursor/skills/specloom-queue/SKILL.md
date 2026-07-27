@@ -70,10 +70,9 @@ After a Brief → Done:
 
 | From | May Task | When |
 |------|----------|------|
-| **specloom-brief** | **specloom-build** | Plan done; queue head Ready — start implementation |
-| **specloom-validate** | **specloom-build** | Brief Done; next head promoted Ready |
-| **specloom-build** | **specloom-test** | Build pass (optional full-auto) |
-| **specloom-test** | **specloom-validate** | Test pass (optional full-auto) |
+| **specloom-brief** | **specloom-run** | Plan done; queue head Ready |
+| **specloom-run** | build / validate / test / document | Internal only — see specloom-run-protocol |
 
-Default **full-auto chain on**: brief→build; build→test; test→validate; validate→build(next).  
-User may say `manual` to only print next peer instead of Task.
+Default: brief→**run** (one SPE). Run does **not** auto-start the next SPE after Done.  
+User may say `manual` to skip Task from brief.
+

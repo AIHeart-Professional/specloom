@@ -1,24 +1,24 @@
 ---
 name: specloom-build-protocol
 description: >
-  INTERNAL — specloom-build + build-worker. Queue-aware build; auto Task test unless manual.
+  INTERNAL — specloom-build + build-worker. Implement only; orchestrator owns gates.
   Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Build protocol
 
-Also load **specloom-queue**.
+Invoked under **specloom-run**. No auto Task test.
 
 ## Session
 
-1. Contract + resolve-work + git-workflow + queue  
-2. Resolve Brief = queue head Ready/`specloom:ready` or Building/`specloom:building`  
-3. Set stage **Building** (`specloom:building`; clear ready)  
-4. Checkout/pull **`ai-workflow` only** (no task branch)  
+1. Contract + resolve Brief from handoff  
+2. Stage **Building** if not already  
+3. Checkout/pull **`ai-workflow`**  
+4. Apply `issues[]` from prior validate if any  
 5. Delegate **specloom-build-worker** ≤10  
-6. On pass → push `ai-workflow` + Linear comment (SHAs) → stage **Testing** (`specloom:testing`)  
-7. Unless user said `manual`: **Task specloom-test**; else tell user `@specloom-test`
+6. Commit on `ai-workflow`  
+7. Return **BUILD_RESULT** to parent — **do not** Task test/validate  
 
 ## Worker loop (≤10)
 
@@ -30,14 +30,14 @@ Unchecked task → layer agent → checkbox after git confirm → comment.
 | backend | specloom-backend |
 | database | specloom-database |
 
-All checked → **specloom-build-check**. Fail → Failed + comment.
+All checked → **specloom-build-check**. Fail → failed status to parent.
 
 ## Caps
 
-Max 10 → Failed `attempt cap`.
+Max 10 worker iterations → failed `attempt cap` to parent (orchestrator counts gate retries separately).
 
 ## Result
 
 ```json
-{"type":"BUILD_RESULT","status":"complete|blocked|failed","brief_key":"","tasks_done":[],"tasks_open":[],"branch":"ai-workflow","commit_shas":[],"auto_test":true,"notes":""}
+{"type":"BUILD_RESULT","status":"complete|blocked|failed","brief_key":"","tasks_done":[],"tasks_open":[],"branch":"ai-workflow","commit_shas":[],"notes":""}
 ```

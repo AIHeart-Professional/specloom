@@ -1,38 +1,54 @@
 ---
 name: specloom-validate-protocol
 description: >
-  INTERNAL — specloom-validate. Auto Done; docs closeout; promote next; auto Task build.
+  INTERNAL — specloom-validate. Score code_quality or test_quality for specloom-run.
   Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Validate protocol
 
-Load **specloom-queue**.
+Invoked under **specloom-run**. **Does not** mark Done / promote / Task build.
 
 ## Session
 
-1. Contract + resolve-work + queue  
-2. Stage **Validating** / `specloom:validating`  
-3. Re-run tests + **specloom-validate-loop** ≤3  
-4. Phase alignment + Reason check  
-5. **Pass → Done** (clear specloom stage labels). Comment with SHAs on `ai-workflow`.  
-6. **Docs closeout** — Task **specloom-document** `closeout` for this Brief (archive spec + refresh README/architecture/system/workflow/queue)  
-7. **Promote next** runnable Brief → `specloom:ready` (see specloom-queue)  
-8. Unless `manual` or no next: **Task specloom-build** on next head  
-9. If no open Briefs on Phase → Complete Phase Project  
-10. **Fail →** `owner:build|test`; Failed; route peers  
+1. Read `RUN_HANDOFF.mode` = `code_quality` | `test_quality`  
+2. Thresholds: `require_confidence` (default **0.99**); for test mode `require_coverage` (default **1.0**)  
+3. **specloom-validate-loop** ≤3  
+4. Return **VALIDATE_RESULT** only  
 
-## No sign-off
+## code_quality
 
-Never `/approve`.
+- Load **code-{lang}** skills + Brief Code Standards  
+- Domain validators as needed  
+- Score adherence to professional standards + Brief acceptance for implementation  
+- `confidence` ∈ [0,1]; pass iff ≥ threshold  
+- Failures → `owner:build`
 
-## Domain validators
+## test_quality
 
-`specloom-validate-frontend|backend|database`
+- Load **test-{lang}** skills + Brief Test Standards  
+- Score test professionalism (styles, isolation, assertions)  
+- **Coverage:** fraction of Brief production source files/lines covered; pass iff ≥ `require_coverage` (default 100%)  
+- If coverage tool missing → fail with issue to add coverage measurement OR enumerate uncovered files and set coverage `< 1`  
+- Weak tests → `owner:test`; missing prod seams → `owner:build`
 
 ## Result
 
 ```json
-{"type":"VALIDATE_RESULT","status":"pass|fail","brief_key":"","confidence":0,"next_brief_key":null,"auto_build_next":true,"docs_closeout":true,"issues":[],"phase_complete":false}
+{
+  "type":"VALIDATE_RESULT",
+  "status":"pass|fail",
+  "mode":"code_quality|test_quality",
+  "brief_key":"",
+  "confidence":0.0,
+  "coverage":null,
+  "issues":[{"owner":"build|test","detail":""}]
+}
 ```
+
+## Forbidden
+
+- Marking Brief Done  
+- Tasking document / build / test  
+- Passing below 0.99 when require_confidence is 0.99

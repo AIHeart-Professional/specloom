@@ -1,23 +1,26 @@
 ---
 name: specloom-remediation
 description: >
-  INTERNAL — build/test/validate. Route failures by owner tags. Not user-invokable.
+  INTERNAL — specloom-run. Route validate failures back through orchestrator loops.
+  Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Remediation
 
-On validate fail comment:
+Orchestrator (**specloom-run**) reads `VALIDATE_RESULT.issues[]`:
 
 ```
 owner:build — …
 owner:test — …
 ```
 
-| Owner | Next |
-|-------|------|
-| build | Brief → Failed or Building; user/automation `@specloom-build` |
-| test | Brief → Testing; `@specloom-test` |
-| both | build first, then test, then validate |
+| Owner | Orchestrator action |
+|-------|---------------------|
+| build | Re-enter BUILD_GATE (or mid TEST_GATE → Task build then re-validate test) |
+| test | Re-enter TEST_GATE with issues |
+| both | build first, then test, then matching validate |
 
-Build/test read last validate comment; fix only owned items; clear by new validate pass.
+Sub-agents do **not** Task each other. Only **specloom-run** routes.
+
+After **5** failed attempts on the same gate → BLOCKED + alert user (see specloom-run-protocol).

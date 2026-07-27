@@ -388,7 +388,7 @@ Standards: external specloom-standards (pinned ref).
 Docs: separate \`<app>-docs\` repo (\`architecture\` / \`system\` / \`workflow\` / \`specs\`) — \`@specloom-document\`.
 App: code + tests + CI + runtime assets only.
 
-Peers: \`@specloom-brief\` → \`@specloom-build\` → \`@specloom-test\` → \`@specloom-validate\`
+Peers: \`@specloom-brief\` → \`@specloom-run\` (build/validate/test internal)
 Also: \`@specloom-document\` · \`@specloom-git\`
 App git base: \`ai-workflow\` · Docs: \`main\`
 `;
@@ -622,7 +622,7 @@ function main() {
   console.log("\nDone.");
   const peers =
     opts.version === "v2"
-      ? "specloom-init, specloom-brief, specloom-build, specloom-test, specloom-validate, specloom-document, specloom-git"
+      ? "specloom-init, specloom-brief, specloom-run, specloom-document, specloom-git"
       : "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
   if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
   if (opts.codex) console.log(`Codex peers:  ${peers}`);
