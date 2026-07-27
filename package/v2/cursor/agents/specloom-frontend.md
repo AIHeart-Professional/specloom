@@ -18,6 +18,16 @@ Else JSON `ACCESS_DENIED`.
 **specloom-coding** (loads `code-{lang}` per Task languages — e.g. `code-tauri`, `code-rust`, `code-typescript`)  
 **specloom-ux-refs** when Brief lists UX / Image Files
 
+## Advisory (init)
+
+Assume **specloom-lang-ensure** already ran. Load each `code-{L}` + standards CORE if present. Return:
+
+```json
+{"type":"INIT_ADVISORY_RESULT","layer":"frontend","languages":[],"code_skills":[],"paths":[],"must":[],"forbid":[]}
+```
+
+No repo edits. Missing `code-{L}` → list `missing:code-L` so planner re-runs lang-ensure.
+
 ## Build
 
 Task sources only. Layer frontend. No tests.  
