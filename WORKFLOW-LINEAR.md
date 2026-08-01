@@ -1,7 +1,8 @@
 # SpecLoom — Linear Brief Workflow (Target)
 
 > **Status:** Target architecture — agents/skills live in **`package/v2/`**. Install: `node scripts/install.mjs --v2 --cursor --force`.  
-> Legacy v1: [`WORKFLOW.md`](WORKFLOW.md) + `package/v1/`.
+> Legacy v1: [`WORKFLOW.md`](WORKFLOW.md) + `package/v1/`.  
+> **Agents + skills catalog:** [`package/v2/WORKFLOW-AND-FUNCTIONALITY.md`](package/v2/WORKFLOW-AND-FUNCTIONALITY.md)
 
 This document describes the **new** SpecLoom workflow: product planning in **Linear**, engineering standards in an **external standards repo**, SpecLoom agents/skills outside the app, code in the **app repo**, **Cursor Cloud Automations** as runners, full-auto gates, no sign-off.
 

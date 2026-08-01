@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SpecLoom installer — copies agents + skills to Cursor, Codex, and Google Antigravity dirs.
+ * SpecLoom installer — copies agents + skills to Cursor, Codex, Claude Code, and Google Antigravity dirs.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -11,8 +11,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PACKAGE_ROOT = path.join(REPO_ROOT, "package");
 
-const MANAGED_SKILL_PREFIXES = ["specloom-", "code-", "test-"];
-const MANAGED_CURSOR_SKILL_PREFIXES = ["specloom-"];
+const MANAGED_SKILL_PREFIXES = ["specloom-", "document-", "code-", "test-"];
+const MANAGED_CURSOR_SKILL_PREFIXES = ["specloom-", "document-"];
 
 function usage() {
   console.log(`SpecLoom installer
@@ -25,8 +25,9 @@ Options:
   --v2              Use package/v2 (Linear Overview→Phase→Brief)
   --cursor          Install Cursor agents + skills (~/.cursor/)
   --codex           Install Codex agents + shared skills (~/.codex/, ~/.agents/)
+  --claude          Install Claude Code agents + skills (~/.claude/)
   --antigravity     Install Antigravity skills + global workflows (~/.gemini/)
-  --all             Install Cursor, Codex, and Antigravity (default)
+  --all             Install Cursor, Codex, Claude Code, and Antigravity (default)
   --bootstrap <dir> Scaffold target repo after install (v1=docs tree; v2=minimal note)
   --force           Overwrite existing files (backs up first)
   --dry-run         Print actions without writing
@@ -35,6 +36,8 @@ Options:
 Examples:
   node scripts/install.mjs --v1 --all
   node scripts/install.mjs --v2 --cursor --force
+  node scripts/install.mjs --v2 --claude --force
+  node scripts/install.mjs --v2 --cursor --claude --force
   node scripts/install.mjs --v2 --cursor --bootstrap ./my-app
 `);
 }
@@ -44,6 +47,7 @@ function parseArgs(argv) {
     version: "v1",
     cursor: false,
     codex: false,
+    claude: false,
     antigravity: false,
     all: false,
     bootstrap: null,
@@ -59,6 +63,7 @@ function parseArgs(argv) {
     else if (arg === "--v2") opts.version = "v2";
     else if (arg === "--cursor") opts.cursor = true;
     else if (arg === "--codex") opts.codex = true;
+    else if (arg === "--claude") opts.claude = true;
     else if (arg === "--antigravity") opts.antigravity = true;
     else if (arg === "--all") opts.all = true;
     else if (arg === "--force") opts.force = true;
@@ -70,10 +75,13 @@ function parseArgs(argv) {
     } else throw new Error(`Unknown argument: ${arg}`);
   }
 
-  if (!opts.cursor && !opts.codex && !opts.antigravity && !opts.all) opts.all = true;
+  if (!opts.cursor && !opts.codex && !opts.claude && !opts.antigravity && !opts.all) {
+    opts.all = true;
+  }
   if (opts.all) {
     opts.cursor = true;
     opts.codex = true;
+    opts.claude = true;
     opts.antigravity = true;
   }
 
@@ -106,6 +114,26 @@ function antigravityGlobalWorkflowsDir() {
   return path.join(homeDir(), ".gemini", "antigravity", "global_workflows");
 }
 
+function claudeAgentsDir() {
+  return path.join(homeDir(), ".claude", "agents");
+}
+
+function claudeSkillsDir() {
+  return path.join(homeDir(), ".claude", "skills");
+}
+
+/** Claude Code: drop Cursor-only frontmatter keys that confuse skill loading. */
+function rewriteClaudeSkill(content) {
+  return content
+    .replace(/^disable-model-invocation:\s*true\s*\n/m, "")
+    .replace(/^disable-model-invocation:\s*false\s*\n/m, "");
+}
+
+/** Claude Code agents: map Cursor inherit → Claude default inherit-ish omit, keep body. */
+function rewriteClaudeAgent(content) {
+  return content.replace(/^model:\s*inherit\s*\n/m, "model: inherit\n");
+}
+
 function walkFiles(dir) {
   const out = [];
   if (!fs.existsSync(dir)) return out;
@@ -123,6 +151,11 @@ function isManagedSkillName(name) {
 
 function isManagedCursorSkillName(name) {
   return MANAGED_CURSOR_SKILL_PREFIXES.some((p) => name.startsWith(p));
+}
+
+function isManagedAgentFile(rel) {
+  const name = path.basename(rel);
+  return name === "specloom.md" || name.startsWith("specloom-");
 }
 
 function backupPath(target) {
@@ -196,7 +229,7 @@ function installCursor({ force, dryRun, pkgRoot }) {
   const agents = copyTree({
     source: cursorAgentsSrc,
     target: cursorAgentsDest,
-    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
+    filter: (_base, rel) => isManagedAgentFile(rel),
     force,
     dryRun,
     label: "cursor/agents",
@@ -250,7 +283,7 @@ function installCodex({ force, dryRun, pkgRoot, version }) {
   const agents = copyTree({
     source: agentsSrc,
     target: codexAgentsDest,
-    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
+    filter: (_base, rel) => isManagedAgentFile(rel),
     transform: version === "v1" ? rewriteCodexAgent : undefined,
     force,
     dryRun,
@@ -274,13 +307,62 @@ function installCodex({ force, dryRun, pkgRoot, version }) {
   const specloomSkills = copyTree({
     source: path.join(pkgRoot, "cursor", "skills"),
     target: sharedSkillsDest,
-    filter: (base) => base.startsWith("specloom-"),
+    filter: (base) => isManagedCursorSkillName(base),
     force,
     dryRun,
     label: "specloom-skills→codex",
   });
 
   return { agents, skills: shared, specloomSkills };
+}
+
+function installClaude({ force, dryRun, pkgRoot }) {
+  const cursorAgentsSrc = path.join(pkgRoot, "cursor", "agents");
+  const cursorSkillsSrc = path.join(pkgRoot, "cursor", "skills");
+  const sharedSkillsSrc = path.join(pkgRoot, "shared-skills");
+  const agentsDest = claudeAgentsDir();
+  const skillsDest = claudeSkillsDir();
+
+  console.log("\n== Claude Code ==");
+  console.log(`  agents → ${agentsDest}`);
+  console.log(`  skills → ${skillsDest}`);
+
+  const agents = copyTree({
+    source: cursorAgentsSrc,
+    target: agentsDest,
+    filter: (_base, rel) => isManagedAgentFile(rel),
+    transform: rewriteClaudeAgent,
+    force,
+    dryRun,
+    label: "claude/agents",
+  });
+
+  const skills = copyTree({
+    source: cursorSkillsSrc,
+    target: skillsDest,
+    filter: (base) => isManagedCursorSkillName(base),
+    transform: rewriteClaudeSkill,
+    force,
+    dryRun,
+    label: "claude/skills (specloom+document)",
+  });
+
+  let shared = { copied: 0, skipped: 0 };
+  if (fs.existsSync(sharedSkillsSrc)) {
+    shared = copyTree({
+      source: sharedSkillsSrc,
+      target: skillsDest,
+      filter: (base) => isManagedSkillName(base),
+      transform: rewriteClaudeSkill,
+      force,
+      dryRun,
+      label: "claude/skills (code/test)",
+    });
+  } else {
+    console.log("[skip] shared-skills (not in this version)");
+  }
+
+  return { agents, skills, shared };
 }
 
 function installAntigravity({ force, dryRun, pkgRoot }) {
@@ -297,7 +379,7 @@ function installAntigravity({ force, dryRun, pkgRoot }) {
   const specloomAgents = copyTree({
     source: cursorAgentsSrc,
     target: agentsDest,
-    filter: (_base, rel) => path.basename(rel).startsWith("specloom-"),
+    filter: (_base, rel) => isManagedAgentFile(rel),
     force,
     dryRun,
     label: "antigravity/agents",
@@ -388,9 +470,10 @@ Standards: external specloom-standards (pinned ref).
 Docs: separate \`<app>-docs\` repo (\`architecture\` / \`system\` / \`workflow\` / \`specs\`) — \`@specloom-document\`.
 App: code + tests + CI + runtime assets only.
 
-Peers: \`@specloom-brief\` → \`@specloom-run\` (build/validate/test internal)
-Also: \`@specloom-document\` · \`@specloom-git\`
-App git base: \`ai-workflow\` · Docs: \`main\`
+Peers: \`@specloom\` (orchestrator) · \`@specloom-document\`
+Internals: project-manager · loop · implementation · security · tester · repository
+App git: work branch → merge \`ai-workflow\` · Docs: \`main\`
+Coverage gate: ≥ 0.99
 `;
   writeIfMissing(path.join(repoRoot, "SPECLOOM.md"), note, { force, dryRun });
   console.log("\nBootstrap v2 complete. Wire Linear MCP + standards clone for automations.");
@@ -616,16 +699,21 @@ function main() {
 
   if (opts.cursor) installCursor(opts);
   if (opts.codex) installCodex(opts);
+  if (opts.claude) installClaude(opts);
   if (opts.antigravity) installAntigravity(opts);
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
   const peers =
     opts.version === "v2"
-      ? "specloom-init, specloom-brief, specloom-run, specloom-document, specloom-git"
+      ? "specloom, specloom-document"
       : "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
   if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
   if (opts.codex) console.log(`Codex peers:  ${peers}`);
+  if (opts.claude) {
+    console.log(`Claude Code:  ${peers} (agents in ~/.claude/agents, skills in ~/.claude/skills)`);
+    console.log(`  Entry: ask for specloom / @specloom — restart Claude Code if ~/.claude was new`);
+  }
   if (opts.antigravity) {
     console.log(`Antigravity:  /${peers.replace(/, /g, ", /")}`);
     console.log(`  agents:    ${antigravityGlobalAgentsDir()}`);

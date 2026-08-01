@@ -1,16 +1,19 @@
-# SpecLoom v2 (Linear Brief)
+# SpecLoom v2
 
-**Peers:** `@specloom-init` · `@specloom-brief` · `@specloom-run` · `@specloom-document` · `@specloom-git`
+**Canonical:** [`WORKFLOW-V2.md`](./WORKFLOW-V2.md)
+
+**Peers:** `@specloom` (handoff + NLP only) · `@specloom-document`
 
 ```
-@specloom-init → planner → Overview + GitHub + docs + Phases + Briefs
-@specloom-brief → queue + sync docs
-@specloom-run → build → code validate (≥99%) → test → test validate (≥99% + 100% cov)
-                 ≤5 retries/gate → push ai-workflow → Done
+@specloom → Task PM / Loop / Document / Repository → NLP summary
+Loop: Impl → Security → Tester → SUCCESS/FAILED
+Repository merges specloom/<brief> → ai-workflow
 ```
 
-Internal only: `specloom-build` · `specloom-test` · `specloom-validate`
+**Orchestrator skills:** `specloom-contract` · `specloom-orchestrator` only.
 
-Install: `node scripts/install.mjs --v2 --cursor --force`
-
-Contract: [`WORKFLOW-LINEAR.md`](../../WORKFLOW-LINEAR.md)
+Install:
+```bash
+node scripts/install.mjs --v2 --cursor --force
+node scripts/install.mjs --v2 --claude --force
+```

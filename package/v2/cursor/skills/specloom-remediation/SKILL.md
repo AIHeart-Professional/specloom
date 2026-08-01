@@ -1,26 +1,28 @@
 ---
 name: specloom-remediation
 description: >
-  INTERNAL — specloom-run. Route validate failures back through orchestrator loops.
+  INTERNAL — Loop Controller. Route gate failures to Implementation / Tester / Security.
   Not user-invokable.
 disable-model-invocation: true
 ---
 
 # Remediation
 
-Orchestrator (**specloom-run**) reads `VALIDATE_RESULT.issues[]`:
+**Loop** reads gate issues:
 
 ```
 owner:build — …
 owner:test — …
+owner:security — …
 ```
 
-| Owner | Orchestrator action |
-|-------|---------------------|
-| build | Re-enter BUILD_GATE (or mid TEST_GATE → Task build then re-validate test) |
-| test | Re-enter TEST_GATE with issues |
-| both | build first, then test, then matching validate |
+| Owner | Loop action |
+|-------|-------------|
+| build | Re-Task Implementation with diagnostics |
+| test | Re-Task Tester (or Implementation if tests need code) |
+| security | Re-Task Implementation with security findings (then Security again) |
+| both build+test | Implementation first, then Tester |
 
-Sub-agents do **not** Task each other. Only **specloom-run** routes.
+Workers **never** Task each other. Only **Loop** routes.
 
-After **5** failed attempts on the same gate → BLOCKED + alert user (see specloom-run-protocol).
+After **5** failed attempts → `status: FAILED` payload to Orchestrator (Orchestrator NLPs user — does not retry).
