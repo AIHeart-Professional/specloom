@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpecLoom v2 — Workflow, Agents, Skills &amp; Plan</title>
+<style>
+  :root{
+    --bg:#fbfaf9; --panel:#fff; --ink:#1c1b1a; --muted:#6d6965; --faint:#95908b; --line:#e4e0dc;
+    --ok:#2f7d4f; --okbg:#e8f3ec; --stub:#b0442f; --stubbg:#fbeae6;
+    --chg:#8a6516; --chgbg:#faf1dd; --blue:#2c5f8a; --bluebg:#e8f0f7;
+    --vio:#5b4a8a; --viobg:#efecf8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#17161a; --panel:#1f1e23; --ink:#eceaf0; --muted:#9a959f; --faint:#7c7783; --line:#33313a;
+      --ok:#7fc99b; --okbg:#1d2f25; --stub:#e89179; --stubbg:#331f1a;
+      --chg:#dcb463; --chgbg:#332a17; --blue:#8fbde6; --bluebg:#1a2733;
+      --vio:#b3a3e0; --viobg:#26213a;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px 24px 90px;background:var(--bg);color:var(--ink);
+    font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:31px;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0 0 8px;font-size:15px}
+  h2{font-size:19px;margin:46px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:12.5px;margin:26px 0 10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.87em;
+    background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+  .fig{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 12px;overflow-x:auto;margin:0 0 10px}
+  .figcap{color:var(--faint);font-size:12.5px;margin:0 0 26px;text-align:center}
+  svg{display:block;margin:0 auto;max-width:100%;height:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+    font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line)}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:2px 8px;margin-bottom:16px}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:nowrap}
+  .b{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .b-ok{background:var(--okbg);color:var(--ok)}
+  .b-stub{background:var(--stubbg);color:var(--stub)}
+  .b-chg{background:var(--chgbg);color:var(--chg)}
+  .b-new{background:var(--viobg);color:var(--vio)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 30px;font-size:13.5px;color:var(--muted)}
+  .legend span b{margin-right:6px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;line-height:1.1;letter-spacing:-.02em}
+  .stat span{color:var(--muted);font-size:12.5px}
+  .skl{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:2}
+  .skl i{font-style:normal;padding:2px 6px;border-radius:5px;margin-right:5px;display:inline-block;white-space:nowrap}
+  .s-ok{background:var(--okbg);color:var(--ok)}
+  .s-stub{background:var(--stubbg);color:var(--stub)}
+  .note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--chg);
+    border-radius:0 10px 10px 0;padding:14px 18px;margin:20px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>SpecLoom v2 — target state</h1>
+<p class="sub">What the system does, who does it, and what the seven phases change. Ground truth is <code>package/v2/</code> on 2026‑08‑02.</p>
+
+<div class="legend">
+  <span><b class="b b-ok">written</b> has real content today</span>
+  <span><b class="b b-stub">stub</b> frontmatter + “Status: STUB” only</span>
+  <span><b class="b b-chg">changes</b> a phase rewrites it</span>
+  <span><b class="b b-new">new</b> does not exist yet</span>
+</div>
+
+<h2>1 · Who may call whom</h2>
+
+<div class="fig">
+<svg viewBox="0 0 940 604" role="img" aria-label="SpecLoom v2 agent hierarchy: user to orchestrator to four agents, loop owns three workers">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <!-- user -->
+  <rect x="385" y="18" width="170" height="42" rx="9" fill="var(--panel)" stroke="var(--line)" stroke-width="1.6"/>
+  <text x="470" y="44" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">You</text>
+  <g color="var(--muted)">
+    <path d="M456,60 L456,84" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+    <path d="M486,84 L486,60" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)" stroke-dasharray="4 3"/>
+    <text x="500" y="78" font-size="10.5" fill="var(--faint)">NLP reply</text>
+  </g>
+
+  <!-- orchestrator -->
+  <rect x="230" y="86" width="480" height="60" rx="10" fill="var(--bluebg)" stroke="var(--blue)" stroke-width="1.8"/>
+  <text x="470" y="110" text-anchor="middle" font-size="14.5" font-weight="700" fill="var(--blue)"
+        font-family="ui-monospace,Menlo,monospace">@specloom</text>
+  <text x="470" y="128" text-anchor="middle" font-size="11.5" fill="var(--muted)">Main Orchestrator — handoff + NLP only. No code, git, Linear or retries.</text>
+  <text x="722" y="112" font-size="10.5" font-weight="700" fill="var(--ok)">WRITTEN</text>
+  <text x="722" y="126" font-size="10" fill="var(--faint)">2 skills</text>
+
+  <!-- bus -->
+  <g color="var(--muted)">
+    <path d="M470,146 L470,172" stroke="currentColor" stroke-width="1.7" fill="none"/>
+    <path d="M105,172 L835,172" stroke="currentColor" stroke-width="1.7" fill="none"/>
+    <path d="M105,172 L105,206" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+    <path d="M348,172 L348,206" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+    <path d="M592,172 L592,206" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+    <path d="M835,172 L835,206" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+  </g>
+
+  <!-- four agents -->
+  <g>
+    <rect x="14" y="208" width="182" height="80" rx="9" fill="var(--panel)" stroke="var(--line)" stroke-width="1.6"/>
+    <text x="105" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">project-manager</text>
+    <text x="105" y="247" text-anchor="middle" font-size="10.5" fill="var(--muted)">owns Linear · Task Spec</text>
+    <text x="105" y="261" text-anchor="middle" font-size="10.5" fill="var(--muted)">queue · run_set</text>
+    <text x="105" y="279" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ok)">WRITTEN · 12 skills</text>
+
+    <rect x="257" y="208" width="182" height="80" rx="9" fill="var(--panel)" stroke="var(--line)" stroke-width="1.6"/>
+    <text x="348" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">loop</text>
+    <text x="348" y="247" text-anchor="middle" font-size="10.5" fill="var(--muted)">run_set sequential</text>
+    <text x="348" y="261" text-anchor="middle" font-size="10.5" fill="var(--muted)">gates · retries · routing</text>
+    <text x="348" y="279" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ok)">WRITTEN · 8 skills</text>
+
+    <rect x="501" y="208" width="182" height="80" rx="9" fill="var(--panel)" stroke="var(--line)" stroke-width="1.6"/>
+    <text x="592" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">repository</text>
+    <text x="592" y="247" text-anchor="middle" font-size="10.5" fill="var(--muted)">stacked PRs</text>
+    <text x="592" y="261" text-anchor="middle" font-size="10.5" fill="var(--muted)">merge_stack → ai-workflow</text>
+    <text x="592" y="279" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ok)">WRITTEN · 4 skills</text>
+
+    <rect x="744" y="208" width="182" height="80" rx="9" fill="var(--panel)" stroke="var(--line)" stroke-width="1.6"/>
+    <text x="835" y="230" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">document</text>
+    <text x="835" y="247" text-anchor="middle" font-size="10.5" fill="var(--muted)">docs repo mirror</text>
+    <text x="835" y="261" text-anchor="middle" font-size="10.5" fill="var(--muted)">any doc type</text>
+    <text x="835" y="279" text-anchor="middle" font-size="10" font-weight="700" fill="var(--chg)">1 of 14 skills written</text>
+  </g>
+
+  <!-- loop's workers -->
+  <g color="var(--muted)">
+    <path d="M348,288 L348,318" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+  </g>
+  <rect x="222" y="320" width="252" height="228" rx="11" fill="none" stroke="var(--line)" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="348" y="340" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--faint)">LOOP TASKS THESE — THEY NEVER TASK EACH OTHER</text>
+
+  <rect x="240" y="350" width="216" height="54" rx="8" fill="var(--stubbg)" stroke="var(--stub)" stroke-width="1.5"/>
+  <text x="348" y="370" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">implementation</text>
+  <text x="348" y="386" text-anchor="middle" font-size="10" fill="var(--muted)">STUB · phase 5 · 3 skills</text>
+
+  <rect x="240" y="414" width="216" height="54" rx="8" fill="var(--stubbg)" stroke="var(--stub)" stroke-width="1.5"/>
+  <text x="348" y="434" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">security</text>
+  <text x="348" y="450" text-anchor="middle" font-size="10" fill="var(--muted)">STUB · phase 3 · 3 skills</text>
+
+  <rect x="240" y="478" width="216" height="54" rx="8" fill="var(--stubbg)" stroke="var(--stub)" stroke-width="1.5"/>
+  <text x="348" y="498" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">tester</text>
+  <text x="348" y="514" text-anchor="middle" font-size="10" fill="var(--muted)">STUB · phase 5 · 4 skills</text>
+
+  <g color="var(--muted)">
+    <path d="M348,404 L348,412" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+    <path d="M348,468 L348,476" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+  </g>
+
+  <!-- truth stores -->
+  <g>
+    <text x="700" y="342" font-size="10.5" font-weight="700" fill="var(--faint)">TRUTH STORES</text>
+    <rect x="700" y="352" width="226" height="44" rx="8" fill="var(--viobg)" stroke="var(--vio)" stroke-width="1.4"/>
+    <text x="713" y="371" font-size="11.5" font-weight="700" fill="var(--vio)">Linear</text>
+    <text x="713" y="386" font-size="10" fill="var(--muted)">planning SoT · PM is the only writer</text>
+
+    <rect x="700" y="404" width="226" height="44" rx="8" fill="var(--viobg)" stroke="var(--vio)" stroke-width="1.4"/>
+    <text x="713" y="423" font-size="11.5" font-weight="700" fill="var(--vio)" font-family="ui-monospace,Menlo,monospace">ai-workflow</text>
+    <text x="713" y="438" font-size="10" fill="var(--muted)">app trunk · Repository only</text>
+
+    <rect x="700" y="456" width="226" height="44" rx="8" fill="var(--viobg)" stroke="var(--vio)" stroke-width="1.4"/>
+    <text x="713" y="475" font-size="11.5" font-weight="700" fill="var(--vio)">docs git <tspan font-family="ui-monospace,Menlo,monospace">main</tspan></text>
+    <text x="713" y="490" font-size="10" fill="var(--muted)">mirror — never planning SoT</text>
+
+    <rect x="700" y="508" width="226" height="44" rx="8" fill="var(--viobg)" stroke="var(--vio)" stroke-width="1.4"/>
+    <text x="713" y="527" font-size="11.5" font-weight="700" fill="var(--vio)">specloom-standards</text>
+    <text x="713" y="542" font-size="10" fill="var(--muted)">code-* / test-* rules</text>
+  </g>
+
+  <!-- pm -> linear -->
+  <g color="var(--vio)">
+    <path d="M105,288 L105,570 L690,570 L690,378 L696,378" stroke="var(--vio)" stroke-width="1.4" fill="none"
+          stroke-dasharray="5 4" marker-end="url(#ar)"/>
+    <text x="120" y="586" font-size="10" fill="var(--faint)">PM is the only agent that writes Linear</text>
+  </g>
+</svg>
+</div>
+<p class="figcap">Figure 1 — the org graph. Four agents answer to the Orchestrator; only the Loop has workers.</p>
+
+<h2>2 · What happens to one Brief</h2>
+
+<div class="fig">
+<svg viewBox="0 0 940 560" role="img" aria-label="Per-Brief gate sequence and the stacked branch model">
+  <!-- run set -->
+  <text x="20" y="26" font-size="11" font-weight="700" fill="var(--faint)">RUN_SET — BRIEFS RUN ONE AT A TIME, FULL GATES EACH</text>
+  <g>
+    <rect x="20" y="36" width="120" height="38" rx="8" fill="var(--bluebg)" stroke="var(--blue)" stroke-width="1.5"/>
+    <text x="80" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="var(--blue)" font-family="ui-monospace,Menlo,monospace">BUD-10</text>
+    <rect x="152" y="36" width="120" height="38" rx="8" fill="var(--panel)" stroke="var(--line)" stroke-width="1.5"/>
+    <text x="212" y="60" text-anchor="middle" font-size="12" fill="var(--faint)" font-family="ui-monospace,Menlo,monospace">BUD-11</text>
+    <rect x="284" y="36" width="120" height="38" rx="8" fill="var(--panel)" stroke="var(--line)" stroke-width="1.5"/>
+    <text x="344" y="60" text-anchor="middle" font-size="12" fill="var(--faint)" font-family="ui-monospace,Menlo,monospace">BUD-12</text>
+    <text x="420" y="60" font-size="11" fill="var(--muted)">→ queued, not started</text>
+  </g>
+
+  <!-- gates -->
+  <g color="var(--muted)">
+    <path d="M80,74 L80,102" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/>
+  </g>
+
+  <rect x="20" y="104" width="196" height="52" rx="8" fill="var(--chgbg)" stroke="var(--chg)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="118" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="var(--chg)">UX ensure</text>
+  <text x="118" y="140" text-anchor="middle" font-size="10" fill="var(--muted)">only if the Brief is visual</text>
+
+  <g color="var(--muted)"><path d="M118,156 L118,180" stroke="currentColor" stroke-width="1.7" fill="none" marker-end="url(#ar)"/></g>
+
+  <!-- three gates -->
+  <g>
+    <rect x="20" y="182" width="400" height="64" rx="9" fill="var(--panel)" stroke="var(--stub)" stroke-width="1.7"/>
+    <circle cx="48" cy="214" r="13" fill="var(--stubbg)"/>
+    <text x="48" y="219" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)">1</text>
+    <text x="70" y="209" font-size="13" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">implementation</text>
+    <text x="70" y="226" font-size="10.5" fill="var(--muted)">frontend · backend · database layers — commits to the work branch</text>
+    <text x="404" y="200" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--stub)">STUB</text>
+
+    <rect x="20" y="256" width="400" height="64" rx="9" fill="var(--panel)" stroke="var(--stub)" stroke-width="1.7"/>
+    <circle cx="48" cy="288" r="13" fill="var(--stubbg)"/>
+    <text x="48" y="293" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)">2</text>
+    <text x="70" y="283" font-size="13" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">security</text>
+    <text x="70" y="300" font-size="10.5" fill="var(--muted)">secrets · OWASP · stack SAST — High/Critical fails the Brief</text>
+    <text x="404" y="274" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--stub)">STUB</text>
+
+    <rect x="20" y="330" width="400" height="64" rx="9" fill="var(--panel)" stroke="var(--stub)" stroke-width="1.7"/>
+    <circle cx="48" cy="362" r="13" fill="var(--stubbg)"/>
+    <text x="48" y="367" text-anchor="middle" font-size="12" font-weight="700" fill="var(--stub)">3</text>
+    <text x="70" y="357" font-size="13" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">tester</text>
+    <text x="70" y="374" font-size="10.5" fill="var(--muted)">every AC → an assertion · coverage · visual diff vs Image Files</text>
+    <text x="404" y="348" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--stub)">STUB</text>
+
+    <g color="var(--muted)">
+      <path d="M118,246 L118,254" stroke="currentColor" stroke-width="1.6" fill="none" marker-end="url(#ar)"/>
+      <path d="M118,320 L118,328" stroke="currentColor" stroke-width="1.6" fill="none" marker-end="url(#ar)"/>
+    </g>
+  </g>
+
+  <!-- retry -->
+  <g color="var(--stub)">
+    <path d="M20,362 L8,362 L8,214 L18,214" stroke="var(--stub)" stroke-width="1.5" fill="none"
+          stroke-dasharray="5 3" marker-end="url(#ar)"/>
+  </g>
+  <text x="24" y="416" font-size="10.5" fill="var(--stub)" font-weight="600">retry ≤ 5 total, routed by owner:build | test | security</text>
+  <text x="24" y="431" font-size="10.5" fill="var(--chg)">phase 6 → a budget per gate, so FAILED names the stuck one</text>
+
+  <!-- gate thresholds panel -->
+  <g>
+    <text x="452" y="196" font-size="11" font-weight="700" fill="var(--faint)">STOP CONDITION — TODAY vs PHASE 4</text>
+    <rect x="452" y="206" width="472" height="188" rx="10" fill="var(--panel)" stroke="var(--line)" stroke-width="1.5"/>
+    <text x="468" y="228" font-size="11" font-weight="700" fill="var(--muted)">gate</text>
+    <text x="640" y="228" font-size="11" font-weight="700" fill="var(--muted)">today</text>
+    <text x="770" y="228" font-size="11" font-weight="700" fill="var(--muted)">planned</text>
+    <line x1="464" y1="236" x2="912" y2="236" stroke="var(--line)" stroke-width="1"/>
+
+    <text x="468" y="256" font-size="11.5" fill="var(--ink)">confidence</text>
+    <text x="640" y="256" font-size="11.5" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">≥ 0.99</text>
+    <text x="770" y="256" font-size="11.5" fill="var(--ok)">findings — dropped</text>
+
+    <text x="468" y="280" font-size="11.5" fill="var(--ink)">code_confidence</text>
+    <text x="640" y="280" font-size="11.5" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">≥ 0.99</text>
+    <text x="770" y="280" font-size="11.5" fill="var(--ok)">findings — dropped</text>
+
+    <text x="468" y="304" font-size="11.5" fill="var(--ink)">ux_confidence</text>
+    <text x="640" y="304" font-size="11.5" fill="var(--stub)" font-family="ui-monospace,Menlo,monospace">≥ 0.99</text>
+    <text x="770" y="304" font-size="11.5" fill="var(--ok)">per-criterion pass/fail</text>
+
+    <text x="468" y="328" font-size="11.5" fill="var(--ink)">coverage</text>
+    <text x="640" y="328" font-size="11.5" fill="var(--ok)" font-family="ui-monospace,Menlo,monospace">≥ 0.99</text>
+    <text x="770" y="328" font-size="11.5" fill="var(--ok)">kept — it is measured</text>
+
+    <text x="468" y="352" font-size="11.5" fill="var(--ink)">security</text>
+    <text x="640" y="352" font-size="11.5" fill="var(--ok)">0 High/Critical</text>
+    <text x="770" y="352" font-size="11.5" fill="var(--ok)">kept — falsifiable</text>
+
+    <line x1="464" y1="364" x2="912" y2="364" stroke="var(--line)" stroke-width="1"/>
+    <text x="468" y="382" font-size="10.5" fill="var(--muted)">a self-assigned 0.99 cannot tell “done” from “stuck”</text>
+  </g>
+
+  <!-- git stack -->
+  <text x="20" y="464" font-size="11" font-weight="700" fill="var(--faint)">GIT — STACKED BRANCHES, MERGED ONLY WHEN THE WHOLE SET PASSES</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="11">
+    <line x1="150" y1="540" x2="880" y2="540" stroke="var(--line)" stroke-width="5" stroke-linecap="round"/>
+    <text x="20" y="544" font-size="11" fill="var(--muted)">main</text>
+    <line x1="150" y1="514" x2="880" y2="514" stroke="var(--ok)" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+    <text x="20" y="518" font-size="11" fill="var(--ok)" font-weight="700">ai-workflow</text>
+    <line x1="230" y1="490" x2="500" y2="490" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="20" y="494" font-size="10.5" fill="var(--blue)">specloom/BUD-10</text>
+    <line x1="330" y1="478" x2="600" y2="478" stroke="var(--blue)" stroke-width="3.5" stroke-linecap="round" opacity=".7"/>
+    <text x="610" y="482" font-size="10" fill="var(--faint)">BUD-11 stacked on BUD-10</text>
+
+    <path d="M230,514 L230,492" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+    <path d="M330,490 L330,480" stroke="var(--blue)" stroke-width="1.6" fill="none"/>
+    <path d="M600,478 L600,514" stroke="var(--ok)" stroke-width="1.8" fill="none" marker-end="url(#ar)" color="var(--ok)"/>
+    <path d="M500,490 L500,514" stroke="var(--ok)" stroke-width="1.8" fill="none" marker-end="url(#ar)" color="var(--ok)"/>
+    <text x="640" y="530" font-size="10.5" fill="var(--ok)" font-weight="700">merge_stack, bottom-up</text>
+    <text x="640" y="544" font-size="10" fill="var(--stub)">phase 6 adds revert_stack</text>
+  </g>
+</svg>
+</div>
+<p class="figcap">Figure 2 — one Brief through three gates, and where its branch goes. A failed set stops; nothing merges.</p>
+
+<div class="note">
+<b>The gap the plan is really about.</b> Every box in figure 2 that does work is a stub. The system can currently decide what to build, in what order, on which branch — and cannot build it. Phases 3 and 5 close that; phase 4 decides what “passed” means before those agents get written, so they only get written once.
+</div>
+
+<h2>3 · Where it stands</h2>
+
+<div class="stats">
+  <div class="stat"><b>8</b><span>agents — 3 are stubs</span></div>
+  <div class="stat"><b>50</b><span>skills — 44 cursor + 6 shared</span></div>
+  <div class="stat"><b style="color:var(--stub)">26</b><span>stub files of 58 (45%)</span></div>
+  <div class="stat"><b style="color:var(--stub)">11</b><span>live files naming deleted agents</span></div>
+  <div class="stat"><b style="color:var(--stub)">3 of 4</b><span>workflow docs describe a roster that no longer exists</span></div>
+</div>
+
+<h2>4 · Agents and their skills</h2>
+
+<h3>User entry</h3>
+<div class="card"><table>
+<tr><td class="mono"><b>@specloom</b></td><td><span class="b b-ok">written</span></td>
+<td>Main Orchestrator. Parses intent, Tasks one of four agents, turns their JSON into prose. Forbidden from code, git, Linear, queue resolution and retries.
+<div class="skl"><i class="s-ok">specloom-contract</i><i class="s-ok">specloom-orchestrator</i></div></td></tr>
+<tr><td class="mono"><b>@specloom-document</b></td><td><span class="b b-chg">1 of 14</span></td>
+<td>Optional direct docs entry. Router picks the type skill. Everything except <code>document-repo</code> is a stub.
+<div class="skl"><i class="s-ok">specloom-contract</i><i class="s-ok">document-repo</i><i class="s-stub">document-router</i><i class="s-stub">document-architecture</i><i class="s-stub">document-system</i><i class="s-stub">document-workflow</i><i class="s-stub">document-api</i><i class="s-stub">document-spec</i><i class="s-stub">document-ux</i><i class="s-stub">document-adr</i><i class="s-stub">document-readme</i><i class="s-stub">document-runbook</i><i class="s-stub">document-changelog</i><i class="s-stub">document-pr</i><i class="s-stub">document-scan</i></div></td></tr>
+</table></div>
+
+<h3>Internal — planning and control</h3>
+<div class="card"><table>
+<tr><td class="mono"><b>project-manager</b></td><td><span class="b b-ok">written</span></td>
+<td>The only agent that writes Linear. Builds Overview → Phase → Brief, extracts visual acceptance criteria from mockups, orders the queue, returns a Task Spec and <code>run_set</code>. Never calls the Loop or a worker.
+<div class="skl"><i class="s-ok">specloom-contract</i><i class="s-ok">specloom-brief-plan</i><i class="s-ok">specloom-brief-bootstrap</i><i class="s-ok">specloom-linear-team</i><i class="s-ok">specloom-queue</i><i class="s-ok">specloom-resolve-work</i><i class="s-ok">specloom-ui-ux-extract</i><i class="s-ok">specloom-domain-research</i><i class="s-ok">specloom-lang-ensure</i><i class="s-ok">specloom-init-dialogue</i><i class="s-ok">specloom-init-foundation</i><i class="s-stub">specloom-planning</i></div></td></tr>
+<tr><td class="mono"><b>loop</b></td><td><span class="b b-ok">written</span></td>
+<td>Walks the <code>run_set</code> one Brief at a time, Tasks the three workers itself, routes failures by owner, counts retries. Never chats, never marks Done, never merges the trunk.
+<div class="skl"><i class="s-ok">specloom-contract</i><i class="s-ok">specloom-loop-protocol</i><i class="s-ok">specloom-resolve-work</i><i class="s-ok">specloom-queue</i><i class="s-ok">specloom-ux-refs</i><i class="s-ok">specloom-remediation</i><i class="s-stub">specloom-lang-mount</i><i class="s-stub">specloom-coverage</i></div></td></tr>
+<tr><td class="mono"><b>repository</b></td><td><span class="b b-ok">written</span></td>
+<td>The only agent that touches <code>ai-workflow</code>. Opens a stacked PR per Brief, merges the stack bottom-up when the set passes.
+<div class="skl"><i class="s-ok">specloom-git-workflow</i><i class="s-ok">specloom-git-merge-trunk</i><i class="s-stub">specloom-git-commit</i><i class="s-stub">specloom-git-worktree</i></div></td></tr>
+</table></div>
+
+<h3>Internal — the three gates</h3>
+<div class="card"><table>
+<tr><td class="mono"><b>implementation</b></td><td><span class="b b-stub">stub</span><br><span class="b b-chg">phase 5</span></td>
+<td>Production code on the work branch, frontend/backend/database. Loads <code>code-{lang}</code> plus only the standards the Brief lists — no freestyle if the skill is missing.
+<div class="skl"><i class="s-ok">specloom-coding</i><i class="s-ok">specloom-standards-fetch</i><i class="s-stub">specloom-ui-layout</i></div></td></tr>
+<tr><td class="mono"><b>security</b></td><td><span class="b b-stub">stub</span><br><span class="b b-chg">phase 3</span></td>
+<td>v2's one new capability over v1, and currently four empty files. Also the only gate whose pass condition is already falsifiable — which is why it goes first and defines the finding shape the others reuse.
+<div class="skl"><i class="s-stub">specloom-security-secrets</i><i class="s-stub">specloom-security-owasp</i><i class="s-stub">specloom-security-stack</i></div></td></tr>
+<tr><td class="mono"><b>tester</b></td><td><span class="b b-stub">stub</span><br><span class="b b-chg">phase 5</span></td>
+<td>Maps every acceptance criterion to an assertion, measures coverage honouring ignore directives, diffs screenshots against the listed Image Files. Never writes production code.
+<div class="skl"><i class="s-ok">specloom-testing</i><i class="s-ok">specloom-standards-fetch</i><i class="s-stub">specloom-coverage</i><i class="s-stub">specloom-visual-diff</i></div></td></tr>
+</table></div>
+
+<h3>Shared language skills</h3>
+<div class="card"><table>
+<tr><td class="mono">code / test</td><td><span class="b b-ok">written</span></td>
+<td><span class="skl"><i class="s-ok">code-react</i><i class="s-ok">code-rust</i><i class="s-ok">code-tauri</i><i class="s-ok">test-react</i><i class="s-ok">test-rust</i><i class="s-ok">test-tauri</i></span><br>
+<code>specloom-lang-ensure</code> generates a missing pair from templates before a Task Spec may claim that language.</td></tr>
+</table></div>
+
+<h2>5 · The seven phases</h2>
+
+<div class="card"><table>
+<tr><th>Phase</th><th>What</th><th>Touches</th></tr>
+<tr><td><b>1</b><br><span class="b b-ok">cheap</span></td><td><b>Make the docs describe the shipped system.</b> The root README lists six v2 agents that do not exist and links the contract to a stale doc.</td>
+<td class="mono">README.md<br>WORKFLOW-LINEAR.md<br>WORKFLOW-AND-FUNCTIONALITY.md</td></tr>
+
+<tr><td><b>2</b><br><span class="b b-ok">cheap</span></td><td><b>Purge stale routing.</b> <code>specloom-queue</code> tells PM to auto-Task an archived agent, contradicting <code>specloom-contract</code> which the same agent loads. Add <code>--verify</code> to the installer.</td>
+<td class="mono">specloom-queue<br>specloom-brief-bootstrap<br>specloom-init-dialogue<br>+8 header refs<br>scripts/install.mjs</td></tr>
+
+<tr><td><b>3</b></td><td><b>Write the Security gate.</b> Highest-value stub set: new capability, four empty files, and its pass rule needs no scoring decision. Defines the finding shape.</td>
+<td class="mono">specloom-security<br>-secrets · -owasp · -stack</td></tr>
+
+<tr><td><b>4</b><br><span class="b b-chg">decide</span></td><td><b>Settle what “passed” means.</b> Drop the three self-assigned 0.99 scores; keep coverage and security. Findings need a <code>file</code> and a rule source or they are dropped. Do this <i>before</i> phase 5.</td>
+<td class="mono">specloom-contract<br>WORKFLOW-V2.md §12</td></tr>
+
+<tr><td><b>5</b></td><td><b>Write Implementation and Tester</b> against whatever phase 4 decided, so they are written once.</td>
+<td class="mono">specloom-implementation<br>specloom-tester<br>coverage · visual-diff<br>ui-layout · lang-mount<br>git-commit · git-worktree<br>planning</td></tr>
+
+<tr><td><b>6</b></td><td><b>Close the operational gaps.</b> Add <code>revert_stack</code>. Define what happens to orphaned stacked PRs when a set fails mid-way. Split retry ≤ 5 into per-gate budgets. Define Linear-unavailable behaviour.</td>
+<td class="mono">specloom-git-merge-trunk<br>specloom-loop-protocol<br>specloom-resolve-work</td></tr>
+
+<tr><td><b>7</b></td><td><b>Document skills.</b> 13 stubs, lowest urgency, largest count. <code>document-router</code> first since it selects the others.</td>
+<td class="mono">document-*</td></tr>
+
+<tr><td><b>—</b></td><td><b>Installer, separately.</b> <code>package/v2/</code> has no <code>codex/</code> or <code>antigravity/</code>; the installer silently falls back to copying Cursor markdown into <code>~/.codex/agents/</code> and reports success. Either add those targets or make the flags refuse.</td>
+<td class="mono">scripts/install.mjs</td></tr>
+</table></div>
+
+<div class="note">
+<b>Before committing to 3–5.</b> With all three workers stubbed, no Brief has plausibly run end to end. The cheapest move after phases 1–2 is one small real Brief with the workers written just well enough to function — and let that run tell you which of the remaining 23 stubs it actually demands. That ordering will probably differ from this one.
+</div>
+
+</div>
+</body>
+</html>

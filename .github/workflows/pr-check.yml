@@ -1,0 +1,104 @@
+# SpecLoom v4 external PR check — reusable workflow.
+#
+# App repos call this on pull_request (see package/v4/repo-templates/pr-check.caller.template.yml).
+# Job 1 runs the SonarQube scan and waits for the quality gate.
+# Job 2 runs Claude Code headlessly to (1) document what the PR changed and
+# (2) triage Sonar's vulnerabilities/issues/coverage into a reviewer-ready comment.
+#
+# This replaces the v3 per-Brief Security gate's deep scan: it fires on every PR,
+# agent-authored or hand-written, outside the agentic loop.
+#
+# Required in the calling repo (or org):
+#   secrets: SONAR_TOKEN, SONAR_HOST_URL, CLAUDE_CODE_OAUTH_TOKEN
+#            (or ANTHROPIC_API_KEY — pass it as CLAUDE_CODE_OAUTH_TOKEN's alternative below)
+#   vars/inputs: sonar_project_key
+
+name: SpecLoom PR check
+
+on:
+  workflow_call:
+    inputs:
+      sonar_project_key:
+        description: SonarQube project key for the calling repo
+        required: true
+        type: string
+      use_api_key:
+        description: Bill via ANTHROPIC_API_KEY instead of the Max-subscription OAuth token
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      SONAR_TOKEN:
+        required: true
+      SONAR_HOST_URL:
+        required: true
+      CLAUDE_CODE_OAUTH_TOKEN:
+        required: false
+      ANTHROPIC_API_KEY:
+        required: false
+
+concurrency:
+  group: specloom-pr-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0   # Sonar needs history for new-code detection
+      - uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ inputs.sonar_project_key }}
+      - uses: SonarSource/sonarqube-quality-gate-action@v1
+        continue-on-error: true   # a failed gate should still get triaged, not skipped
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  claude:
+    needs: sonar
+    if: always() && needs.sonar.result != 'cancelled'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ inputs.sonar_project_key }}
+        with:
+          claude_code_oauth_token: ${{ inputs.use_api_key == false && secrets.CLAUDE_CODE_OAUTH_TOKEN || '' }}
+          anthropic_api_key: ${{ inputs.use_api_key == true && secrets.ANTHROPIC_API_KEY || '' }}
+          prompt: |
+            You are running on PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+            Produce exactly two PR comments. On a re-run (synchronize), find your previous
+            comments (they start with "## What changed" and "## Sonar triage") and UPDATE them
+            via `gh pr comment --edit-last` or the API — never stack duplicates.
+
+            1. CHANGE DOCUMENTATION — run `gh pr diff ${{ github.event.pull_request.number }}`
+               and `git log --oneline origin/${{ github.event.pull_request.base.ref }}..HEAD`.
+               Post a comment titled "## What changed": what was updated and why it matters,
+               grouped by area, not file-by-file noise. Call out migrations, config changes,
+               new dependencies, and anything a reviewer must know before approving.
+
+            2. SONAR TRIAGE — query the SonarQube Web API with curl (token in $SONAR_TOKEN,
+               host in $SONAR_HOST_URL, project key in $SONAR_PROJECT_KEY):
+               - Issues:   $SONAR_HOST_URL/api/issues/search?componentKeys=$SONAR_PROJECT_KEY&pullRequest=${{ github.event.pull_request.number }}
+               - Hotspots: $SONAR_HOST_URL/api/hotspots/search?projectKey=$SONAR_PROJECT_KEY&pullRequest=${{ github.event.pull_request.number }}
+               - Measures: $SONAR_HOST_URL/api/measures/component?component=$SONAR_PROJECT_KEY&pullRequest=${{ github.event.pull_request.number }}&metricKeys=new_coverage,new_violations,new_security_hotspots,new_bugs,new_vulnerabilities
+               Read the actual flagged code before judging. Post "## Sonar triage":
+               vulnerabilities and bugs ranked by REAL risk (your read, not just Sonar's
+               severity), likely false positives named as such with one line of reasoning,
+               and new-code coverage vs the gate. If everything is clean, say so in two lines.
+          claude_args: --allowedTools "Read,Grep,Glob,Bash(gh pr:*),Bash(git log:*),Bash(git diff:*),Bash(curl:*)" --max-turns 30

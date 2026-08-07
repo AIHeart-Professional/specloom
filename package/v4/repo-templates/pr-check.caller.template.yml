@@ -1,0 +1,20 @@
+# SpecLoom v4 — PR check caller.
+# Copy to <app-repo>/.github/workflows/pr-check.yml and set your Sonar project key.
+#
+# Repo secrets needed: SONAR_TOKEN, SONAR_HOST_URL, CLAUDE_CODE_OAUTH_TOKEN
+#   CLAUDE_CODE_OAUTH_TOKEN comes from `claude setup-token` (bills your Max subscription).
+#   To bill the API instead, set ANTHROPIC_API_KEY and use_api_key: true.
+
+name: PR check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  specloom-pr-check:
+    uses: AIHeart-Professional/specloom/.github/workflows/pr-check.yml@main
+    with:
+      sonar_project_key: CHANGE_ME   # your SonarQube project key
+      # use_api_key: true            # uncomment to bill ANTHROPIC_API_KEY instead of Max
+    secrets: inherit

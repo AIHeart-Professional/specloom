@@ -23,6 +23,11 @@ Usage:
 Options:
   --v1              Use package/v1 (legacy docs/ features+specs) [default]
   --v2              Use package/v2 (Linear Overview→Phase→Brief)
+  --v3              Use package/v3 (v2 + findings contract, per-gate budgets)
+  --v4              Use package/v4 (no orchestrator; run-set Workflow script; 2 gates; CI security)
+  --verify          Check every skill reference resolves, then exit
+  --clean           Remove ALL managed specloom/document/code/test agents and skills
+                    from the targets first (backed up). Use when switching versions.
   --cursor          Install Cursor agents + skills (~/.cursor/)
   --codex           Install Codex agents + shared skills (~/.codex/, ~/.agents/)
   --claude          Install Claude Code agents + skills (~/.claude/)
@@ -44,7 +49,7 @@ Examples:
 
 function parseArgs(argv) {
   const opts = {
-    version: "v1",
+    version: "v3",
     cursor: false,
     codex: false,
     claude: false,
@@ -53,6 +58,8 @@ function parseArgs(argv) {
     bootstrap: null,
     force: false,
     dryRun: false,
+    verify: false,
+    clean: false,
     help: false,
   };
 
@@ -61,6 +68,8 @@ function parseArgs(argv) {
     if (arg === "-h" || arg === "--help") opts.help = true;
     else if (arg === "--v1") opts.version = "v1";
     else if (arg === "--v2") opts.version = "v2";
+    else if (arg === "--v3") opts.version = "v3";
+    else if (arg === "--v4") opts.version = "v4";
     else if (arg === "--cursor") opts.cursor = true;
     else if (arg === "--codex") opts.codex = true;
     else if (arg === "--claude") opts.claude = true;
@@ -68,6 +77,8 @@ function parseArgs(argv) {
     else if (arg === "--all") opts.all = true;
     else if (arg === "--force") opts.force = true;
     else if (arg === "--dry-run") opts.dryRun = true;
+    else if (arg === "--verify") opts.verify = true;
+    else if (arg === "--clean") opts.clean = true;
     else if (arg === "--bootstrap") {
       const next = argv[++i];
       if (!next) throw new Error("--bootstrap requires a directory path");
@@ -158,9 +169,37 @@ function isManagedAgentFile(rel) {
   return name === "specloom.md" || name.startsWith("specloom-");
 }
 
+/**
+ * Backups and cleaned files go to REPO_ROOT/attic/<stamp>/, never next to live files.
+ * The old scheme (*.specloom-backup-* / *.removed-* siblings) left litter that Claude Code
+ * kept loading as skills — dozens of dead entries taxing every session's context.
+ */
+function atticDir(stamp) {
+  const dir = path.join(REPO_ROOT, "attic", stamp);
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+/** rename, falling back to copy+delete when source and attic sit on different drives. */
+function safeMove(src, dest) {
+  try {
+    fs.renameSync(src, dest);
+  } catch (err) {
+    if (err.code !== "EXDEV") throw err;
+    fs.cpSync(src, dest, { recursive: true });
+    fs.rmSync(src, { recursive: true, force: true });
+  }
+}
+
+function moveToAttic(target, stamp) {
+  const dest = path.join(atticDir(stamp), `${path.basename(path.dirname(target))}__${path.basename(target)}`);
+  safeMove(target, dest);
+  return dest;
+}
+
 function backupPath(target) {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  return `${target}.specloom-backup-${stamp}`;
+  return path.join(atticDir(stamp), `${path.basename(path.dirname(target))}__${path.basename(target)}`);
 }
 
 function copyTree({ source, target, filter, transform, force, dryRun, label }) {
@@ -199,7 +238,7 @@ function copyTree({ source, target, filter, transform, force, dryRun, label }) {
 
     if (fs.existsSync(dest) && force) {
       const bak = backupPath(dest);
-      fs.renameSync(dest, bak);
+      safeMove(dest, bak);
       console.log(`[backup] ${bak}`);
     }
 
@@ -279,7 +318,13 @@ function installCodex({ force, dryRun, pkgRoot, version }) {
 
   console.log("\n== Codex ==");
 
-  const agentsSrc = fs.existsSync(codexAgentsSrc) ? codexAgentsSrc : cursorAgentsSrc;
+  if (!fs.existsSync(codexAgentsSrc)) {
+    console.error(`[refused] Codex: ${path.basename(pkgRoot)} has no codex/agents/.`);
+    console.error(`          Cursor agents are markdown; Codex loads .toml. Copying them would`);
+    console.error(`          write files Codex silently ignores. Use --cursor or --claude.`);
+    return { agents: { copied: 0, skipped: 0 }, skills: { copied: 0, skipped: 0 }, refused: true };
+  }
+  const agentsSrc = codexAgentsSrc;
   const agents = copyTree({
     source: agentsSrc,
     target: codexAgentsDest,
@@ -362,7 +407,21 @@ function installClaude({ force, dryRun, pkgRoot }) {
     console.log("[skip] shared-skills (not in this version)");
   }
 
-  return { agents, skills, shared };
+  // v4+: deterministic Workflow scripts (e.g. specloom-run-set) → ~/.claude/workflows
+  const workflowsSrc = path.join(pkgRoot, "claude", "workflows");
+  let workflows = { copied: 0, skipped: 0 };
+  if (fs.existsSync(workflowsSrc)) {
+    workflows = copyTree({
+      source: workflowsSrc,
+      target: path.join(homeDir(), ".claude", "workflows"),
+      filter: () => true,
+      force,
+      dryRun,
+      label: "claude/workflows",
+    });
+  }
+
+  return { agents, skills, shared, workflows };
 }
 
 function installAntigravity({ force, dryRun, pkgRoot }) {
@@ -440,7 +499,7 @@ function writeIfMissing(file, content, { force, dryRun }) {
   }
   fs.mkdirSync(path.dirname(file), { recursive: true });
   if (fs.existsSync(file) && force) {
-    fs.renameSync(file, backupPath(file));
+    safeMove(file, backupPath(file));
   }
   fs.writeFileSync(file, content, "utf8");
   console.log(`[ok] bootstrap: ${file}`);
@@ -682,11 +741,151 @@ function bootstrapRepo(repoRoot, { force, dryRun, pkgRoot, version }) {
   bootstrapRepoV1(repoRoot, { force, dryRun, pkgRoot });
 }
 
+
+/** Every **specloom-x** / **document-x** reference must resolve to a live agent or skill. */
+function verifyPackage(pkgRoot) {
+  const agentsDir = path.join(pkgRoot, "cursor", "agents");
+  const skillsDir = path.join(pkgRoot, "cursor", "skills");
+  const sharedDir = path.join(pkgRoot, "shared-skills");
+  const dirNames = (d) =>
+    fs.existsSync(d) ? fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : [];
+
+  const skills = new Set([...dirNames(skillsDir), ...dirNames(sharedDir)]);
+  const agents = new Set(
+    fs.existsSync(agentsDir) ? fs.readdirSync(agentsDir).filter((f) => f.endsWith(".md")).map((f) => f.replace(/\.md$/, "")) : []
+  );
+
+  // retired names, but NOT their hyphenated descendants (specloom-brief-plan is live)
+  const RETIRED =
+    /\b(specloom-(run|brief|planner|init|build|build-worker|build-check|test-loop|validate|validate-loop|sync|standardized-loop|worker-validation)(?![-\w])|sdd-[a-z-]+)/g;
+  // real things that are not agents or skills
+  const EXTERNAL = new Set(["specloom-standards"]);
+  const problems = [];
+  let stubs = 0, files = 0;
+
+  for (const file of [...walkFiles(agentsDir), ...walkFiles(skillsDir)]) {
+    if (!file.endsWith(".md")) continue;
+    files++;
+    const text = fs.readFileSync(file, "utf8");
+    const rel = path.relative(pkgRoot, file);
+    if (/Status:\s*STUB/.test(text)) { stubs++; problems.push(`${rel}: still a STUB`); }
+    for (const m of text.matchAll(/\*\*((?:specloom|document|code|test)-[a-z0-9-]+)\*\*/g)) {
+      if (!skills.has(m[1]) && !agents.has(m[1]) && !EXTERNAL.has(m[1])) problems.push(`${rel}: references ${m[1]} — not an agent or skill`);
+    }
+    for (const m of text.matchAll(RETIRED)) problems.push(`${rel}: names retired agent ${m[0]}`);
+    // v3 also forbids self-reported token/cost fields — an agent cannot measure itself
+    for (const m of text.matchAll(/\b(tokens_used|tokens_spent_by_agent|estimated_tokens|self_reported_cost)\b/g)) {
+      const ln = text.slice(0, m.index).split("\n").length;
+      const src = text.split("\n")[ln - 1] || "";
+      if (!/\b(v1|v2|retired?s?|no longer|there is no|does not exist|do not exist|forbid|invented|never)\b/i.test(src))
+        problems.push(`${rel}:${ln}: self-reported usage field ${m[1]} — use a receipt`);
+    }
+    // v3 retired every self-assigned score; prose *about* the retirement is allowed
+    for (const m of text.matchAll(/\b(confidence_score|code_confidence|ux_confidence)\b/g)) {
+      const line = text.slice(0, m.index).split("\n").length;
+      const src = text.split("\n")[line - 1] || "";
+      if (!/\b(v2|retired?s?|no longer|there is no|does not exist|do not exist|replaces?d?|is gone)\b/i.test(src))
+        problems.push(`${rel}:${line}: uses retired score ${m[1]}`);
+    }
+    const fm = text.match(/^---\n([\s\S]*?)\n---/);
+    if (fm && file.endsWith("SKILL.md")) {
+      const name = (fm[1].match(/^name:\s*(\S+)/m) || [])[1];
+      const dir = path.basename(path.dirname(file));
+      if (name !== dir) problems.push(`${rel}: frontmatter name "${name}" != directory "${dir}"`);
+    }
+  }
+
+  // orphans: a managed skill directory no agent declares. Catches stale skills left behind
+  // when a version is edited in place — nothing references them, so nothing else notices.
+  const declared = new Set();
+  for (const f of walkFiles(agentsDir)) {
+    if (!f.endsWith(".md")) continue;
+    for (const m of fs.readFileSync(f, "utf8").matchAll(/\*\*((?:specloom|document|code|test)-[a-z0-9-]+)\*\*/g))
+      declared.add(m[1]);
+  }
+  // a skill referenced by another skill counts as reachable too
+  for (const f of walkFiles(skillsDir)) {
+    if (!f.endsWith(".md")) continue;
+    for (const m of fs.readFileSync(f, "utf8").matchAll(/\*\*((?:specloom|document|code|test)-[a-z0-9-]+)\*\*/g))
+      declared.add(m[1]);
+  }
+  for (const name of dirNames(skillsDir)) {
+    if (!declared.has(name)) problems.push(`cursor/skills/${name}/: orphan — no agent or skill references it`);
+  }
+
+  const uniq = [...new Set(problems)];
+  if (!uniq.length) {
+    console.log(`[verify] OK — ${agents.size} agents, ${skills.size} skills, ${files} files, 0 stubs, all references resolve.`);
+    return 0;
+  }
+  console.error(`[verify] ${uniq.length} problem(s)${stubs ? ` (${stubs} stub)` : ""}:`);
+  for (const p of uniq) console.error("  " + p);
+  return 1;
+}
+
+
+/**
+ * Remove every managed agent file and skill directory from a target pair.
+ * Switching versions leaves orphans otherwise — v1 ships ~24 agents, v2 ships 8, v3 ships 8,
+ * and the names barely overlap, so an un-cleaned upgrade leaves the old ones loaded and live.
+ */
+function cleanTarget({ label, agentsDir, skillsDir, dryRun }) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  let agents = 0, skills = 0, swept = 0;
+
+  // Sweep litter from the old backup scheme first: *.removed-* / *.specloom-backup-* siblings
+  // still register as skills and tax every session's context.
+  const LITTER = /\.(removed|specloom-backup)-/;
+  for (const dir of [agentsDir, skillsDir]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!LITTER.test(e.name)) continue;
+      const full = path.join(dir, e.name);
+      if (dryRun) console.log(`[dry-run] ${label}: sweep litter ${e.name}`);
+      else { moveToAttic(full, stamp); console.log(`[sweep] ${label}: ${e.name}`); }
+      swept++;
+    }
+  }
+
+  if (fs.existsSync(agentsDir)) {
+    for (const f of fs.readdirSync(agentsDir)) {
+      if (!f.endsWith(".md")) continue;
+      const base = f.replace(/\.md$/, "");
+      if (!MANAGED_SKILL_PREFIXES.some((p) => base.startsWith(p)) && base !== "specloom") continue;
+      const full = path.join(agentsDir, f);
+      if (dryRun) console.log(`[dry-run] ${label}: remove agent ${f}`);
+      else { moveToAttic(full, stamp); console.log(`[clean] ${label}: ${f}`); }
+      agents++;
+    }
+  }
+
+  if (fs.existsSync(skillsDir)) {
+    for (const d of fs.readdirSync(skillsDir, { withFileTypes: true })) {
+      if (!d.isDirectory()) continue;
+      if (!MANAGED_SKILL_PREFIXES.some((p) => d.name.startsWith(p))) continue;
+      const full = path.join(skillsDir, d.name);
+      if (dryRun) console.log(`[dry-run] ${label}: remove skill ${d.name}/`);
+      else { moveToAttic(full, stamp); console.log(`[clean] ${label}: ${d.name}/`); }
+      skills++;
+    }
+  }
+
+  console.log(`[clean] ${label}: ${agents} agent(s), ${skills} skill(s), ${swept} litter file(s)${dryRun ? " (dry run)" : ` → attic/${stamp}/`}`);
+  return { agents, skills, swept };
+}
+
 function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) {
     usage();
     return;
+  }
+
+  const verifyRoot = versionPackageRoot(opts.version);
+  if (opts.verify) process.exit(verifyPackage(verifyRoot));
+  if ((opts.version === "v3" || opts.version === "v4") && verifyPackage(verifyRoot) !== 0) {
+    console.error("\nRefusing to install with unresolved references. Fix them or use --dry-run.");
+    process.exit(1);
   }
 
   const pkgRoot = versionPackageRoot(opts.version);
@@ -697,24 +896,60 @@ function main() {
   console.log(`Package: ${pkgRoot}`);
   console.log(`Home:    ${homeDir()}`);
 
+  if (opts.clean) {
+    console.log("\n== Clean ==");
+    if (opts.cursor)
+      cleanTarget({ label: "cursor", agentsDir: path.join(homeDir(), ".cursor", "agents"),
+                    skillsDir: path.join(homeDir(), ".cursor", "skills"), dryRun: opts.dryRun });
+    if (opts.claude)
+      cleanTarget({ label: "claude", agentsDir: claudeAgentsDir(), skillsDir: claudeSkillsDir(), dryRun: opts.dryRun });
+    if (opts.codex)
+      cleanTarget({ label: "codex", agentsDir: path.join(homeDir(), ".codex", "agents"),
+                    skillsDir: path.join(homeDir(), ".agents", "skills"), dryRun: opts.dryRun });
+    console.log("  Nothing is deleted — entries are moved to <repo>/attic/<timestamp>/.");
+  }
+
   if (opts.cursor) installCursor(opts);
-  if (opts.codex) installCodex(opts);
+  const codexResult = opts.codex ? installCodex(opts) : null;
   if (opts.claude) installClaude(opts);
-  if (opts.antigravity) installAntigravity(opts);
+  let agyRefused = false;
+  if (opts.antigravity) {
+    const agySrc = path.join(versionPackageRoot(opts.version), "antigravity");
+    if (!fs.existsSync(agySrc)) {
+      console.error(`\n[refused] Antigravity: ${opts.version} has no antigravity/ (rules + workflows).`);
+      console.error(`          Use --cursor or --claude.`);
+      agyRefused = true;
+    } else installAntigravity(opts);
+  }
   if (opts.bootstrap) bootstrapRepo(opts.bootstrap, opts);
 
   console.log("\nDone.");
   const peers =
-    opts.version === "v2"
+    opts.version === "v4"
+      ? "specloom-document (docs); execution: main thread → specloom-project-manager → specloom-run-set workflow"
+      : opts.version === "v3" || opts.version === "v2"
       ? "specloom, specloom-document"
       : "specloom-work-creator, specloom-implement, specloom-validator, specloom-tester, specloom-git";
   if (opts.cursor) console.log(`Cursor peers: @${peers.replace(/, /g, ", @")}`);
-  if (opts.codex) console.log(`Codex peers:  ${peers}`);
+  if (opts.version === "v3") {
+    console.log(`\nv3: findings replace confidence scores; attempts are per gate.`);
+    console.log(`Contract: package/v3/cursor/skills/specloom-contract/SKILL.md`);
+  }
+  if (opts.version === "v4") {
+    console.log(`\nv4: no orchestrator — talk to Claude Code directly. Control flow is the`);
+    console.log(`specloom-run-set Workflow script (~/.claude/workflows). Two gates per Brief;`);
+    console.log(`deep security runs in CI (.github/workflows/pr-check.yml).`);
+    console.log(`Contract: package/v4/cursor/skills/specloom-contract/SKILL.md`);
+  }
+  if (opts.codex && codexResult && !codexResult.refused) console.log(`Codex peers:  ${peers}`);
   if (opts.claude) {
     console.log(`Claude Code:  ${peers} (agents in ~/.claude/agents, skills in ~/.claude/skills)`);
-    console.log(`  Entry: ask for specloom / @specloom — restart Claude Code if ~/.claude was new`);
+    if (opts.version === "v4")
+      console.log(`  Entry: just talk to Claude Code — no @specloom; restart Claude Code to pick up changes`);
+    else
+      console.log(`  Entry: ask for specloom / @specloom — restart Claude Code if ~/.claude was new`);
   }
-  if (opts.antigravity) {
+  if (opts.antigravity && !agyRefused) {
     console.log(`Antigravity:  /${peers.replace(/, /g, ", /")}`);
     console.log(`  agents:    ${antigravityGlobalAgentsDir()}`);
     console.log(`  skills:    ${antigravityGlobalSkillsDir()}`);
