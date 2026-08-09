@@ -16,7 +16,7 @@ All Projects + Issues use that team. Never Specloom meta-team for product work.
 ## Create Phase (from Overview)
 
 1. Read Overview Project/Document on product team  
-2. Create Linear Project + Document (Reason · Goal · In/Out · Quality · Completion) with `setTeams: [team_name]`  
+2. Create Linear Project + Document (Reason · Goal · In/Out · Quality · Completion) with `setTeams: [team_name]` — Project name `P<n> — <name>`, numbered from P0 (**specloom-planning**)  
 3. One Project **In Progress**; rest Planned  
 4. Multiple Briefs per Phase — never one mega-Brief  
 
@@ -25,7 +25,7 @@ All Projects + Issues use that team. Never Specloom meta-team for product work.
 Every Issue must be **implementation-complete** as a spec:
 
 1. `team`: product `team_name` (Linear assigns `{KEY}-n`)  
-2. Title: clear slice (optional `[{KEY}]` prefix)  
+2. Title: `P<phase>-<i>: <clear slice>` — naming rule in **specloom-planning** (e.g. `P0-1: Scene manager`)  
 3. Labels: `brief` + layers (`frontend`|`backend`|`database`)  
 4. Body sections:
    1. Reason  

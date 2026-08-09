@@ -10,6 +10,20 @@ disable-model-invocation: true
 
 Turns an Overview into Phases, and a Phase into Briefs the run-set workflow can execute unattended.
 
+## Naming — mandatory, both trackers
+
+Phases are numbered from **P0**; work items carry their phase and position:
+
+| Item | Title format | Example |
+|------|-------------|---------|
+| Phase | `Phase P<n>: <name>` | `Phase P0: Core loop` |
+| Brief | `P<phase>-<i>: <title>` | `P0-1: Scene manager` — work item 1 in Phase 0 |
+
+`<i>` is the Brief's position within its Phase, from 1, in `queue_order` sequence at planning
+time. The `P<n>-<i>` prefix is display naming only — `brief_key` stays the tracker's native key
+(`GH-<number>` / `{KEY}-n`), and renumbering existing issues when one is inserted or removed is
+**not** done; a new Brief takes the next free `<i>` in its Phase.
+
 ## Phase boundaries
 
 A Phase is a coherent slice a user could see shipped. Not a layer.
@@ -25,7 +39,7 @@ queue.
 
 ## Brief sizing
 
-One Brief is one work branch, one stacked PR, one pass of three gates.
+One Brief is one work branch, one stacked PR, one pass of the gates.
 
 | Signal it is too big | Split by |
 |----------------------|----------|

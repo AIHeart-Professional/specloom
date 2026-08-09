@@ -20,19 +20,41 @@ In every work Brief (after Goal or in frontmatter block):
 ## Queue
 queue_order: 10
 depends_on: []          # e.g. [BUD-5, BUD-6]
-blocks: []              # open question ids if any
+blocks: []              # DERIVED — inverse of depends_on; do not hand-author
 ```
 
 - `queue_order`: integer, lower = earlier (10, 20, 30…)  
 - `depends_on`: must be **Done** before this Brief can be Ready  
+- `blocks`: **not authored** — see *Derived field: `blocks`* below  
 - Planner/brief sets order from architecture (scaffold → data → API → UI → polish)
+
+## Derived field: `blocks`
+
+`blocks` is never hand-authored. It is the **inverse of `depends_on`**, recomputed from the graph:
+
+```
+blocks(B) = { X : B ∈ depends_on(X) }
+```
+
+B blocks exactly the Briefs that name B in their own `depends_on`. Recompute it for **every
+affected Brief** whenever any `depends_on` changes — at plan time, on a Brief edit, and on any
+re-plan. A hand-edited `blocks` is overwritten on the next recompute; the field is a rendering of
+the dependency graph, not an input to it.
+
+Only the **body `blocks:` field** needs recomputing. On a tracker with native relations, writing
+`depends_on` → `blocked-by` already creates the inverse `blocking` edge automatically (see the
+adapter), so native relations stay correct without a second write.
 
 ## Ordering algorithm
 
 1. List Phase Briefs (label `brief`)  
 2. Topological sort by `depends_on` (fail if cycle → fix before Ready)  
 3. Break ties with `queue_order`, then Issue id  
-4. **Runnable** = deps all Done AND `blocks` empty AND body complete  
+4. **Runnable** = deps all Done AND no unresolved Open Questions AND body complete  
+
+Note: `blocks` is **not** a readiness gate — it is the derived inverse of `depends_on` (the
+Briefs this one unblocks). Readiness is gated by `depends_on`; unresolved Open Questions are
+tracked separately (Phase Completion criteria), not in the `blocks` field.
 
 ## How many Ready?
 

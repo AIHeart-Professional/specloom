@@ -61,12 +61,12 @@ gh issue create --repo <owner/repo> --title "Overview: <product>" \
   --type Overview --body-file overview.md
 gh issue pin <n> --repo <owner/repo>
 
-# Phase
-gh issue create --repo <owner/repo> --title "Phase 1: <name>" \
+# Phase — numbered from P0 (naming: specloom-planning)
+gh issue create --repo <owner/repo> --title "Phase P0: <name>" \
   --type Phase --body-file phase.md
 
-# Brief, parented to its Phase
-gh issue create --repo <owner/repo> --title "<brief title>" \
+# Brief, parented to its Phase — P<phase>-<i>: work item i in that Phase
+gh issue create --repo <owner/repo> --title "P0-1: <brief title>" \
   --type Brief --parent <phase-number> --body-file brief.md \
   --label specloom:backlog
 
